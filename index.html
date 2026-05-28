@@ -1,0 +1,2247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>VBet — Sportsbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Figma design tokens */
+  --bg:#010c23;
+  --bg-60:rgba(1,12,35,.6);
+  --bg-64:rgba(1,12,35,.64);
+  --main:#d80d83;
+  --main-40:rgba(216,13,131,.4);
+  --main-16:rgba(216,13,131,.16);
+  --odds:#ffad29;
+  --green:#249f58;
+  --red:#b4132b;
+  --tertiary:#ffad29;
+  --w-100:#fff;
+  --w-90:rgba(255,255,255,.9);
+  --w-80:rgba(255,255,255,.8);
+  --w-72:rgba(255,255,255,.72);
+  --w-64:rgba(255,255,255,.64);
+  --w-56:rgba(255,255,255,.56);
+  --w-48:rgba(255,255,255,.48);
+  --w-32:rgba(255,255,255,.32);
+  --w-24:rgba(255,255,255,.24);
+  --w-16:rgba(255,255,255,.16);
+  --w-12:rgba(255,255,255,.12);
+  --w-8:rgba(255,255,255,.08);
+  --w-6:rgba(255,255,255,.06);
+  --w-4:rgba(255,255,255,.04);
+  --w-2:rgba(255,255,255,.02);
+  --d-32:rgba(0,2,5,.32);
+  --d-40:rgba(0,2,5,.4);
+  --d-56:rgba(0,2,5,.56);
+  --d-80:rgba(0,2,5,.8);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:#000;font-family:'Rubik',system-ui,-apple-system,sans-serif;color:var(--w-100);font-size:14px;line-height:20px;letter-spacing:0}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+img,svg{display:block;max-width:100%}
+ul{list-style:none}
+a{color:inherit;text-decoration:none}
+
+.app{
+  width:375px;margin:0 auto;min-height:100vh;
+  background:var(--bg);position:relative;padding-bottom:114px;
+  overflow-x:hidden;
+}
+
+/* ========== STATUS BAR (40px) ========== */
+.statusbar{
+  position:relative;height:40px;width:375px;
+  background:linear-gradient(90deg,var(--w-4) 0%,var(--w-4) 100%),linear-gradient(90deg,var(--bg) 0%,var(--bg) 100%);
+}
+.statusbar .time{
+  position:absolute;left:48px;top:50%;transform:translate(-50%,-50%);
+  font-family:'SF Pro','SF Pro Display','-apple-system',sans-serif;
+  font-weight:700;font-size:14px;letter-spacing:-.3px;color:var(--w-90);text-align:center;width:54px;
+}
+.statusbar .battery{position:absolute;top:50%;right:19px;transform:translateY(-50%);width:20.926px;height:9.748px}
+.statusbar .wifi{position:absolute;top:50%;right:44.23px;transform:translateY(-50%);width:13.188px;height:9.461px}
+.statusbar .cellular{position:absolute;top:50%;right:61.72px;transform:translateY(-50%);width:14.622px;height:9.175px}
+
+/* ========== HEADER ========== */
+.header-bar{
+  width:100%;padding:8px 8px 8px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(90deg,var(--w-8) 0%,var(--w-8) 100%),linear-gradient(90deg,var(--bg-60) 0%,var(--bg-60) 100%);
+  backdrop-filter:blur(21px);
+  filter:drop-shadow(0 4px 4px rgba(0,0,0,.4));
+}
+.header-bar .vbet{width:56px;height:16px;display:block}
+.header-bar .logo-wrap{width:75px;height:32px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.header-bar .right{display:flex;align-items:center;gap:4px;position:relative}
+
+.icon-btn-pink{
+  width:32px;height:32px;border-radius:999px;background:var(--main);
+  display:flex;align-items:center;justify-content:center;
+  border-top:1px solid var(--w-24);overflow:hidden;
+}
+.icon-btn-pink img{width:16px;height:16px}
+.icon-btn-ghost{
+  width:32px;height:32px;border-radius:999px;background:var(--w-8);
+  display:flex;align-items:center;justify-content:center;
+  border-top:1px solid var(--w-16);overflow:hidden;
+}
+.icon-btn-ghost img{width:16px;height:16px}
+
+.balance{
+  height:32px;border-radius:88px;background:var(--w-8);
+  display:flex;align-items:center;gap:4px;padding:0 8px;
+}
+.balance .plus{width:16px;height:16px}
+.balance .amt{font-size:12px;line-height:16px;color:var(--w-100);font-weight:400;white-space:nowrap}
+.balance .cur{width:12px;height:12px}
+
+.header-bar .notif-dot{position:absolute;left:193px;top:0;width:8px;height:8px}
+
+/* ========== SUBNAV / MY ZONE (64px) ========== */
+.subnav{
+  width:100%;padding:16px 8px;
+  display:flex;flex-direction:column;gap:16px;align-items:flex-start;justify-content:center;
+  background:linear-gradient(90deg,var(--w-4) 0%,var(--w-4) 100%),linear-gradient(90deg,var(--bg) 0%,var(--bg) 100%);
+  backdrop-filter:blur(4px);
+  filter:drop-shadow(0 4px 4px rgba(0,0,0,.1));
+}
+.subnav-row{display:flex;align-items:flex-start;gap:8px;width:100%}
+.subnav .my-zone{
+  flex:none;width:279px;height:32px;border:1px solid var(--main-40);border-radius:32px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:4px 16px;
+  background:
+    radial-gradient(ellipse 150px 8px at center bottom, rgba(216,13,131,0.4), transparent 70%);
+}
+.subnav .my-zone .label{font-size:14px;line-height:20px;color:var(--w-72)}
+.subnav .my-zone .stats{display:flex;align-items:center;gap:8px}
+.subnav .my-zone .stat{display:flex;align-items:center;gap:2px}
+.subnav .my-zone .stat img{width:16px;height:16px;display:block}
+.subnav .my-zone .stat .num{
+  background:var(--d-40);border-radius:8px;width:20px;height:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;line-height:16px;color:var(--w-72);
+}
+.subnav .my-zone .divider{height:16px;width:1px;background:var(--w-16)}
+
+/* ========== BANNER ========== */
+.banner-wrap{position:relative;padding:0 8px;width:100%}
+.banner-card{
+  position:relative;width:100%;height:192px;border-radius:12px;overflow:hidden;
+  border:1.176px solid var(--w-8);
+  background:#010c23;
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+/* ---- New banner layers ---- */
+.bnr-bg{position:absolute;inset:0;border-radius:12px;pointer-events:none;z-index:0;overflow:hidden}
+.bnr-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.48;border-radius:12px}
+.bnr-dark{position:absolute;inset:0;background:rgba(0,2,5,0.08);pointer-events:none;z-index:0;border-radius:12px}
+.bnr-trophy{
+  position:absolute;left:29.63%;top:-7.66px;width:39.79%;height:191px;
+  filter:blur(0.95px);pointer-events:none;z-index:1;
+}
+.bnr-trophy img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.16}
+.bnr-ar-player{
+  position:absolute;left:62.76%;top:42.82px;width:35.63%;height:134px;
+  overflow:hidden;pointer-events:none;z-index:2;
+}
+.bnr-ar-player img{
+  position:absolute;height:100%;left:-54.64%;top:0;width:209.29%;max-width:none;display:block;
+}
+.bnr-mbappe{
+  position:absolute;left:-12.56%;top:37.82px;
+  width:61.56%;height:197px;
+  pointer-events:none;z-index:3;
+}
+.bnr-mbappe img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+/* Event info: team badges + UCL center */
+.bnr-event{
+  position:relative;z-index:4;width:100%;height:116px;
+  display:flex;align-items:flex-end;justify-content:center;padding-top:17px;
+}
+.bnr-team-l{
+  width:100px;flex-shrink:0;
+  display:flex;flex-direction:column;align-items:flex-end;justify-content:center;
+  padding:12px 0;
+}
+.bnr-team-r{
+  width:100px;flex-shrink:0;
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
+  padding:12px 0;
+}
+.bnr-badge{position:relative;width:40px;height:40px;flex-shrink:0;overflow:hidden}
+.bnr-badge img{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:contain}
+.bnr-badge-ar{position:relative;width:40px;height:40px;flex-shrink:0}
+.bnr-badge-ar img{position:absolute;height:40px;left:3px;top:0;width:34px;display:block}
+.bnr-center{
+  flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;padding:0 4.706px;
+  backdrop-filter:blur(1.059px);border-radius:11.765px;
+}
+.bnr-ucl{width:67px;height:64px;position:relative;flex-shrink:0}
+.bnr-ucl img{position:absolute;inset:0;width:100%;height:100%;display:block}
+.bnr-dateinfo{display:flex;flex-direction:column;align-items:center;text-align:center}
+.bnr-date{font-size:12px;line-height:16px;font-weight:400;color:rgba(255,255,255,0.72);white-space:nowrap}
+.bnr-time{font-size:12px;line-height:16px;font-weight:500;color:#fff;white-space:nowrap}
+/* Odds bar */
+.bnr-odds{
+  position:relative;z-index:4;width:100%;
+  background:rgba(0,2,5,0.32);backdrop-filter:blur(16px);
+  border-bottom-left-radius:12px;border-bottom-right-radius:12px;
+  padding:2px 12px 12px;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.bnr-teamnames{display:flex;align-items:center;justify-content:space-between;width:100%;white-space:nowrap}
+.bnr-tn{font-size:12px;line-height:16px;font-weight:500;color:#fff;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.bnr-tn-r{width:93px;text-align:center}
+.banner-card .basketball{
+  position:absolute;left:131.22px;top:28.22px;width:204.953px;height:204.953px;
+  display:flex;align-items:center;justify-content:center;pointer-events:none;
+}
+.banner-card .basketball .inner{
+  width:146.955px;height:142.892px;transform:rotate(-45deg);opacity:.48;
+  filter:drop-shadow(0 0 13.815px rgba(218,154,14,.16)) drop-shadow(0 0 103.612px rgba(207,70,39,.32));
+  position:relative;overflow:hidden;
+}
+.banner-card .basketball img{
+  position:absolute;height:93.68%;left:5.87%;top:6.16%;width:90.12%;max-width:none;display:block;
+}
+.banner-card .trophy{
+  position:absolute;left:205px;top:14px;width:127.333px;height:191px;
+  filter:blur(3.15px);
+}
+.banner-card .trophy img{width:100%;height:100%;object-fit:cover}
+
+.banner-card .league{
+  position:relative;z-index:2;width:100%;padding:12px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:var(--w-2);backdrop-filter:blur(0px);
+  border-top-left-radius:12px;border-top-right-radius:12px;
+}
+.banner-card .league-row{display:flex;align-items:center;gap:4.706px;width:100%}
+.flag-uk{display:inline-grid;place-items:start;position:relative;width:24px;height:24px}
+.flag-uk .bg{grid-area:1/1;width:24px;height:24px;opacity:0}
+.flag-uk .img-wrap{grid-area:1/1;display:inline-grid;place-items:start;margin:6px 0 0 2px}
+.flag-uk .mask{grid-area:1/1;width:20px;height:12px;background:#d8d8d8;border-radius:1.905px}
+.flag-uk .img-clip{grid-area:1/1;width:24.348px;height:12px;margin:0 0 0 -2.17px;overflow:hidden}
+.flag-uk .img-clip img{width:100%;height:100%;display:block}
+.banner-card .league-name{
+  flex:1 0 0;font-size:14px;line-height:20px;color:var(--w-72);text-align:center;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+
+.banner-card .wrapper{
+  position:relative;z-index:2;width:100%;padding:6px 12px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.banner-card .team-logos{display:flex;align-items:center}
+.banner-card .team-logos > div{position:relative;width:24px;height:24px}
+.banner-card .team-logos > div:first-child{margin-right:-8px}
+.banner-card .team-logos img{position:absolute;inset:0;width:100%;height:100%;display:block}
+.banner-card .teams{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.banner-card .team{display:flex;align-items:center;gap:4px;width:100%;height:20px}
+.banner-card .team p{
+  font-weight:500;font-size:14px;line-height:20px;color:var(--w-90);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;
+}
+
+.banner-card .odds{
+  position:relative;z-index:2;width:100%;padding:12px;
+  background:var(--w-2);backdrop-filter:blur(16px);
+  border-bottom-left-radius:12px;border-bottom-right-radius:12px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.banner-card .odds-row{display:flex;height:36px;gap:8px;width:100%;justify-content:flex-end}
+.bet-opt{
+  flex:1 0 0;min-width:0;background:var(--w-8);border:1.019px solid var(--w-4);
+  border-radius:6.113px;display:flex;align-items:center;justify-content:space-between;
+  padding:8px 12px;
+}
+.bet-opt .l{font-size:14px;line-height:20px;color:var(--w-48)}
+.bet-opt .o{font-size:14px;line-height:20px;color:var(--w-90)}
+
+.dots{display:flex;gap:6px;justify-content:center;padding:8px 0}
+.dots span{width:6px;height:6px;border-radius:50%;background:var(--w-16)}
+.dots span.active{background:var(--w-72);width:18px;border-radius:3px}
+
+.cons-badge{
+  position:absolute;top:8px;left:16px;z-index:5;
+  background:rgba(0,0,0,.5);backdrop-filter:blur(8px);
+  height:24px;padding:0 10px;border-radius:999px;
+  display:flex;align-items:center;font-size:10px;color:var(--w-72);
+}
+
+/* ========== STORIES ========== */
+.stories{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:0 8px;width:100%;
+}
+.story{display:flex;flex-direction:column;align-items:center;gap:8px;flex:none;position:relative}
+.story .ring{
+  position:relative;border:2px solid var(--main);border-radius:98.18px;
+  padding:4px;display:flex;align-items:center;justify-content:center;
+}
+.story .ring.seen{border-color:var(--w-24)}
+.story .img-wrap{
+  position:relative;width:64px;height:64px;border-radius:80px;
+  display:flex;align-items:center;justify-content:center;padding:10px;
+  overflow:hidden;
+}
+.story .img-bg{
+  position:absolute;inset:0;border-radius:80px;overflow:hidden;
+}
+.story .img-bg img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:80px;
+}
+.story .img-bg::after{content:"";position:absolute;inset:0;background:var(--bg);border-radius:80px}
+.story .exclusive{
+  position:relative;width:67px;height:67px;
+  overflow:hidden;pointer-events:none;flex-shrink:0;
+}
+.story .exclusive img{
+  position:absolute;top:0;height:100%;width:235.71%;max-width:none;
+  display:block;
+}
+.story .title{
+  font-size:12px;line-height:16px;letter-spacing:.4px;color:var(--w-100);
+  text-align:center;font-weight:400;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:86px;
+}
+
+/* ========== JACKPOT ========== */
+.section{padding:24px 8px 0;width:100%}
+.section-title{padding:0 8px;width:100%}
+.section-title h2,.section-title-row h2{
+  flex:1;font-size:14px;line-height:20px;font-weight:400;color:var(--w-72);
+}
+.section-title-row{display:flex;align-items:center;gap:8px;width:100%;margin-bottom:8px}
+
+.jackpot{
+  position:relative;width:100%;max-width:359px;margin:0 auto;
+  height:167px;overflow:visible;
+}
+.jk-ball{
+  position:absolute;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;z-index:2;
+}
+.jk-ball img{display:block;object-fit:cover;pointer-events:none}
+.jackpot-card{
+  position:absolute;left:0;right:0;top:23.04px;bottom:0;
+  padding:56px 8px 8px;border-radius:8px;
+  background:rgba(255,255,255,0.04);border-top:1px solid rgba(255,255,255,0.16);
+  backdrop-filter:blur(15px);
+  display:flex;flex-direction:column;gap:8px;overflow:hidden;z-index:1;
+}
+/* BetConstruct logo */
+.jk-logo{position:absolute;left:50%;top:12px;transform:translateX(-50%);width:98px;height:25px}
+.jk-bolt{position:absolute;top:3px;left:92.3px;width:5.7px;height:7.36px}
+.jk-bolt img{width:100%;height:100%;display:block}
+.jk-text-mask{
+  position:absolute;top:10.64px;left:6px;width:83.77px;height:8px;
+  -webkit-mask-image:url(assets/jk-logo-mask.svg);mask-image:url(assets/jk-logo-mask.svg);
+  -webkit-mask-mode:luminance;mask-mode:luminance;
+  -webkit-mask-size:100% 100%;mask-size:100% 100%;
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+}
+.jk-text-mask img{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* "SPORT Jackpot" title */
+.jackpot-card .title{
+  position:absolute;left:50%;top:43px;transform:translate(-50%,-50%);
+  font-weight:600;font-size:12px;line-height:16px;
+  color:#ffad29;text-shadow:0 0 10px rgba(255,181,30,.3);
+  text-transform:uppercase;white-space:nowrap;letter-spacing:0;
+}
+/* Info icon */
+.jk-info{position:absolute;right:8px;top:7px;width:16px;height:16px;overflow:hidden}
+.jk-info-inner{position:absolute;inset:4.17%}
+.jk-info-inner img{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* Pool rows */
+.jp-row{display:flex;gap:8px;width:100%}
+.jp-cell{
+  flex:1;min-width:0;background:rgba(255,255,255,0.04);border-radius:8px;height:36px;
+  display:flex;align-items:center;padding:4px 8px;gap:4px;
+}
+.jp-medal{width:28px;height:28px;object-fit:cover;flex-shrink:0}
+.jp-cell .meta{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start}
+.jp-cell .meta .k{font-size:8px;line-height:12px;color:rgba(255,255,255,0.64);letter-spacing:.4px;text-transform:uppercase}
+.jp-cell .meta .v{font-size:12px;line-height:16px;color:#fff;font-weight:500;white-space:nowrap}
+.jp-cell .meta .v.red{text-shadow:0 0 5px #ff3131}
+.jp-cell .meta .v.red10{text-shadow:0 0 10px #ff3131}
+.jp-cell .meta .v.blue10{text-shadow:0 0 10px #00538c}
+.jp-cell .meta .v.blue6{text-shadow:0 0 6px #00538c}
+
+/* ========== TOP COMPETITIONS ========== */
+.competitions{
+  display:flex;gap:8px;padding:0 8px;overflow-x:auto;scrollbar-width:none;
+  width:100%;
+}
+.competitions::-webkit-scrollbar{display:none}
+.comp-chip{
+  flex:none;height:52px;display:flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:6px;background:var(--w-4);backdrop-filter:blur(20px);
+  position:relative;overflow:hidden;
+}
+.comp-chip .glow{
+  position:absolute;top:50%;left:0;transform:translateY(-50%);width:64px;height:64px;
+  background:#fff;border-radius:266.4px;opacity:.08;filter:blur(12px);
+}
+.comp-chip .glow.blue{background:#1556e4}
+.comp-chip .logo-wrap{position:relative;width:24px;height:24px;background:#fff;border-radius:99.9px;flex:none;overflow:hidden}
+.comp-chip .logo-wrap.blue{background:#1556e4}
+.comp-chip .logo-wrap img{position:absolute;display:block}
+.comp-chip .name{font-size:14px;line-height:20px;color:var(--w-64);white-space:nowrap}
+
+/* ========== TOP WINNERS ========== */
+.winners-row{display:flex;gap:8px;padding:0 8px;overflow-x:auto;scrollbar-width:none;width:100%}
+.winners-row::-webkit-scrollbar{display:none}
+.winner{
+  flex:none;width:290px;background:var(--w-4);border-radius:8px;
+  padding:8px 12px;display:flex;flex-direction:column;gap:8px;
+}
+.winner .head{display:flex;align-items:center;gap:8px;width:100%}
+.winner .head img{width:24px;height:24px;flex:none;display:block;border-radius:50%}
+.winner .head .sport{
+  font-size:12px;line-height:16px;letter-spacing:.4px;color:var(--w-64);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.winner .details{padding:0 4px;display:flex;align-items:center;width:100%}
+.winner .user-info{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.winner .meta-row{display:flex;align-items:center;gap:4px;font-size:12px;letter-spacing:.4px}
+.winner .meta-row .odds{color:var(--w-90);font-weight:500;line-height:16px}
+.winner .meta-row .type{color:var(--w-48);line-height:16px}
+.winner .amounts{display:flex;align-items:center;justify-content:space-between;width:100%}
+.winner .amount{font-size:16px;line-height:24px;font-weight:500;color:var(--w-90);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.winner .time{font-size:12px;line-height:16px;letter-spacing:.4px;color:var(--w-64)}
+
+/* ========== SINGLE EVENT WIDGETS ========== */
+.events-row{display:flex;gap:8px;padding:0 8px;overflow-x:auto;scrollbar-width:none;width:100%}
+.events-row::-webkit-scrollbar{display:none}
+.event-card{
+  position:relative;flex:none;width:340px;border:1px solid var(--w-8);
+  border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:16px;
+  overflow:hidden;
+}
+.event-card .bg{position:absolute;inset:0;border-radius:8px;background:var(--w-4)}
+.event-card .bg img{position:absolute;inset:-60px;width:calc(100% + 120px);height:calc(100% + 120px);object-fit:cover;opacity:.22;filter:blur(47px)}
+.event-card > *{position:relative;z-index:1}
+.event-card .ev-head{display:flex;align-items:center;justify-content:center;width:100%;border-bottom:1px solid var(--w-8);padding-bottom:16px}
+.event-card .ev-head .row{display:flex;align-items:center;gap:4.706px;flex:1;min-width:0}
+.event-card .ev-head .sport-icon{width:24px;height:24px;flex:none}
+.event-card .ev-head .lg-name{
+  flex:1;font-size:14px;line-height:20px;color:var(--w-64);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;
+}
+.event-card .live-pill{
+  height:20px;min-width:20px;padding:2px 6px;background:var(--red);
+  border-radius:999px;display:flex;align-items:center;justify-content:center;
+  font-size:12px;line-height:16px;font-weight:500;color:var(--w-90);
+}
+.event-card .match{display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.event-card .team{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0}
+.event-card .team .logo{width:32px;height:32px;border-radius:8px;overflow:hidden;position:relative;flex-shrink:0}
+/* Fulham-style: inset 10% 19.96% 10% 20% */
+.event-card .team .logo .logo-inner{position:absolute;inset:10% 19.96% 10% 20%}
+.event-card .team .logo .logo-inner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* Aston Villa-style: centered 28px inner, image slightly oversized */
+.event-card .team .logo .logo-av{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:28px;height:28px;overflow:hidden}
+.event-card .team .logo .logo-av img{position:absolute;left:-11.35%;top:-11.35%;width:122.7%;height:122.7%;max-width:none}
+.event-card .team .nm{font-size:14px;line-height:20px;font-weight:500;color:var(--w-90);white-space:nowrap}
+.event-card .info-mid{flex:1 0 0;min-width:1px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.event-card .score{background:var(--w-80);border-radius:2px;padding:2px 8px;display:flex;align-items:center;justify-content:center}
+.event-card .score p{font-size:14px;line-height:20px;font-weight:500;color:#000205}
+.event-card .min{font-size:14px;line-height:20px;font-weight:500;color:var(--w-72);text-align:center;width:52px}
+.event-card .bet-opts{display:flex;gap:2px;width:100%}
+.event-card .bet-opts .bet-opt{
+  flex:1;min-width:0;overflow:hidden;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 16px;border-radius:4px;
+  background:var(--w-8);
+  border:1.019px solid rgba(255,255,255,.04);
+}
+.event-card .bet-opts .bet-opt:not(:first-child){padding:8px 12px}
+.event-card .bet-opts .bet-opt .l{font-size:12px;line-height:16px;color:var(--w-32)}
+.event-card .bet-opts .bet-opt .o{font-size:14px;line-height:20px;color:var(--odds)}
+
+/* ========== MULTIPLE OF THE DAY ========== */
+.motd-card{
+  position:relative;padding:16px;border-radius:8px;
+  border:1px solid rgba(255,255,255,0.08);
+  backdrop-filter:blur(47px);
+  background:
+    linear-gradient(235.22deg,rgba(132,107,58,0.314) 1.48%,rgba(132,107,58,0) 47%),
+    linear-gradient(90deg,rgba(255,255,255,0.02) 0%,rgba(255,255,255,0.02) 100%);
+  display:flex;flex-direction:column;gap:8px;overflow:visible;
+}
+.motd-bonus{
+  position:absolute;right:-9px;top:11px;
+  display:flex;flex-direction:column;align-items:flex-end;
+}
+.motd-bonus-label{
+  background:#ffad29;padding:4px;
+  border-radius:4px 4px 0 4px;
+  font-size:10px;font-weight:600;line-height:14px;letter-spacing:0.4px;
+  color:#000205;white-space:nowrap;
+}
+.motd-bonus-tail{width:8px;height:10px;transform:rotate(180deg)}
+.motd-bonus-tail img{width:100%;height:100%;display:block}
+.motd-header{padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.motd-league{display:flex;align-items:center;gap:4px}
+.motd-league span{font-size:14px;line-height:20px;color:rgba(255,255,255,0.72);font-weight:400;white-space:nowrap}
+.motd-dot{position:relative;flex-shrink:0;display:inline-flex}
+.motd-dot.sz6{width:6px;height:6px}
+.motd-dot.sz4{width:4px;height:4px}
+.motd-dot img{position:absolute;inset:0;width:100%;height:100%;max-width:none;display:block}
+.motd-body{display:flex;flex-direction:column;width:100%}
+.motd-row{display:flex;gap:4px;width:100%}
+.motd-row-icon{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  width:20px;flex-shrink:0;padding-bottom:4px;align-self:stretch;
+}
+.motd-row-icon.last{padding-bottom:0}
+.motd-icon{width:16px;height:16px;position:relative;flex-shrink:0}
+.motd-icon img{position:absolute;inset:8.33%;width:83.33%;height:83.33%;max-width:none}
+.motd-spacer{flex:1 0 0;min-height:1px;width:1px;background:rgba(255,255,255,0.12)}
+.motd-row-info{
+  flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;
+  padding-top:2px;padding-bottom:16px;
+}
+.motd-row-info.last{padding-bottom:2px;gap:2px}
+.motd-event-info{display:flex;align-items:center;gap:16px;width:100%}
+.motd-teams{
+  flex:1;min-width:0;font-size:12px;line-height:16px;font-weight:400;
+  color:rgba(255,255,255,0.56);letter-spacing:0.4px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.motd-date{
+  display:flex;align-items:center;gap:4px;flex-shrink:0;
+  font-size:12px;line-height:16px;color:rgba(255,255,255,0.56);letter-spacing:0.4px;white-space:nowrap;
+}
+.motd-market-info{display:flex;align-items:flex-end;justify-content:space-between;width:100%}
+.motd-market-label{display:flex;gap:4px;align-items:center;flex:1;min-width:0}
+.motd-market{font-size:14px;line-height:20px;font-weight:400;color:rgba(255,255,255,0.56);flex-shrink:0}
+.motd-selection{font-size:14px;line-height:20px;font-weight:500;color:rgba(255,255,255,0.8);flex-shrink:0}
+.motd-odds{font-size:14px;line-height:20px;font-weight:500;color:rgba(255,255,255,0.72);flex-shrink:0}
+.motd-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:16px;border-top:1px solid rgba(255,255,255,0.06);
+}
+.motd-total-odds{display:flex;align-items:center;gap:4px;padding:0 4px;height:20px}
+.motd-total-label{font-size:12px;line-height:16px;color:rgba(255,255,255,0.56);letter-spacing:0.4px;white-space:nowrap}
+.motd-total-value{font-size:14px;line-height:20px;font-weight:600;color:var(--odds)}
+.motd-betslip-btn{
+  background:rgba(255,255,255,0.08);
+  border:none;border-top:1px solid rgba(255,255,255,0.16);
+  border-radius:999px;padding:4px 12px;
+  height:24px;min-height:24px;max-height:24px;min-width:56px;
+  font-family:inherit;font-size:12px;line-height:16px;font-weight:400;
+  color:rgba(255,255,255,0.9);cursor:pointer;white-space:nowrap;display:flex;align-items:center;
+}
+
+/* ========== BET BUILDER ========== */
+.bb-outer{
+  position:relative;
+  background:linear-gradient(234.87deg,rgba(216,13,131,0.077) 1.52%,rgba(216,13,131,0) 63.94%);
+  border-radius:8px;
+}
+.bb-logo-blur{
+  position:absolute;right:3px;top:0;
+  width:125px;height:125px;
+  filter:blur(6px);pointer-events:none;z-index:0;overflow:hidden;
+}
+.bb-logo-blur-inner{position:absolute;inset:16.67% -0.87% 14.42% 0.87%}
+.bb-logo-blur-inner img{position:absolute;inset:0;width:100%;height:100%;max-width:none}
+.bb-scrollbar{
+  position:absolute;right:-10px;top:60px;
+  width:6px;height:48px;max-height:164px;
+  background:rgba(255,255,255,0.64);opacity:0.4;border-radius:4px;
+  pointer-events:none;z-index:2;
+}
+.bb-card{
+  position:relative;z-index:1;
+  padding:16px;border-radius:8px;overflow:visible;
+  border:1px solid rgba(255,255,255,0.08);
+  backdrop-filter:blur(2px);
+  background:rgba(255,255,255,0.02);
+  display:flex;flex-direction:column;gap:8px;
+}
+.bb-header{
+  display:flex;flex-direction:column;gap:4px;
+  padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.bb-league{display:flex;gap:6px;align-items:center;position:relative;width:100%}
+.bb-flag{width:18px;height:13px;overflow:hidden;position:relative;flex-shrink:0}
+.bb-flag > img{position:absolute;inset:0;width:100%;height:100%;max-width:none}
+.bb-flag-group{position:absolute;inset:11.11% 24.26% 12.17% 24.26%}
+.bb-flag-group img{position:absolute;inset:0;width:100%;height:100%;max-width:none}
+.bb-league-name{
+  font-size:12px;line-height:16px;font-weight:400;
+  color:rgba(255,255,255,0.8);letter-spacing:0.4px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;
+}
+.bb-logo-icon{position:absolute;right:61px;top:-5px;width:24px;height:24px}
+.bb-logo-icon-inner{position:absolute;inset:16.67% -0.87% 14.42% 0.87%}
+.bb-logo-icon-inner img{position:absolute;inset:0;width:100%;height:100%;max-width:none}
+.bb-date{
+  display:flex;gap:4px;align-items:center;padding-left:26px;
+  font-size:12px;line-height:16px;color:rgba(255,255,255,0.56);letter-spacing:0.4px;
+}
+.bb-event-row{display:flex;gap:8px;align-items:flex-start}
+.bb-event-ic{width:16px;height:20px;position:relative;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.bb-event-ic img{position:absolute;inset:8.33%;width:83.33%;height:83.33%;max-width:none}
+.bb-event-name{
+  font-size:14px;line-height:20px;font-weight:500;color:rgba(255,255,255,0.8);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  flex:1;min-width:0;padding-bottom:8px;
+}
+.bb-selections{display:flex;flex-direction:column;width:100%}
+.bb-sel-row{display:flex;gap:6px;width:100%;align-items:flex-start}
+.bb-sel-icol{
+  width:13px;flex-shrink:0;align-self:stretch;
+  display:flex;flex-direction:column;align-items:center;
+}
+.bb-bullet-wrap{
+  width:16px;height:16px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.bb-bullet-wrap img{width:6px;height:6px;display:block}
+.bb-sel-spacer{flex:1 0 0;min-height:1px;width:1px;background:rgba(255,255,255,0.12)}
+.bb-sel-info{flex:1;min-width:0;padding-bottom:8px}
+.bb-sel-info.last{padding-bottom:0}
+.bb-sel-market{display:flex;gap:4px;align-items:flex-start;letter-spacing:0.4px;white-space:nowrap}
+.bb-mkt-lbl{font-size:12px;line-height:16px;font-weight:400;color:rgba(255,255,255,0.56);flex-shrink:0}
+.bb-mkt-val{font-size:12px;line-height:16px;font-weight:500;color:rgba(255,255,255,0.8);flex-shrink:0}
+
+/* ========== TOP OUTRIGHTS ========== */
+.to-section{padding-top:24px}
+.to-chips-row{
+  display:flex;gap:8px;padding:8px 8px 0;
+  overflow-x:auto;scrollbar-width:none;
+}
+.to-chips-row::-webkit-scrollbar{display:none}
+.to-cards-wrap{position:relative;padding-top:12px}
+.to-cards-row{
+  display:flex;gap:8px;padding:0 8px;
+  overflow-x:auto;scrollbar-width:none;
+}
+.to-cards-row::-webkit-scrollbar{display:none}
+/* Each outright card */
+.to-card{
+  position:relative;width:328px;flex-shrink:0;
+}
+.to-card-bg-logo{
+  position:absolute;right:4px;top:0;
+  width:120px;height:120px;border-radius:78.914px;
+  overflow:hidden;opacity:0.08;pointer-events:none;z-index:0;
+}
+.to-card-bg-logo img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+}
+.to-card-inner{
+  backdrop-filter:blur(8px);
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:8px;padding:16px;
+  display:flex;flex-direction:column;gap:16px;
+  position:relative;z-index:1;
+}
+/* League header inside card */
+.to-league-info{display:flex;gap:12px;align-items:flex-start}
+.to-league-logo{
+  width:48px;height:48px;border-radius:23.077px;
+  flex-shrink:0;overflow:hidden;position:relative;background:transparent;
+}
+.to-league-logo img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+}
+.to-league-details{display:flex;flex-direction:column;gap:4px;justify-content:center}
+.to-league-name{
+  font-size:14px;line-height:20px;font-weight:400;
+  color:rgba(255,255,255,0.8);white-space:nowrap;
+}
+.to-league-country{display:flex;gap:8px;align-items:center}
+.to-flag{
+  width:20px;height:14.286px;border-radius:3px;
+  overflow:hidden;flex-shrink:0;position:relative;
+}
+.to-flag img{position:absolute;inset:0;width:100%;height:100%;display:block}
+.to-country-name{
+  font-size:14px;line-height:20px;font-weight:400;
+  color:rgba(255,255,255,0.64);white-space:nowrap;
+}
+/* Bet options list */
+.to-bets{display:flex;flex-direction:column;gap:4px;width:100%}
+.to-bet-opt{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 16px;
+  background:rgba(255,255,255,0.04);
+  border:1.019px solid rgba(255,255,255,0.04);
+  border-radius:4px;overflow:hidden;
+}
+.to-bet-team{
+  font-size:12px;line-height:16px;font-weight:400;
+  color:rgba(255,255,255,0.8);white-space:nowrap;
+}
+.to-bet-odds{
+  font-size:14px;line-height:20px;font-weight:400;
+  color:rgba(255,255,255,0.8);white-space:nowrap;flex-shrink:0;
+}
+/* Scroll indicator bar */
+.to-scrollbar{
+  position:absolute;right:4px;top:80px;
+  width:6px;height:48px;max-height:164px;
+  background:rgba(255,255,255,0.64);
+  border-radius:4px;opacity:0.4;
+  pointer-events:none;z-index:2;
+}
+/* Right gradient fade + chevron nav — absolute overlay outside overflow container */
+.to-nav{
+  position:absolute;right:0;top:0;bottom:0;
+  width:88px;
+  background:linear-gradient(90deg, rgba(1,12,35,0) 0%, #010c23 94.16%);
+  display:flex;align-items:center;justify-content:flex-end;
+  padding-right:8px;
+  pointer-events:none;z-index:2;
+}
+.to-nav-btn{
+  pointer-events:all;
+  width:40px;height:40px;border-radius:999px;
+  background:rgba(255,255,255,0.12);
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.to-nav-btn img{width:20px;height:20px;display:block}
+
+/* ========== POPULAR PLAYER ========== */
+.pp-section{padding-top:24px}
+.pp-card{
+  position:relative;border-radius:8px;
+  background:linear-gradient(234.2deg,rgba(216,13,131,0.173) 0.71%,rgba(216,13,131,0) 63.75%);
+}
+.pp-inner{
+  backdrop-filter:blur(2px);
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:8px;
+  display:flex;flex-direction:column;gap:8px;
+  padding:16px;
+  position:relative;
+}
+/* Header */
+.pp-hd{
+  border-bottom:1px solid rgba(255,255,255,0.12);
+  padding-bottom:8px;width:100%;
+  padding-right:100px;
+}
+.pp-pname{
+  font-size:14px;line-height:20px;font-weight:500;
+  color:rgba(255,255,255,0.9);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.pp-meta{display:flex;gap:4px;align-items:center}
+.pp-meta span{
+  font-size:12px;line-height:16px;font-weight:400;
+  color:rgba(255,255,255,0.56);letter-spacing:0.4px;white-space:nowrap;
+}
+.pp-dot{width:4px;height:4px;position:relative;flex-shrink:0}
+.pp-dot img{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* Selections */
+.pp-sels{display:flex;flex-direction:column;padding-right:100px}
+.pp-event-row{display:flex;gap:8px;align-items:flex-start;padding-bottom:8px}
+.pp-event-ic{
+  width:16px;height:16px;position:relative;flex-shrink:0;
+}
+.pp-event-ic img{position:absolute;inset:0;width:100%;height:100%;display:block}
+.pp-event-nm{
+  font-size:14px;line-height:20px;font-weight:500;
+  color:rgba(255,255,255,0.8);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;
+}
+.pp-mkt-row{display:flex;gap:6px;align-items:flex-start}
+.pp-blt-col{
+  display:flex;flex-direction:column;align-items:center;
+  width:13px;align-self:stretch;flex-shrink:0;
+}
+.pp-blt-ic{
+  display:flex;align-items:center;justify-content:center;
+  height:16px;flex-shrink:0;
+}
+.pp-blt-ic img{width:6px;height:6px;display:block}
+.pp-blt-sp{width:1px;background:rgba(255,255,255,0.12);flex:1;min-height:1px}
+.pp-mkt-info{
+  display:flex;gap:4px;align-items:flex-start;flex:1;min-width:0;
+  padding-bottom:8px;letter-spacing:0.4px;white-space:nowrap;overflow:hidden;
+}
+.pp-mkt-lbl{font-size:12px;line-height:16px;font-weight:400;color:rgba(255,255,255,0.56);overflow:hidden;text-overflow:ellipsis}
+.pp-mkt-val{font-size:12px;line-height:16px;font-weight:500;color:rgba(255,255,255,0.8);flex-shrink:0}
+/* Footer */
+.pp-footer{
+  border-top:1px solid rgba(255,255,255,0.06);
+  padding-top:16px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.pp-odds{display:flex;gap:4px;align-items:center;padding:0 4px;height:20px}
+.pp-odds-lbl{font-size:12px;line-height:16px;font-weight:400;color:rgba(255,255,255,0.56);letter-spacing:0.4px;white-space:nowrap}
+.pp-odds-val{font-size:14px;line-height:20px;font-weight:600;color:#ffad29;white-space:nowrap}
+.pp-actions{display:flex;align-items:flex-start;width:140px}
+.pp-betslip-btn{
+  flex:1;height:24px;min-height:24px;max-height:24px;
+  background:rgba(255,255,255,0.08);
+  border:none;border-top:1px solid rgba(255,255,255,0.16);
+  border-radius:999px;padding:6px 12px;
+  font-size:12px;line-height:16px;font-weight:400;
+  color:rgba(255,255,255,0.9);white-space:nowrap;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;
+}
+/* Player image (absolute, top-right of card) */
+.pp-player-wrap{
+  position:absolute;right:3px;top:50px;
+  width:115px;
+  display:flex;flex-direction:column;align-items:center;gap:7.778px;
+  pointer-events:none;z-index:2;
+}
+.pp-player-shadow{
+  position:absolute;right:13.31px;top:-6px;
+  width:66.689px;height:74.879px;
+}
+.pp-player-shadow-blur{position:absolute;inset:0;filter:blur(3.82px)}
+.pp-player-shadow-img{position:absolute;inset:0;opacity:0.2;overflow:hidden;pointer-events:none}
+.pp-player-shadow-img img{
+  position:absolute;height:111.11%;left:-14.13%;top:-5.11%;width:124.76%;max-width:none;display:block;
+}
+.pp-player-fig{position:relative;width:57px;height:64px;overflow:hidden;flex-shrink:0}
+.pp-player-fig img{
+  position:absolute;height:111.11%;left:-14.13%;top:-5.11%;width:124.76%;max-width:none;display:block;
+}
+/* Bonus badge */
+.pp-bonus{
+  position:absolute;right:-8px;top:8px;
+  display:flex;flex-direction:column;align-items:flex-end;z-index:5;
+}
+.pp-bonus-badge{
+  background:#ffad29;padding:4px;
+  border-radius:4px 4px 0 4px;
+  display:flex;align-items:center;justify-content:center;
+}
+.pp-bonus-badge span{
+  font-size:10px;line-height:14px;font-weight:600;
+  color:#000205;letter-spacing:0.4px;white-space:nowrap;font-family:inherit;
+}
+.pp-bonus-arrow{
+  display:flex;align-items:center;justify-content:center;
+  transform:rotate(180deg);
+}
+.pp-bonus-arrow img{width:8px;height:10px;display:block}
+
+/* ========== TRENDING SPORTS ========== */
+.ts-section{padding-top:24px}
+.ts-row{
+  display:flex;gap:8px;padding:0 8px;
+  overflow-x:auto;scrollbar-width:none;
+}
+.ts-row::-webkit-scrollbar{display:none}
+.ts-card{
+  position:relative;width:100px;height:80px;
+  border-radius:8px;overflow:hidden;flex-shrink:0;
+}
+.ts-card-overlay{
+  position:absolute;inset:0;background:rgba(255,255,255,0.04);border-radius:8px;z-index:2;
+}
+.ts-card-img{
+  position:absolute;inset:0;overflow:hidden;border-radius:8px;
+  opacity:0.64;backdrop-filter:blur(1px);z-index:1;
+}
+.ts-card-img.bright{opacity:0.8;backdrop-filter:none}
+.ts-card-img.raw{opacity:1;backdrop-filter:none;border-radius:0}
+.ts-card-img img{position:absolute;max-width:none;display:block;}
+.ts-label{
+  position:absolute;left:35.5px;top:8px;
+  transform:translateX(-50%);
+  font-size:14px;line-height:20px;font-weight:500;
+  color:rgba(255,255,255,0.64);white-space:nowrap;z-index:3;
+}
+
+/* ========== GAME WIDGET ========== */
+/* --- Filters --- */
+.gw-filters{display:flex;flex-direction:column;gap:16px;padding:0 8px;margin-bottom:8px}
+.gw-tabs{display:flex;gap:16px;align-items:center;border-bottom:1px solid rgba(255,255,255,0.08)}
+.gw-tab{
+  flex:1;height:32px;display:flex;align-items:center;justify-content:center;
+  padding:4px 2px 8px;font-size:12px;line-height:16px;
+  color:rgba(255,255,255,0.56);white-space:nowrap;cursor:pointer;
+}
+.gw-tab.active{border-bottom:1px solid #fff;color:#fff;margin-bottom:-1px}
+.gw-chips{display:flex;gap:8px;align-items:center;overflow:hidden}
+.gw-chip{
+  width:32px;height:32px;border-radius:999px;
+  background:rgba(255,255,255,0.08);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;
+}
+.gw-chip.active{
+  width:auto;height:32px;padding:8px 12px;gap:4px;min-width:70px;
+  background:rgba(216,13,131,0.16);border:1px solid #d80d83;
+}
+.gw-chip-ic{width:16px;height:16px;position:relative;overflow:hidden;flex-shrink:0;opacity:.8}
+.gw-chip.active .gw-chip-ic{opacity:1}
+.gw-chip-ic img{position:absolute;inset:0;width:100%;height:100%;display:block}
+.gw-chip-label{font-size:12px;line-height:16px;font-weight:500;color:rgba(255,255,255,.9);white-space:nowrap}
+/* --- Market Tables --- */
+.gw-market-tables{display:flex;flex-direction:column;gap:4px}
+.gw-league-title{
+  display:flex;align-items:center;gap:8px;
+  padding:4px 8px;
+}
+.gw-flag-wrap{width:24px;height:24px;position:relative;flex-shrink:0}
+.gw-flag-inner{position:absolute;left:2px;top:6px;width:20px;height:12px;border-radius:1.9px;overflow:hidden}
+.gw-flag-inner img{position:absolute;left:-10.87%;top:0;width:121.74%;height:100%;max-width:none}
+.gw-league-name{font-size:14px;line-height:20px;color:rgba(255,255,255,.64);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gw-dot6{width:6px;height:6px;position:relative;flex-shrink:0;display:inline-flex}
+.gw-dot6 img{position:absolute;inset:0;width:100%;height:100%}
+/* Live Card (flat, no bg card) */
+.gw-live-card{display:flex;flex-direction:column;gap:8px;background:rgba(255,255,255,.04);margin:0 8px}
+/* Repeating match container */
+.gw-match-box{
+  display:flex;flex-direction:column;gap:8px;
+  background:rgba(255,255,255,.08);border-radius:6px;margin:0 8px;
+}
+.gw-match-box .gw-card-hd{border-bottom-color:rgba(1,12,35,0.64)}
+/* Shared card header */
+.gw-card-hd{
+  display:flex;align-items:center;gap:4px;padding:2px 8px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+.gw-live-dot{width:20px;height:20px;position:relative;overflow:hidden;flex-shrink:0}
+.gw-live-dot img{position:absolute;inset:25%;width:50%;height:50%;max-width:none}
+.gw-icon-btn{
+  width:24px;height:24px;border-radius:999px;overflow:hidden;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.gw-icon-btn .ic{width:16px;height:16px;position:relative;overflow:hidden}
+.gw-icon-btn .ic img{position:absolute;inset:0;width:100%;height:100%}
+.gw-hd-txt{font-size:12px;line-height:16px;color:rgba(255,255,255,.56);letter-spacing:.4px;white-space:nowrap}
+.gw-hd-right{display:flex;gap:4px;align-items:center;margin-left:auto;flex-shrink:0}
+/* Match body */
+.gw-match-body{padding:0 8px 8px;display:flex;flex-direction:column;gap:8px}
+/* Teams + score */
+.gw-teams-score{display:flex;align-items:flex-start;justify-content:space-between}
+.gw-team-side{display:flex;gap:8px;align-items:flex-start;flex:1;min-width:0}
+.gw-fav{
+  width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.gw-fav .ic{width:16px;height:16px;position:relative;overflow:hidden}
+.gw-fav .ic img{position:absolute;inset:0;width:100%;height:100%}
+.gw-vdiv{width:1px;align-self:stretch;background:rgba(255,255,255,.08);flex-shrink:0;margin:2px 0}
+.gw-team-names{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.gw-team-row{display:flex;gap:4px;align-items:center}
+.gw-team-logo{width:20px;height:20px;position:relative;border-radius:5px;overflow:hidden;flex-shrink:0}
+.gw-team-logo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.gw-team-nm{font-size:12px;line-height:16px;color:rgba(255,255,255,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Score columns */
+.gw-scores{display:flex;gap:8px;align-items:center;height:40px;flex-shrink:0}
+.gw-score-col{display:flex;flex-direction:column;justify-content:space-around;height:40px;align-items:flex-end;padding:4px 0}
+.gw-score-v{font-size:12px;line-height:16px;color:rgba(255,255,255,.48);white-space:nowrap}
+.gw-score-box{
+  display:flex;flex-direction:column;justify-content:space-around;height:40px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);
+  border-radius:4px;padding:4px 8px;align-items:flex-end;flex-shrink:0;
+}
+.gw-score-box .gw-score-v{color:rgba(255,255,255,.9);font-weight:500}
+/* Match result row */
+.gw-mkt-hd{display:flex;justify-content:space-between;align-items:center;padding:0 4px}
+.gw-mkt-name{font-size:12px;line-height:16px;color:rgba(255,255,255,.48);letter-spacing:.4px}
+.gw-mkt-more{font-size:12px;line-height:16px;color:rgba(255,255,255,.48)}
+/* Bet options */
+.gw-bet-opts{display:flex;gap:2px;width:100%}
+.gw-match-box .gw-bet-opts{gap:4px}
+.gw-bet-opt{
+  flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;
+  padding:8px 16px;border-radius:4px;
+  background:rgba(255,255,255,.04);border:1.019px solid rgba(255,255,255,.04);
+}
+.gw-bet-opt .l{font-size:12px;line-height:16px;color:rgba(255,255,255,.32)}
+.gw-bet-opt .o{font-size:14px;line-height:20px;color:var(--odds)}
+/* Indicator */
+.gw-indicator{display:flex;gap:4px;align-items:center;justify-content:center}
+.gw-ind{border-radius:45px;background:rgba(255,255,255,.32);flex-shrink:0}
+.gw-ind.s{width:2px;height:2px}
+.gw-ind.m{width:6px;height:6px}
+.gw-ind.a{width:14px;height:6px;background:rgba(255,255,255,.56)}
+/* Tennis match (no logos, longer names) */
+.gw-tennis-teams{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;padding-top:2px}
+.gw-tennis-name{font-size:14px;line-height:20px;color:rgba(255,255,255,.8);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ========== TOURNAMENT ========== */
+.tournament-wrap{position:relative;padding:0;width:100%;margin-top:8px}
+.tournament-image{
+  position:relative;width:100%;height:152px;border-radius:12px;overflow:hidden;
+}
+.tournament-image .img-clip{position:absolute;inset:0;overflow:hidden;border-radius:12px;opacity:.53}
+.tournament-image .img-clip img{position:absolute;left:-6.08%;top:.28%;width:112.16%;height:99.72%;max-width:none}
+.tournament-image .overlay{position:absolute;inset:0;border-radius:12px;background:linear-gradient(to bottom,rgba(0,0,0,0) 66.563%,rgba(0,0,0,.8))}
+.tournament-trophy{
+  position:absolute;left:52px;top:-10px;width:180.104px;height:180.104px;
+  display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:2;
+}
+.tournament-trophy .inner{
+  width:128.693px;height:126.012px;transform:rotate(-45deg);filter:blur(1.108px);
+  position:relative;overflow:hidden;
+}
+.tournament-trophy .inner img{
+  position:absolute;height:116.84%;left:16.73%;top:-33.74%;width:114.41%;max-width:none;
+}
+.tournament-info{
+  position:relative;margin:-48px 0 0;border-radius:12px;
+  background:var(--w-4);border-top:1px solid var(--w-16);backdrop-filter:blur(20px);
+  padding:16px;display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;
+  z-index:3;
+}
+.tournament-info .title{
+  font-size:14px;line-height:20px;font-weight:500;color:var(--w-100);text-align:center;width:251px;
+}
+.tournament-info .prize-group{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;height:48px;width:100%;padding:4px;border-radius:12px;
+}
+.tournament-info .prize-lbl{font-size:12px;line-height:16px;color:var(--w-48);text-align:center;font-weight:400}
+.tournament-info .prize-amt{
+  font-size:24px;line-height:32px;font-weight:600;color:var(--tertiary);text-align:center;
+  text-shadow:0 0 30px #ff3131;letter-spacing:0;
+}
+.countdown{
+  position:absolute;left:calc(50% - 72px);transform:translateX(-50%);top:16px;
+  background:var(--d-56);backdrop-filter:blur(40px);border-radius:8px;
+  padding:4px 16px;display:flex;gap:8px;align-items:flex-start;justify-content:center;z-index:4;
+}
+.countdown .lbl{font-size:12px;line-height:16px;color:var(--w-64)}
+.countdown .div{width:1px;height:16px;background:var(--w-16);align-self:stretch}
+.countdown .d{font-size:12px;line-height:16px;color:var(--w-100)}
+.countdown .time{display:flex;gap:2px;font-size:12px;line-height:16px;color:var(--w-100)}
+.info-i{position:absolute;right:24px;top:16px;width:16px;height:16px;z-index:4}
+
+/* ========== APPROXIMATED REMAINING SECTIONS ========== */
+.placeholder-section{
+  margin:24px 8px;padding:16px;border-radius:12px;
+  background:var(--w-4);border:1px dashed var(--w-12);
+  color:var(--w-48);font-size:12px;text-align:center;
+}
+
+/* nav styles live in nav.js */
+
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== Status Bar ===== -->
+  <div class="statusbar">
+    <p class="time">9:41</p>
+    <img class="cellular" src="assets/9a9814626f1691496dee37fbaec4dc36714c9fc3.svg" alt="">
+    <img class="wifi" src="assets/8a2078f592bc8059bdee9a1b67c5850384630832.svg" alt="">
+    <img class="battery" src="assets/f555df63f6a65f0f822624125f6922109416d804.svg" alt="">
+  </div>
+
+  <!-- ===== Header ===== -->
+  <div class="header-bar">
+    <div class="logo-wrap">
+      <img class="vbet" src="assets/c7ee4cb442a696c4b22400e87d4d4564d77ee63d.svg" alt="VBet">
+    </div>
+    <div class="right">
+      <button class="icon-btn-pink" aria-label="announcements">
+        <img src="assets/cd2ab15627e314b76cd18186ac8debb1e046753b.svg" alt="">
+      </button>
+      <div class="balance">
+        <img class="plus" src="assets/fba9a203cde61becd3d03a28733eed924695e9e6.svg" alt="">
+        <span class="amt">2 000 000.50</span>
+        <img class="cur" src="assets/dcbe03fff8b7bff8da30b22defa876253b4ed716.svg" alt="">
+      </div>
+      <button class="icon-btn-ghost" aria-label="user">
+        <img src="assets/c51db1de3442902710310b7f412f5e50bf258747.svg" alt="">
+      </button>
+      <img class="notif-dot" src="assets/3bfbd9ba21a63ae47aae5835471dcaa057683d29.svg" alt="">
+    </div>
+  </div>
+
+  <!-- ===== My Zone subnav ===== -->
+  <div class="subnav">
+    <div class="subnav-row">
+      <button class="icon-btn-ghost" aria-label="search">
+        <img src="assets/a60c35b6330c349df1b28504b4e27f90d97d172a.svg" alt="">
+      </button>
+      <div class="my-zone">
+        <span class="label">My Zone</span>
+        <div class="stats">
+          <div class="stat">
+            <img src="assets/8870c8992c4849c49f96ffb9b4eb1a7d18919ada.svg" alt="">
+            <div class="num">3</div>
+          </div>
+          <div class="divider"></div>
+          <div class="stat">
+            <img src="assets/acd11b20fb2060636db862fa9127aba4208a4c74.svg" alt="">
+            <div class="num">2</div>
+          </div>
+          <div class="divider"></div>
+          <div class="stat">
+            <img src="assets/80e95aa265f716d0508b727c0f4d19dede41ec35.svg" alt="">
+            <div class="num">2</div>
+          </div>
+        </div>
+      </div>
+      <button class="icon-btn-ghost" aria-label="settings">
+        <img src="assets/f37caf38309d5f5ce34bd17d34b049ca71fb945f.svg" alt="">
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== Banner ===== -->
+  <div class="banner-wrap">
+    <div class="cons-badge">1 / 3</div>
+    <div class="banner-card">
+
+      <!-- Background: textured image + dark scrim -->
+      <div class="bnr-bg"><img src="assets/banner-bg.png" alt=""></div>
+      <div class="bnr-dark"></div>
+
+      <!-- Trophy (very faint blurred, z:1) -->
+      <div class="bnr-trophy"><img src="assets/banner-trophy.png" alt=""></div>
+
+      <!-- Arsenal player photo (right side, z:2) -->
+      <div class="bnr-ar-player"><img src="assets/banner-arsenal-player.png" alt=""></div>
+
+      <!-- Mbappé photo (left side, overlaps left edge, z:3) -->
+      <div class="bnr-mbappe"><img src="assets/banner-mbappe.png" alt=""></div>
+
+      <!-- Event info: PSG badge | UCL + date | Arsenal badge (z:4) -->
+      <div class="bnr-event">
+        <div class="bnr-team-l">
+          <div class="bnr-badge"><img src="assets/banner-psg.svg" alt="PSG"></div>
+        </div>
+        <div class="bnr-center">
+          <div class="bnr-ucl"><img src="assets/banner-ucl.svg" alt="UEFA Champions League"></div>
+          <div class="bnr-dateinfo">
+            <span class="bnr-date">25.05.26</span>
+            <span class="bnr-time">16:00</span>
+          </div>
+        </div>
+        <div class="bnr-team-r">
+          <div class="bnr-badge-ar"><img src="assets/banner-arsenal.svg" alt="Arsenal"></div>
+        </div>
+      </div>
+
+      <!-- Odds bar (z:4, bottom) -->
+      <div class="bnr-odds">
+        <div class="bnr-teamnames">
+          <span class="bnr-tn">Paris Saint Germain</span>
+          <span class="bnr-tn bnr-tn-r">Arsenal</span>
+        </div>
+        <div class="odds-row">
+          <div class="bet-opt"><span class="l">1</span><span class="o">1.25</span></div>
+          <div class="bet-opt"><span class="l">x</span><span class="o">1.5</span></div>
+          <div class="bet-opt"><span class="l">2</span><span class="o">2.25</span></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="dots">
+      <span class="active"></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- ===== Stories ===== -->
+  <div class="stories">
+
+    <!-- Story 1: Hot Matches (active – pink ring) -->
+    <div class="story">
+      <div class="ring">
+        <div class="img-wrap">
+          <div class="img-bg"><img src="assets/story-bg.png" alt=""></div>
+          <!-- exclusive 67×67, img left=-114.13% -->
+          <div class="exclusive"><img src="assets/story-hot-matches.png" alt="" style="left:-114.13%"></div>
+        </div>
+      </div>
+      <div class="title">Hot Matches</div>
+    </div>
+
+    <!-- Story 2: Court Kings (seen – white ring) -->
+    <div class="story">
+      <div class="ring seen">
+        <div class="img-wrap">
+          <div class="img-bg"><img src="assets/story-bg.png" alt=""></div>
+          <!-- exclusive 67×67, img left=-118.32% -->
+          <div class="exclusive"><img src="assets/story-court-kings.png" alt="" style="left:-118.32%"></div>
+        </div>
+      </div>
+      <div class="title">Court Kings</div>
+    </div>
+
+    <!-- Story 3: Daily Match (active – pink ring, exclusive 65×65) -->
+    <div class="story">
+      <div class="ring">
+        <div class="img-wrap">
+          <div class="img-bg"><img src="assets/story-bg.png" alt=""></div>
+          <!-- exclusive 65×65, img left=-121.22% top=0.45% -->
+          <div class="exclusive" style="width:65px;height:65px"><img src="assets/story-daily-match.png" alt="" style="left:-121.22%;top:0.45%"></div>
+        </div>
+      </div>
+      <div class="title">Daily Match</div>
+    </div>
+
+    <!-- Story 4: Pro Arena (active – pink ring, exclusive 66×66) -->
+    <div class="story">
+      <div class="ring">
+        <div class="img-wrap">
+          <div class="img-bg"><img src="assets/story-bg.png" alt=""></div>
+          <!-- exclusive 66×66, img left=-93.4% top=-1.1% -->
+          <div class="exclusive" style="width:66px;height:66px"><img src="assets/story-pro-arena.png" alt="" style="left:-93.4%;top:-1.1%"></div>
+        </div>
+      </div>
+      <div class="title">Pro Arena</div>
+    </div>
+
+  </div>
+
+  <!-- ===== Jackpot ===== -->
+  <section class="section" style="padding-top:8px;overflow:visible">
+    <div style="padding:0 8px">
+    <div class="jackpot">
+
+      <!-- Sports balls: floating decorative, layered above card -->
+
+      <!-- Trophy/cup: far left, -30deg, 60.995px container / 44.652px inner -->
+      <div class="jk-ball" style="left:calc(50% - 59.5px - 30.498px);top:-2px;width:60.995px;height:60.995px">
+        <div style="transform:rotate(-30deg);width:44.652px;height:44.652px;position:relative;flex-shrink:0">
+          <img src="assets/jk-ball-trophy.png" alt="" style="position:absolute;inset:0;width:100%;height:100%">
+        </div>
+      </div>
+
+      <!-- Tennis ball: left of center, -15deg, 36.324px container / 29.659px inner -->
+      <div class="jk-ball" style="left:calc(50% - 38.84px - 18.162px);top:5px;width:36.324px;height:36.324px">
+        <div style="transform:rotate(-15deg);width:29.659px;height:29.659px;position:relative;flex-shrink:0">
+          <img src="assets/jk-ball-tennis.png" alt="" style="position:absolute;inset:0;width:100%;height:100%">
+        </div>
+      </div>
+
+      <!-- Soccer ball: center top, no rotation, 47px -->
+      <div class="jk-ball" style="left:calc(50% - 3.5px - 23.5px);top:-4.96px;width:47px;height:47px">
+        <img src="assets/jk-ball-soccer.png" alt="" style="width:47px;height:47px;object-fit:cover">
+      </div>
+
+      <!-- Basketball: right of center, -30deg, 43.947px container / 32.171px inner -->
+      <div class="jk-ball" style="left:calc(50% + 34.97px - 21.974px);top:0;width:43.947px;height:43.947px">
+        <div style="transform:rotate(-30deg);width:32.171px;height:32.171px;position:relative;flex-shrink:0">
+          <img src="assets/jk-ball-basketball.png" alt="" style="position:absolute;inset:0;width:100%;height:100%">
+        </div>
+      </div>
+
+      <!-- American football: far right, -15deg, 35.607px container / 29.073px inner -->
+      <div class="jk-ball" style="left:calc(50% + 66.8px - 17.804px);top:11.71px;width:35.607px;height:35.607px">
+        <div style="transform:rotate(-15deg);width:29.073px;height:29.073px;position:relative;flex-shrink:0">
+          <img src="assets/jk-ball-football.png" alt="" style="position:absolute;inset:0;width:100%;height:100%">
+        </div>
+      </div>
+
+      <!-- Glass card -->
+      <div class="jackpot-card">
+
+        <!-- BetConstruct logo (98×25px) -->
+        <div class="jk-logo">
+          <div class="jk-bolt"><img src="assets/jk-logo-vector.svg" alt=""></div>
+          <div class="jk-text-mask"><img src="assets/jk-logo-group1.svg" alt=""></div>
+        </div>
+
+        <!-- Section sub-title -->
+        <div class="title">SPORT Jackpot</div>
+
+        <!-- Info icon -->
+        <div class="jk-info"><div class="jk-info-inner"><img src="assets/jk-info.svg" alt=""></div></div>
+
+        <!-- Row 1: MEGA | MAJOR -->
+        <div class="jp-row">
+          <div class="jp-cell">
+            <img class="jp-medal" src="assets/jk-medal-mega.png" alt="">
+            <div class="meta"><span class="k">MEGA</span><span class="v red">$ 12 341.59</span></div>
+          </div>
+          <div class="jp-cell">
+            <img class="jp-medal" src="assets/jk-medal-major.png" alt="">
+            <div class="meta"><span class="k">Major</span><span class="v blue10">$ 3 124.64</span></div>
+          </div>
+        </div>
+
+        <!-- Row 2: MINOR | MINI -->
+        <div class="jp-row">
+          <div class="jp-cell">
+            <img class="jp-medal" src="assets/jk-medal-minor.png" alt="">
+            <div class="meta"><span class="k">Minor</span><span class="v blue6">$ 12 341.59</span></div>
+          </div>
+          <div class="jp-cell">
+            <img class="jp-medal" src="assets/jk-medal-mini.png" alt="">
+            <div class="meta"><span class="k">Mini</span><span class="v red">$ 3 124.64</span></div>
+          </div>
+        </div>
+
+      </div><!-- /jackpot-card -->
+    </div><!-- /jackpot -->
+    </div>
+  </section>
+
+  <!-- ===== Top Competitions ===== -->
+  <section class="section" style="padding-top:24px">
+    <div class="section-title-row"><h2>Top Competitions</h2></div>
+    <div class="competitions">
+      <div class="comp-chip">
+        <div class="glow"><div></div></div>
+        <div class="logo-wrap"><img src="assets/8ddde88a14c05073e82a89bb83d43439fc919b12.svg" alt="" style="position:absolute;top:12.5%;left:20%;right:20%;bottom:12.5%;width:60%;height:75%"></div>
+        <span class="name">Premier League</span>
+      </div>
+      <div class="comp-chip">
+        <div class="glow"></div>
+        <div class="logo-wrap"><img src="assets/e32fe68a922b9aee1c912779df0b087583e9564d.svg" alt="" style="position:absolute;top:12.5%;left:27.08%;right:27.08%;bottom:12.5%;width:45.84%;height:75%"></div>
+        <span class="name">Serie A</span>
+      </div>
+      <div class="comp-chip">
+        <div class="glow"></div>
+        <div class="logo-wrap"><img src="assets/9c9abf6e522c806e7fddd46e7dbcbbb32e039ba7.svg" alt="" style="position:absolute;top:12.5%;left:14.58%;right:14.58%;bottom:12.5%;width:70.84%;height:75%"></div>
+        <span class="name">LaLiga</span>
+      </div>
+      <div class="comp-chip">
+        <div class="glow"></div>
+        <div class="logo-wrap"><img src="assets/6cfb141515b99fc022440cfb2472a0072ad85e7d.svg" alt="" style="position:absolute;top:12.5%;left:12.5%;right:12.5%;bottom:12.5%;width:75%;height:75%"></div>
+        <span class="name">Bundesliga</span>
+      </div>
+      <div class="comp-chip">
+        <div class="glow blue"></div>
+        <div class="logo-wrap blue"><img src="assets/5ec45c21e4ffe2db79e7f6583459764bb960c0ec.svg" alt="" style="position:absolute;top:12.5%;left:20.42%;right:20.42%;bottom:12.5%;width:59.16%;height:75%"></div>
+        <span class="name">League 1</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Top Winners ===== -->
+  <section class="section" style="padding-top:24px">
+    <div class="section-title-row"><h2>Top Winners</h2></div>
+    <div class="winners-row">
+      <div class="winner">
+        <div class="head">
+          <img src="assets/f610e58e8cb6667488c5e84602016cc2fda4fbd9.png" alt="">
+          <span class="sport">Arsenal-Liverpool</span>
+        </div>
+        <div class="details"><div class="user-info">
+          <div class="meta-row"><span class="odds">x 1.56</span><span class="type">Single Bet</span></div>
+          <div class="amounts"><span class="amount">$ 200 574.88</span><span class="time">5 min ago</span></div>
+        </div></div>
+      </div>
+      <div class="winner">
+        <div class="head">
+          <img src="assets/b10cdfbc6b1cd069d4aa3f93ba233b4b36928d11.png" alt="">
+          <span class="sport">Tristan Schoolkate - Darwin Blanch</span>
+        </div>
+        <div class="details"><div class="user-info">
+          <div class="meta-row"><span class="odds">x 17.56</span><span class="type">Single Bet</span></div>
+          <div class="amounts"><span class="amount">$ 50 600.32</span><span class="time">25 min ago</span></div>
+        </div></div>
+      </div>
+      <div class="winner">
+        <div class="head">
+          <img src="assets/555ce1b1de48c824b09218e67fd3ed6aee9d342c.png" alt="">
+          <span class="sport">Olympiacos Piraeus BC - Fenerbahce</span>
+        </div>
+        <div class="details"><div class="user-info">
+          <div class="meta-row"><span class="odds">x 43.20</span><span class="type">Single Bet</span></div>
+          <div class="amounts"><span class="amount">$ 43 200.32</span><span class="time">25 min ago</span></div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Single Event Widgets ===== -->
+  <section class="section" style="padding-top:24px">
+    <div class="section-title-row"><h2>Top Events</h2></div>
+    <div class="events-row">
+      <!-- Card 1: Fulham vs Aston Villa (Figma node 4676:35088) -->
+      <div class="event-card">
+        <div class="bg"><img src="assets/sew-bg.png" alt=""></div>
+        <div class="ev-head">
+          <div class="row">
+            <img class="sport-icon" src="assets/sew-football.svg" alt="">
+            <div class="flag-uk">
+              <div class="bg"></div>
+              <div class="img-wrap">
+                <div class="mask"></div>
+                <div class="img-clip"><img src="assets/sew-uk-flag.png" alt=""></div>
+              </div>
+            </div>
+            <p class="lg-name">UEFA Champions League</p>
+            <div class="live-pill">Live</div>
+          </div>
+        </div>
+        <div class="match">
+          <div class="team">
+            <div class="logo">
+              <div class="logo-inner"><img src="assets/sew-fulham.png" alt="Fulham"></div>
+            </div>
+            <span class="nm">Fulham</span>
+          </div>
+          <div class="info-mid">
+            <div class="score"><p>2:0</p></div>
+            <span class="min">65’</span>
+          </div>
+          <div class="team">
+            <div class="logo">
+              <div class="logo-av"><img src="assets/sew-aston-villa.png" alt="Aston Villa"></div>
+            </div>
+            <span class="nm">Aston Villa</span>
+          </div>
+        </div>
+        <div class="bet-opts">
+          <div class="bet-opt"><span class="l">1</span><span class="o">1.25</span></div>
+          <div class="bet-opt"><span class="l">X</span><span class="o">1.25</span></div>
+          <div class="bet-opt"><span class="l">2</span><span class="o">1.25</span></div>
+        </div>
+      </div>
+      <!-- Card 2: Arsenal vs Chelsea -->
+      <div class="event-card">
+        <div class="bg"><img src="assets/sew-bg.png" alt=""></div>
+        <div class="ev-head">
+          <div class="row">
+            <img class="sport-icon" src="assets/sew-football.svg" alt="">
+            <div class="flag-uk">
+              <div class="bg"></div>
+              <div class="img-wrap">
+                <div class="mask"></div>
+                <div class="img-clip"><img src="assets/sew-uk-flag.png" alt=""></div>
+              </div>
+            </div>
+            <p class="lg-name">Premier League</p>
+            <div class="live-pill">Live</div>
+          </div>
+        </div>
+        <div class="match">
+          <div class="team">
+            <div class="logo"></div>
+            <span class="nm">Arsenal</span>
+          </div>
+          <div class="info-mid">
+            <div class="score"><p>1:1</p></div>
+            <span class="min">42’</span>
+          </div>
+          <div class="team">
+            <div class="logo"></div>
+            <span class="nm">Chelsea</span>
+          </div>
+        </div>
+        <div class="bet-opts">
+          <div class="bet-opt"><span class="l">1</span><span class="o">2.05</span></div>
+          <div class="bet-opt"><span class="l">X</span><span class="o">3.40</span></div>
+          <div class="bet-opt"><span class="l">2</span><span class="o">3.25</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Multiple of the Day ===== -->
+  <section class="section" style="padding-top:24px">
+    <div class="section-title-row"><h2>Multiple Sets</h2></div>
+    <div style="padding:0 8px">
+      <div class="motd-card">
+
+        <!-- Bonus badge -->
+        <div class="motd-bonus">
+          <div class="motd-bonus-label">+ 10% BONUS</div>
+          <div class="motd-bonus-tail"><img src="assets/motd-triangle.svg" alt=""></div>
+        </div>
+
+        <!-- Header -->
+        <div class="motd-header">
+          <div class="motd-league">
+            <span>Set 1</span>
+            <div class="motd-dot sz6"><img src="assets/motd-dot-6.svg" alt=""></div>
+            <span>UEFA Conference League</span>
+          </div>
+        </div>
+
+        <!-- Selections -->
+        <div class="motd-body">
+
+          <!-- Row 1 -->
+          <div class="motd-row">
+            <div class="motd-row-icon">
+              <div class="motd-icon"><img src="assets/motd-football-icon.svg" alt=""></div>
+              <div class="motd-spacer"></div>
+            </div>
+            <div class="motd-row-info">
+              <div class="motd-event-info">
+                <p class="motd-teams">SL Benfica - Real Madrid</p>
+                <div class="motd-date">
+                  <span>Tomorrow</span>
+                  <div class="motd-dot sz4"><img src="assets/motd-dot-4.svg" alt=""></div>
+                  <span>20:00</span>
+                </div>
+              </div>
+              <div class="motd-market-info">
+                <div class="motd-market-label">
+                  <span class="motd-market">Match Result:</span>
+                  <span class="motd-selection">Real Madrid</span>
+                </div>
+                <span class="motd-odds">3.25</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2 -->
+          <div class="motd-row">
+            <div class="motd-row-icon">
+              <div class="motd-icon"><img src="assets/motd-football-icon.svg" alt=""></div>
+              <div class="motd-spacer"></div>
+            </div>
+            <div class="motd-row-info">
+              <div class="motd-event-info">
+                <p class="motd-teams">SL Benfica - Real Madrid</p>
+                <div class="motd-date">
+                  <span>Tomorrow</span>
+                  <div class="motd-dot sz4"><img src="assets/motd-dot-4.svg" alt=""></div>
+                  <span>20:00</span>
+                </div>
+              </div>
+              <div class="motd-market-info">
+                <div class="motd-market-label">
+                  <span class="motd-market">Match Result:</span>
+                  <span class="motd-selection">Real Madrid</span>
+                </div>
+                <span class="motd-odds">3.25</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3 (last — no spacer) -->
+          <div class="motd-row">
+            <div class="motd-row-icon last">
+              <div class="motd-icon"><img src="assets/motd-football-icon.svg" alt=""></div>
+            </div>
+            <div class="motd-row-info last">
+              <div class="motd-event-info">
+                <p class="motd-teams">SL Benfica - Real Madrid</p>
+                <div class="motd-date">
+                  <span>Tomorrow</span>
+                  <div class="motd-dot sz4"><img src="assets/motd-dot-4.svg" alt=""></div>
+                  <span>20:00</span>
+                </div>
+              </div>
+              <div class="motd-market-info">
+                <div class="motd-market-label">
+                  <span class="motd-market">Match Result:</span>
+                  <span class="motd-selection">Real Madrid</span>
+                </div>
+                <span class="motd-odds">3.25</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /motd-body -->
+
+        <!-- Footer -->
+        <div class="motd-footer">
+          <div class="motd-total-odds">
+            <span class="motd-total-label">Total Odds:</span>
+            <span class="motd-total-value">4.15</span>
+          </div>
+          <button class="motd-betslip-btn">Add to Betslip</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Bet Builder Widget ===== -->
+  <section class="section" style="padding-top:24px">
+    <div class="section-title-row"><h2>Bet Builder Offers</h2></div>
+    <div style="padding:0 8px">
+      <div class="bb-outer">
+
+        <!-- Blurred logo glow (behind card, top-right) -->
+        <div class="bb-logo-blur">
+          <div class="bb-logo-blur-inner"><img src="assets/bb-logo-blur.svg" alt=""></div>
+        </div>
+
+        <!-- Scrollbar indicator -->
+        <div class="bb-scrollbar"></div>
+
+        <!-- Card -->
+        <div class="bb-card">
+
+          <!-- Bonus badge (reuse motd classes) -->
+          <div class="motd-bonus">
+            <div class="motd-bonus-label">+ 10% BONUS</div>
+            <div class="motd-bonus-tail"><img src="assets/bb-triangle.svg" alt=""></div>
+          </div>
+
+          <!-- Header -->
+          <div class="bb-header">
+            <div class="bb-league">
+              <div class="bb-flag">
+                <img src="assets/bb-flags.svg" alt="">
+                <div class="bb-flag-group"><img src="assets/bb-flag-group.svg" alt=""></div>
+              </div>
+              <span class="bb-league-name">UEFA Conference League</span>
+              <div class="bb-logo-icon">
+                <div class="bb-logo-icon-inner"><img src="assets/bb-logo-icon.svg" alt=""></div>
+              </div>
+            </div>
+            <div class="bb-date">
+              <span>Tomorrow</span>
+              <div class="motd-dot sz4"><img src="assets/bb-dot-4.svg" alt=""></div>
+              <span>20:00</span>
+            </div>
+          </div>
+
+          <!-- Event title row -->
+          <div class="bb-event-row">
+            <div class="bb-event-ic"><img src="assets/bb-football.svg" alt=""></div>
+            <p class="bb-event-name">SL Benfica - Real Madrid</p>
+          </div>
+
+          <!-- 4 Bet selections -->
+          <div class="bb-selections">
+
+            <!-- Row 1 -->
+            <div class="bb-sel-row">
+              <div class="bb-sel-icol">
+                <div class="bb-bullet-wrap"><img src="assets/bb-bullet.svg" alt=""></div>
+                <div class="bb-sel-spacer"></div>
+              </div>
+              <div class="bb-sel-info">
+                <div class="bb-sel-market">
+                  <span class="bb-mkt-lbl">Match Result:</span>
+                  <span class="bb-mkt-val">SL Benfica</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="bb-sel-row">
+              <div class="bb-sel-icol">
+                <div class="bb-bullet-wrap"><img src="assets/bb-bullet.svg" alt=""></div>
+                <div class="bb-sel-spacer"></div>
+              </div>
+              <div class="bb-sel-info">
+                <div class="bb-sel-market">
+                  <span class="bb-mkt-lbl">Double Chance:</span>
+                  <span class="bb-mkt-val">1X</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="bb-sel-row">
+              <div class="bb-sel-icol">
+                <div class="bb-bullet-wrap"><img src="assets/bb-bullet.svg" alt=""></div>
+                <div class="bb-sel-spacer"></div>
+              </div>
+              <div class="bb-sel-info">
+                <div class="bb-sel-market">
+                  <span class="bb-mkt-lbl">Match Result:</span>
+                  <span class="bb-mkt-val">Over</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 4 (last – no spacer) -->
+            <div class="bb-sel-row">
+              <div class="bb-sel-icol last">
+                <div class="bb-bullet-wrap"><img src="assets/bb-bullet.svg" alt=""></div>
+              </div>
+              <div class="bb-sel-info last">
+                <div class="bb-sel-market">
+                  <span class="bb-mkt-lbl">Match Result:</span>
+                  <span class="bb-mkt-val">Over</span>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /bb-selections -->
+
+          <!-- Footer (reuse motd classes) -->
+          <div class="motd-footer">
+            <div class="motd-total-odds">
+              <span class="motd-total-label">Total Odds:</span>
+              <span class="motd-total-value">4.15</span>
+            </div>
+            <button class="motd-betslip-btn">Add to Betslip</button>
+          </div>
+
+        </div><!-- /bb-card -->
+      </div><!-- /bb-outer -->
+    </div>
+  </section>
+
+  <!-- ===== Top Outrights ===== -->
+  <section class="section to-section">
+
+    <!-- Title row -->
+    <div class="section-title-row">
+      <h2>Top Outrights</h2>
+    </div>
+
+    <!-- Sport filter chips (reuse gw-chip styles) -->
+    <div class="to-chips-row">
+      <div class="gw-chip active">
+        <div class="gw-chip-ic"><img src="assets/gw-ic-football.svg" alt=""></div>
+        <span class="gw-chip-label">Football</span>
+      </div>
+      <div class="gw-chip"><div class="gw-chip-ic"><img src="assets/gw-ic-basketball.svg" alt=""></div></div>
+      <div class="gw-chip"><div class="gw-chip-ic"><img src="assets/gw-ic-hockey.svg" alt=""></div></div>
+      <div class="gw-chip"><div class="gw-chip-ic"><img src="assets/gw-ic-badminton.svg" alt=""></div></div>
+      <div class="gw-chip"><div class="gw-chip-ic"><img src="assets/gw-ic-tabletennis.svg" alt=""></div></div>
+      <div class="gw-chip"><div class="gw-chip-ic"><img src="assets/gw-ic-tennis.svg" alt=""></div></div>
+      <div class="gw-chip"><div class="gw-chip-ic"><img src="assets/gw-ic-volleyball.svg" alt=""></div></div>
+      <div class="gw-chip"><div class="gw-chip-ic"><img src="assets/gw-ic-amfootball.svg" alt=""></div></div>
+    </div>
+
+    <!-- Horizontally scrollable outright cards -->
+    <div class="to-cards-wrap">
+    <div class="to-cards-row">
+
+      <!-- Card 1: Premier League -->
+      <div class="to-card">
+        <div class="to-card-bg-logo"><img src="assets/to-pl-logo.png" alt=""></div>
+        <div class="to-card-inner">
+          <div class="to-league-info">
+            <div class="to-league-logo"><img src="assets/to-pl-logo.png" alt="Premier League"></div>
+            <div class="to-league-details">
+              <div class="to-league-name">Premiere League 2025/26</div>
+              <div class="to-league-country">
+                <div class="to-flag" style="background:#249f58"><img src="assets/to-flag-en.svg" alt="England"></div>
+                <span class="to-country-name">England</span>
+              </div>
+            </div>
+          </div>
+          <div class="to-bets">
+            <div class="to-bet-opt"><span class="to-bet-team">Arsenal</span><span class="to-bet-odds">3.50</span></div>
+            <div class="to-bet-opt"><span class="to-bet-team">Manchester City</span><span class="to-bet-odds">5.00</span></div>
+            <div class="to-bet-opt"><span class="to-bet-team">Manchester United</span><span class="to-bet-odds">7.50</span></div>
+            <div class="to-bet-opt"><span class="to-bet-team">Chelsea</span><span class="to-bet-odds">4.20</span></div>
+            <div class="to-bet-opt"><span class="to-bet-team">Liverpool</span><span class="to-bet-odds">9.00</span></div>
+          </div>
+        </div>
+        <div class="to-scrollbar"></div>
+      </div>
+
+      <!-- Card 2: LaLiga -->
+      <div class="to-card">
+        <div class="to-card-inner">
+          <div class="to-league-info">
+            <div class="to-league-logo" style="overflow:hidden;position:relative;width:48px;height:48px">
+              <img src="assets/to-laliga-logo.png" alt="LaLiga" style="position:absolute;height:124.07%;left:-26.13%;top:-5.56%;width:143.24%;max-width:none">
+            </div>
+            <div class="to-league-details">
+              <div class="to-league-name">LaLiga 2026/27</div>
+              <div class="to-league-country">
+                <div class="to-flag" style="background:#f93939"><img src="assets/to-flag-es.svg" alt="Spain"></div>
+                <span class="to-country-name">Spain</span>
+              </div>
+            </div>
+          </div>
+          <div class="to-bets">
+            <div class="to-bet-opt"><span class="to-bet-team">Real Madrid</span><span class="to-bet-odds">2.75</span></div>
+            <div class="to-bet-opt"><span class="to-bet-team">Sevilla FC</span><span class="to-bet-odds">4.00</span></div>
+            <div class="to-bet-opt"><span class="to-bet-team">Real Betis</span><span class="to-bet-odds">6.50</span></div>
+            <div class="to-bet-opt"><span class="to-bet-team">Levante UD</span><span class="to-bet-odds">8.00</span></div>
+            <div class="to-bet-opt"><span class="to-bet-team">Girona FC</span><span class="to-bet-odds">10.00</span></div>
+          </div>
+        </div>
+        <div class="to-scrollbar"></div>
+      </div>
+
+      <!-- Card 3: UEFA Champions League -->
+      <div class="to-card">
+        <div class="to-card-bg-logo"><img src="assets/to-pl-logo.png" alt=""></div>
+        <div class="to-card-inner">
+          <div class="to-league-info">
+            <div class="to-league-logo" style="overflow:hidden;position:relative;width:48px;height:48px;border-radius:0">
+              <img src="assets/to-ucl-logo.png" alt="UCL" style="position:absolute;height:108.65%;left:-9.01%;top:-3.01%;width:118.02%;max-width:none">
+            </div>
+            <div class="to-league-details">
+              <div class="to-league-name">UEFA Champions League</div>
+              <div class="to-league-country">
+                <div class="to-flag"><img src="assets/to-flag-eu.svg" alt="Europe"></div>
+                <span class="to-country-name">Europe</span>
+              </div>
+            </div>
+          </div>
+          <div class="to-bets">
+            <div class="to-bet-opt"><span class="to-bet-team">Paris Saint-Germain</span><span class="to-bet-odds">9.00</span></div>
+            <div class="to-bet-opt"><span class="to-bet-team">Arsenal</span><span class="to-bet-odds">4.20</span></div>
+            <div class="to-bet-opt"><span class="to-bet-team">Atleti</span><span class="to-bet-odds">7.50</span></div>
+            <div class="to-bet-opt"><span class="to-bet-team">Bayern Munchen</span><span class="to-bet-odds">5.00</span></div>
+            <div class="to-bet-opt"><span class="to-bet-team">Real Madrid</span><span class="to-bet-odds">3.50</span></div>
+          </div>
+        </div>
+      </div>
+
+
+    </div><!-- /to-cards-row -->
+
+      <!-- Right nav chevron: absolute overlay, outside the overflow container -->
+      <div class="to-nav">
+        <button class="to-nav-btn">
+          <img src="assets/to-chevron.svg" alt="">
+        </button>
+      </div>
+
+    </div><!-- /to-cards-wrap -->
+  </section>
+
+  <!-- ===== Popular Player ===== -->
+  <section class="section pp-section">
+    <div class="section-title-row">
+      <h2>Popular Players</h2>
+    </div>
+    <div style="padding:0 8px">
+      <div class="pp-card">
+
+        <!-- Glass card content -->
+        <div class="pp-inner">
+
+          <!-- Header: player name + match time -->
+          <div class="pp-hd">
+            <div class="pp-pname">Christiano Ronaldo</div>
+            <div class="pp-meta">
+              <span>Tomorrow</span>
+              <div class="pp-dot"><img src="assets/pp-dot.svg" alt=""></div>
+              <span>20:00</span>
+            </div>
+          </div>
+
+          <!-- Selections -->
+          <div class="pp-sels">
+            <!-- Event -->
+            <div class="pp-event-row">
+              <div class="pp-event-ic"><img src="assets/pp-ball.svg" alt=""></div>
+              <div class="pp-event-nm">SL Benfica - Real Madrid</div>
+            </div>
+            <!-- Market 1 -->
+            <div class="pp-mkt-row">
+              <div class="pp-blt-col">
+                <div class="pp-blt-ic"><img src="assets/pp-bullet.svg" alt=""></div>
+                <div class="pp-blt-sp"></div>
+              </div>
+              <div class="pp-mkt-info">
+                <span class="pp-mkt-lbl">Both Teams Score</span>
+                <span class="pp-mkt-val">Yes</span>
+              </div>
+            </div>
+            <!-- Market 2 -->
+            <div class="pp-mkt-row">
+              <div class="pp-blt-col">
+                <div class="pp-blt-ic"><img src="assets/pp-bullet.svg" alt=""></div>
+                <div class="pp-blt-sp"></div>
+              </div>
+              <div class="pp-mkt-info">
+                <span class="pp-mkt-lbl">Double Chance:</span>
+                <span class="pp-mkt-val">1X</span>
+              </div>
+            </div>
+            <!-- Market 3 (last – no spacer) -->
+            <div class="pp-mkt-row">
+              <div class="pp-blt-col">
+                <div class="pp-blt-ic"><img src="assets/pp-bullet.svg" alt=""></div>
+              </div>
+              <div class="pp-mkt-info">
+                <span class="pp-mkt-lbl">Cristiano Ronaldo shots on Goal</span>
+                <span class="pp-mkt-val">1+</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer: Total Odds + Add to Betslip -->
+          <div class="pp-footer">
+            <div class="pp-odds">
+              <span class="pp-odds-lbl">Total Odds:</span>
+              <span class="pp-odds-val">4.15</span>
+            </div>
+            <div class="pp-actions">
+              <button class="pp-betslip-btn">Add to Betslip</button>
+            </div>
+          </div>
+
+        </div><!-- /pp-inner -->
+
+        <!-- Player image (absolute, top-right) -->
+        <div class="pp-player-wrap">
+          <!-- Blurred shadow glow -->
+          <div class="pp-player-shadow">
+            <div class="pp-player-shadow-blur">
+              <div class="pp-player-shadow-img">
+                <img src="assets/pp-player.png" alt="">
+              </div>
+            </div>
+          </div>
+          <!-- Actual jersey image -->
+          <div class="pp-player-fig">
+            <img src="assets/pp-player.png" alt="">
+          </div>
+        </div>
+
+        <!-- Bonus badge (absolute, top-right edge) -->
+        <div class="pp-bonus">
+          <div class="pp-bonus-badge"><span>+ 10% BONUS</span></div>
+          <div class="pp-bonus-arrow"><img src="assets/pp-triangle.svg" alt=""></div>
+        </div>
+
+      </div><!-- /pp-card -->
+    </div>
+  </section>
+
+  <!-- ===== Trending Sports ===== -->
+  <section class="section ts-section">
+    <div class="section-title-row">
+      <h2>Trending Sports</h2>
+    </div>
+    <div class="ts-row">
+      <!-- Football (opacity:0.8, no blur, has overlay) -->
+      <div class="ts-card">
+        <div class="ts-card-img bright">
+          <img src="assets/ts-football.png" alt="" style="height:117.36%;left:-95.33%;top:0.19%;width:249.42%">
+        </div>
+        <div class="ts-card-overlay"></div>
+        <span class="ts-label">Football</span>
+      </div>
+      <!-- Basketball (opacity:0.64, blur:1px, has overlay) -->
+      <div class="ts-card">
+        <div class="ts-card-img">
+          <img src="assets/ts-basketball.png" alt="" style="height:125.09%;left:-95.65%;top:-2.02%;width:261.94%">
+        </div>
+        <div class="ts-card-overlay"></div>
+        <span class="ts-label">Basketball</span>
+      </div>
+      <!-- Ice Hockey (opacity:0.64, blur:1px, NO overlay) -->
+      <div class="ts-card">
+        <div class="ts-card-img">
+          <img src="assets/ts-hockey.png" alt="" style="height:112.5%;left:-85.48%;top:0.08%;width:239.09%">
+        </div>
+        <span class="ts-label">Ice Hockey</span>
+      </div>
+      <!-- Formula 1 (opacity:0.64, blur:1px, has overlay) -->
+      <div class="ts-card">
+        <div class="ts-card-img">
+          <img src="assets/ts-formula1.png" alt="" style="height:121.25%;left:-97.03%;top:0%;width:257.69%">
+        </div>
+        <div class="ts-card-overlay"></div>
+        <span class="ts-label">Formula 1</span>
+      </div>
+      <!-- Tennis (opacity:0.64, blur:1px, has overlay) -->
+      <div class="ts-card">
+        <div class="ts-card-img">
+          <img src="assets/ts-tennis.png" alt="" style="height:120%;left:-83.24%;top:-13.28%;width:255.03%">
+        </div>
+        <div class="ts-card-overlay"></div>
+        <span class="ts-label">Tennis</span>
+      </div>
+      <!-- Box (opacity:1, no blur, NO overlay, no border-radius) -->
+      <div class="ts-card" style="border-radius:0">
+        <div class="ts-card-img raw">
+          <img src="assets/ts-box.png" alt="" style="height:118.75%;left:-82.38%;top:-0.26%;width:223.93%">
+        </div>
+        <span class="ts-label">Box</span>
+      </div>
+      <!-- Formula 1 (repeat) -->
+      <div class="ts-card">
+        <div class="ts-card-img">
+          <img src="assets/ts-formula1.png" alt="" style="height:121.25%;left:-97.03%;top:0%;width:257.69%">
+        </div>
+        <div class="ts-card-overlay"></div>
+        <span class="ts-label">Formula 1</span>
+      </div>
+      <!-- Basketball (repeat) -->
+      <div class="ts-card">
+        <div class="ts-card-img">
+          <img src="assets/ts-basketball.png" alt="" style="height:125.09%;left:-95.65%;top:-2.02%;width:261.94%">
+        </div>
+        <div class="ts-card-overlay"></div>
+        <span class="ts-label">Basketball</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Game Widget ===== -->
+  <section class="section" style="padding-top:24px">
+
+    <!-- Filters: 3 tabs + sport chip row -->
+    <div class="gw-filters">
+      <div class="gw-tabs">
+        <div class="gw-tab active">Top Live Events</div>
+        <div class="gw-tab">Top Upcoming Events</div>
+        <div class="gw-tab">Boosted Odds</div>
+      </div>
+      <div class="gw-chips">
+        <div class="gw-chip active">
+          <div class="gw-chip-ic"><img src="assets/gw-ic-football.svg" alt=""></div>
+          <span class="gw-chip-label">Football</span>
+        </div>
+        <div class="gw-chip"><div class="gw-chip-ic"><img src="assets/gw-ic-basketball.svg" alt=""></div></div>
+        <div class="gw-chip"><div class="gw-chip-ic"><img src="assets/gw-ic-hockey.svg" alt=""></div></div>
+        <div class="gw-chip"><div class="gw-chip-ic"><img src="assets/gw-ic-badminton.svg" alt=""></div></div>
+        <div class="gw-chip"><div class="gw-chip-ic"><img src="assets/gw-ic-tabletennis.svg" alt=""></div></div>
+        <div class="gw-chip"><div class="gw-chip-ic"><img src="assets/gw-ic-tennis.svg" alt=""></div></div>
+        <div class="gw-chip"><div class="gw-chip-ic"><img src="assets/gw-ic-volleyball.svg" alt=""></div></div>
+        <div class="gw-chip"><div class="gw-chip-ic"><img src="assets/gw-ic-amfootball.svg" alt=""></div></div>
+      </div>
+    </div>
+
+    <!-- Market Tables -->
+    <div class="gw-market-tables">
+
+      <!-- League Title: UK flag · World · Club Friendlies -->
+      <div class="gw-league-title">
+        <div class="gw-flag-wrap">
+          <div class="gw-flag-inner"><img src="assets/gw-uk-flag.png" alt="UK"></div>
+        </div>
+        <span class="gw-league-name">World</span>
+        <div class="gw-dot6"><img src="assets/gw-dot6.svg" alt=""></div>
+        <span class="gw-league-name">Club Friendlies</span>
+      </div>
+
+      <!-- ─── Live Card (Tennis) ─── -->
+      <div class="gw-live-card">
+
+        <!-- Header: live dot · video · H1 · 22:48 ║ bell · chart -->
+        <div class="gw-card-hd">
+          <div class="gw-live-dot"><img src="assets/gw-live.svg" alt=""></div>
+          <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-video.svg" alt=""></div></div>
+          <span class="gw-hd-txt">H1</span>
+          <span class="gw-hd-txt">22:48</span>
+          <div class="gw-hd-right">
+            <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-bell.svg" alt=""></div></div>
+            <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-chart.svg" alt=""></div></div>
+          </div>
+        </div>
+
+        <!-- Match Body -->
+        <div class="gw-match-body">
+
+          <!-- Teams + Scores (tennis: 14px names, no logos) -->
+          <div class="gw-teams-score">
+            <div class="gw-team-side">
+              <div style="display:flex;gap:4px;align-items:center;align-self:stretch;flex-shrink:0">
+                <div class="gw-fav"><div class="ic"><img src="assets/gw-star.svg" alt=""></div></div>
+                <div class="gw-vdiv"></div>
+              </div>
+              <div class="gw-team-names">
+                <div class="gw-tennis-name">Hugo Nys/Edouard Rogger Vaselin</div>
+                <div class="gw-tennis-name">Maximo Gonzalez/Andres Molteni</div>
+              </div>
+            </div>
+            <!-- Score columns: 6|5 ┃ 40 [1] -->
+            <div class="gw-scores" style="height:46px">
+              <div class="gw-score-col" style="height:46px"><span class="gw-score-v">6</span><span class="gw-score-v">1</span></div>
+              <div class="gw-score-col" style="height:46px"><span class="gw-score-v">5</span><span class="gw-score-v">4</span></div>
+              <div style="width:1px;align-self:stretch;background:rgba(255,255,255,.16);flex-shrink:0"></div>
+              <div class="gw-score-col" style="height:46px"><span class="gw-score-v">40</span><span class="gw-score-v">40</span></div>
+              <div class="gw-score-box" style="height:46px"><span class="gw-score-v">1</span><span class="gw-score-v">1</span></div>
+            </div>
+          </div>
+
+          <!-- Market header: "Match Result" · +78 -->
+          <div class="gw-mkt-hd">
+            <span class="gw-mkt-name">Match Result</span>
+            <span class="gw-mkt-more">+78</span>
+          </div>
+
+          <!-- Bet options -->
+          <div class="gw-bet-opts">
+            <div class="gw-bet-opt"><span class="l">1</span><span class="o">1.30</span></div>
+            <div class="gw-bet-opt" style="background:rgba(255,255,255,.08);border-color:transparent"><span class="l">X</span><span class="o">1.20</span></div>
+            <div class="gw-bet-opt" style="background:rgba(255,255,255,.08);border-color:transparent"><span class="l">2</span><span class="o">2.00</span></div>
+          </div>
+
+          <!-- Indicator dots: · ● ━ ● · -->
+          <div class="gw-indicator">
+            <div class="gw-ind s"></div>
+            <div class="gw-ind m"></div>
+            <div class="gw-ind a"></div>
+            <div class="gw-ind m"></div>
+            <div class="gw-ind s"></div>
+          </div>
+
+        </div><!-- /gw-match-body -->
+      </div><!-- /gw-live-card -->
+
+      <!-- ─── Football Match 1: Chelsea vs Aston Villa ─── -->
+      <div class="gw-match-box">
+        <div class="gw-card-hd">
+          <div class="gw-live-dot"><img src="assets/gw-live.svg" alt=""></div>
+          <span class="gw-hd-txt">H2</span>
+          <span class="gw-hd-txt">28:45</span>
+          <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-video.svg" alt=""></div></div>
+          <div class="gw-hd-right">
+            <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-bell.svg" alt=""></div></div>
+            <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-chart.svg" alt=""></div></div>
+          </div>
+        </div>
+        <div class="gw-match-body">
+          <div class="gw-teams-score">
+            <div class="gw-team-side">
+              <div style="display:flex;gap:4px;align-items:center;align-self:stretch;flex-shrink:0">
+                <div class="gw-fav"><div class="ic"><img src="assets/gw-star.svg" alt=""></div></div>
+                <div class="gw-vdiv"></div>
+              </div>
+              <div class="gw-team-names">
+                <div class="gw-team-row">
+                  <div class="gw-team-logo"><img src="assets/gw-fulham.png" alt=""></div>
+                  <span class="gw-team-nm">Chelsea</span>
+                </div>
+                <div class="gw-team-row">
+                  <div class="gw-team-logo"><img src="assets/gw-aston-villa.png" alt=""></div>
+                  <span class="gw-team-nm">Aston Villa</span>
+                </div>
+              </div>
+            </div>
+            <div class="gw-scores">
+              <div class="gw-score-col"><span class="gw-score-v">1</span><span class="gw-score-v">0</span></div>
+              <div class="gw-score-col"><span class="gw-score-v">2</span><span class="gw-score-v">0</span></div>
+              <div class="gw-score-box"><span class="gw-score-v">3</span><span class="gw-score-v">2</span></div>
+            </div>
+          </div>
+          <div class="gw-bet-opts">
+            <div class="gw-bet-opt"><span class="l">1</span><span class="o">6.21</span></div>
+            <div class="gw-bet-opt"><span class="l">X</span><span class="o">3.12</span></div>
+            <div class="gw-bet-opt"><span class="l">2</span><span class="o">1.88</span></div>
+          </div>
+        </div>
+      </div><!-- /match-box 1 -->
+
+      <!-- ─── Football Match 2: Liverpool vs Man City ─── -->
+      <div class="gw-match-box">
+        <div class="gw-card-hd">
+          <div class="gw-live-dot"><img src="assets/gw-live.svg" alt=""></div>
+          <span class="gw-hd-txt">H1</span>
+          <span class="gw-hd-txt">33:12</span>
+          <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-video.svg" alt=""></div></div>
+          <div class="gw-hd-right">
+            <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-bell.svg" alt=""></div></div>
+            <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-chart.svg" alt=""></div></div>
+          </div>
+        </div>
+        <div class="gw-match-body">
+          <div class="gw-teams-score">
+            <div class="gw-team-side">
+              <div style="display:flex;gap:4px;align-items:center;align-self:stretch;flex-shrink:0">
+                <div class="gw-fav"><div class="ic"><img src="assets/gw-star.svg" alt=""></div></div>
+                <div class="gw-vdiv"></div>
+              </div>
+              <div class="gw-team-names">
+                <div class="gw-team-row">
+                  <div class="gw-team-logo"><img src="assets/gw-fulham.png" alt=""></div>
+                  <span class="gw-team-nm">Liverpool</span>
+                </div>
+                <div class="gw-team-row">
+                  <div class="gw-team-logo"><img src="assets/gw-aston-villa.png" alt=""></div>
+                  <span class="gw-team-nm">Manchester City</span>
+                </div>
+              </div>
+            </div>
+            <div class="gw-scores">
+              <div class="gw-score-col"><span class="gw-score-v">0</span><span class="gw-score-v">0</span></div>
+              <div class="gw-score-col"><span class="gw-score-v">1</span><span class="gw-score-v">0</span></div>
+              <div class="gw-score-box"><span class="gw-score-v">1</span><span class="gw-score-v">0</span></div>
+            </div>
+          </div>
+          <div class="gw-bet-opts">
+            <div class="gw-bet-opt"><span class="l">1</span><span class="o">2.10</span></div>
+            <div class="gw-bet-opt"><span class="l">X</span><span class="o">3.40</span></div>
+            <div class="gw-bet-opt"><span class="l">2</span><span class="o">3.25</span></div>
+          </div>
+        </div>
+      </div><!-- /match-box 2 -->
+
+      <!-- ─── Football Match 3: Real Madrid vs Barcelona ─── -->
+      <div class="gw-match-box">
+        <div class="gw-card-hd">
+          <div class="gw-live-dot"><img src="assets/gw-live.svg" alt=""></div>
+          <span class="gw-hd-txt">H2</span>
+          <span class="gw-hd-txt">67:33</span>
+          <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-video.svg" alt=""></div></div>
+          <div class="gw-hd-right">
+            <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-bell.svg" alt=""></div></div>
+            <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-chart.svg" alt=""></div></div>
+          </div>
+        </div>
+        <div class="gw-match-body">
+          <div class="gw-teams-score">
+            <div class="gw-team-side">
+              <div style="display:flex;gap:4px;align-items:center;align-self:stretch;flex-shrink:0">
+                <div class="gw-fav"><div class="ic"><img src="assets/gw-star.svg" alt=""></div></div>
+                <div class="gw-vdiv"></div>
+              </div>
+              <div class="gw-team-names">
+                <div class="gw-team-row">
+                  <div class="gw-team-logo"><img src="assets/gw-fulham.png" alt=""></div>
+                  <span class="gw-team-nm">Real Madrid</span>
+                </div>
+                <div class="gw-team-row">
+                  <div class="gw-team-logo"><img src="assets/gw-aston-villa.png" alt=""></div>
+                  <span class="gw-team-nm">Barcelona</span>
+                </div>
+              </div>
+            </div>
+            <div class="gw-scores">
+              <div class="gw-score-col"><span class="gw-score-v">1</span><span class="gw-score-v">0</span></div>
+              <div class="gw-score-col"><span class="gw-score-v">1</span><span class="gw-score-v">1</span></div>
+              <div class="gw-score-box"><span class="gw-score-v">2</span><span class="gw-score-v">1</span></div>
+            </div>
+          </div>
+          <div class="gw-bet-opts">
+            <div class="gw-bet-opt"><span class="l">1</span><span class="o">1.95</span></div>
+            <div class="gw-bet-opt"><span class="l">X</span><span class="o">3.60</span></div>
+            <div class="gw-bet-opt"><span class="l">2</span><span class="o">3.90</span></div>
+          </div>
+        </div>
+      </div><!-- /match-box 3 -->
+
+    </div><!-- /gw-market-tables -->
+  </section>
+
+  <!-- ===== Tournament ===== -->
+  <section class="section" style="padding-top:24px;padding-bottom:24px">
+    <div class="section-title-row"><h2>Tournaments</h2></div>
+    <div class="tournament-wrap">
+      <div class="tournament-image">
+        <div class="img-clip"><img src="assets/trn-bg.png" alt=""></div>
+        <div class="overlay"></div>
+      </div>
+      <div class="tournament-trophy">
+        <div class="inner"><img src="assets/trn-trophy.png" alt=""></div>
+      </div>
+      <div class="countdown">
+        <span class="lbl">Starts in</span>
+        <span class="div"></span>
+        <span class="d">3 d</span>
+        <span class="time"><span>03</span><span>:</span><span>45</span><span>:</span><span>56</span></span>
+      </div>
+      <img class="info-i" src="assets/trn-info.svg" alt="">
+      <div class="tournament-info">
+        <p class="title">SPORTS TOURNAMENT<br>SERIES FOOTBALL</p>
+        <div class="prize-group">
+          <span class="prize-lbl">Prize Pool</span>
+          <span class="prize-amt">$ 100 000</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Approximated sections ===== -->
+  <div class="placeholder-section">Multiple of the Day · Bet Builder · Live Cards · Footer<br>(approximated — request these for pixel-perfect)</div>
+
+</div><!-- /.app -->
+
+<!-- ===== Second Level Navigation (floating) ===== -->
+<div id="app-nav" data-page="home"></div>
+<script src="nav.js"></script>
+<script src="betslip-popup.js"></script>
+
+</body>
+</html>

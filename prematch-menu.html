@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>VBet — Prematch Menu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#010c23;
+  --bg-60:rgba(1,12,35,.6);
+  --bg-64:rgba(1,12,35,.64);
+  --main:#d80d83;
+  --main-40:rgba(216,13,131,.4);
+  --main-16:rgba(216,13,131,.16);
+  --odds:#ffad29;
+  --green:#249f58;
+  --red:#b4132b;
+  --football:#109121;
+  --basketball:#ff9d2b;
+  --baseball:#2e646c;
+  --box:#006ec1;
+  --am-football:#ee5e56;
+  --ice-hockey:#3497bc;
+  --table-tennis:#75932e;
+  --tennis:#98943f;
+  --w-100:#fff;
+  --w-90:rgba(255,255,255,.9);
+  --w-80:rgba(255,255,255,.8);
+  --w-72:rgba(255,255,255,.72);
+  --w-64:rgba(255,255,255,.64);
+  --w-56:rgba(255,255,255,.56);
+  --w-48:rgba(255,255,255,.48);
+  --w-32:rgba(255,255,255,.32);
+  --w-24:rgba(255,255,255,.24);
+  --w-16:rgba(255,255,255,.16);
+  --w-12:rgba(255,255,255,.12);
+  --w-8:rgba(255,255,255,.08);
+  --w-6:rgba(255,255,255,.06);
+  --w-4:rgba(255,255,255,.04);
+  --w-2:rgba(255,255,255,.02);
+  --d-32:rgba(0,2,5,.32);
+  --d-40:rgba(0,2,5,.4);
+  --d-56:rgba(0,2,5,.56);
+  --d-80:rgba(0,2,5,.8);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:#000;font-family:'Rubik',system-ui,-apple-system,sans-serif;color:var(--w-100);font-size:14px;line-height:20px;letter-spacing:0}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+img,svg{display:block;max-width:100%}
+ul{list-style:none}
+a{color:inherit;text-decoration:none}
+
+.app{
+  width:375px;margin:0 auto;min-height:100vh;
+  background:var(--bg);position:relative;padding-bottom:114px;
+  overflow-x:hidden;
+}
+
+/* ========== STATUS BAR ========== */
+.statusbar{
+  position:relative;height:40px;width:375px;
+  background:linear-gradient(90deg,var(--w-4) 0%,var(--w-4) 100%),linear-gradient(90deg,var(--bg) 0%,var(--bg) 100%);
+}
+.statusbar .time{
+  position:absolute;left:48px;top:50%;transform:translate(-50%,-50%);
+  font-family:'SF Pro','SF Pro Display','-apple-system',sans-serif;
+  font-weight:700;font-size:14px;letter-spacing:-.3px;color:var(--w-90);text-align:center;width:54px;
+}
+.statusbar .battery{position:absolute;top:50%;right:19px;transform:translateY(-50%);width:20.926px;height:9.748px}
+.statusbar .wifi{position:absolute;top:50%;right:44.23px;transform:translateY(-50%);width:13.188px;height:9.461px}
+.statusbar .cellular{position:absolute;top:50%;right:61.72px;transform:translateY(-50%);width:14.622px;height:9.175px}
+
+/* ========== HEADER ========== */
+.header-bar{
+  width:100%;padding:8px 8px 8px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(90deg,var(--w-8) 0%,var(--w-8) 100%),linear-gradient(90deg,var(--bg-60) 0%,var(--bg-60) 100%);
+  backdrop-filter:blur(21px);
+  filter:drop-shadow(0 4px 4px rgba(0,0,0,.4));
+}
+.header-bar .vbet{width:56px;height:16px;display:block}
+.header-bar .logo-wrap{width:75px;height:32px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.header-bar .right{display:flex;align-items:center;gap:4px;position:relative}
+.icon-btn-pink{
+  width:32px;height:32px;border-radius:999px;background:var(--main);
+  display:flex;align-items:center;justify-content:center;
+  border-top:1px solid var(--w-24);overflow:hidden;
+}
+.icon-btn-pink img{width:16px;height:16px}
+.icon-btn-ghost{
+  width:32px;height:32px;border-radius:999px;background:var(--w-8);
+  display:flex;align-items:center;justify-content:center;
+  border-top:1px solid var(--w-16);overflow:hidden;
+}
+.icon-btn-ghost img{width:16px;height:16px}
+.balance{
+  height:32px;border-radius:88px;background:var(--w-8);
+  display:flex;align-items:center;gap:4px;padding:0 8px;
+}
+.balance .plus{width:16px;height:16px}
+.balance .amt{font-size:12px;line-height:16px;color:var(--w-100);font-weight:400;white-space:nowrap}
+.balance .cur{width:12px;height:12px}
+.header-bar .notif-dot{position:absolute;left:193px;top:0;width:8px;height:8px}
+
+/* ========== MY ZONE ========== */
+.subnav{
+  width:100%;padding:16px 8px;
+  display:flex;flex-direction:column;gap:16px;align-items:flex-start;justify-content:center;
+  background:linear-gradient(90deg,var(--w-4) 0%,var(--w-4) 100%),linear-gradient(90deg,var(--bg) 0%,var(--bg) 100%);
+  backdrop-filter:blur(4px);
+  filter:drop-shadow(0 4px 4px rgba(0,0,0,.1));
+}
+.subnav-row{display:flex;align-items:flex-start;gap:8px;width:100%}
+.subnav .my-zone{
+  flex:none;width:279px;height:32px;border:1px solid var(--main-40);border-radius:32px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:4px 16px;
+  background:
+    radial-gradient(ellipse 150px 8px at center bottom, rgba(216,13,131,0.4), transparent 70%);
+}
+.subnav .my-zone .label{font-size:14px;line-height:20px;color:var(--w-72)}
+.subnav .my-zone .stats{display:flex;align-items:center;gap:8px}
+.subnav .my-zone .stat{display:flex;align-items:center;gap:2px}
+.subnav .my-zone .stat img{width:16px;height:16px;display:block}
+.subnav .my-zone .stat .num{
+  background:var(--d-40);border-radius:8px;width:20px;height:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;line-height:16px;color:var(--w-72);
+}
+.subnav .my-zone .divider{height:16px;width:1px;background:var(--w-16)}
+
+/* ========== TOP COMPETITIONS ========== */
+.competitions{
+  display:flex;gap:8px;padding:0 8px;overflow-x:auto;scrollbar-width:none;
+  width:100%;
+}
+.competitions::-webkit-scrollbar{display:none}
+.comp-chip{
+  flex:none;height:52px;display:flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:6px;background:var(--w-4);backdrop-filter:blur(20px);
+  position:relative;overflow:hidden;
+}
+.comp-chip .glow{
+  position:absolute;top:50%;left:0;transform:translateY(-50%);width:64px;height:64px;
+  background:#fff;border-radius:266.4px;opacity:.08;filter:blur(12px);
+}
+.comp-chip .glow.blue{background:#1556e4}
+.comp-chip .logo-wrap{position:relative;width:24px;height:24px;background:#fff;border-radius:99.9px;flex:none;overflow:hidden}
+.comp-chip .logo-wrap.blue{background:#1556e4}
+.comp-chip .logo-wrap img{position:absolute;display:block}
+.comp-chip .name{font-size:14px;line-height:20px;color:var(--w-64);white-space:nowrap}
+
+/* ========== FILTERS BAR ========== */
+.filters-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 12px;width:100%;
+  background:var(--w-4);backdrop-filter:blur(4px);
+  margin-top:8px;
+}
+.filters-group{display:flex;align-items:center;gap:16px}
+.filter-item{display:flex;align-items:center;gap:8px}
+.filter-item .lbl{font-size:12px;line-height:16px;color:var(--w-90)}
+.switch{
+  position:relative;width:32px;height:20px;padding:2px;
+  display:flex;align-items:center;
+}
+.switch .track{
+  width:28px;height:16px;border-radius:999px;background:var(--w-32);
+}
+.switch .knob{
+  position:absolute;top:4px;left:4px;
+  width:12px;height:12px;border-radius:999px;background:var(--bg);
+}
+.switch.on .track{background:var(--main)}
+.switch.on .knob{left:16px}
+.filter-option{
+  display:flex;align-items:center;gap:4px;
+  padding:8px 12px;border-radius:999px;background:var(--w-8);
+  min-width:70px;justify-content:center;
+}
+.filter-option .ic{width:16px;height:16px;display:flex;align-items:center;justify-content:center}
+.filter-option .ic svg{width:100%;height:100%}
+.filter-option .txt{font-size:12px;line-height:16px;color:var(--w-80)}
+
+/* ========== COUNTRY / LEAGUE LIST ========== */
+.country-list{
+  margin:8px;
+  background:var(--w-4);border-radius:4px;
+  display:flex;flex-direction:column;gap:4px;
+  overflow:hidden;
+}
+.country-row{
+  display:flex;flex-direction:column;width:100%;
+}
+.country-head{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 16px;width:100%;border-radius:4px;
+}
+.country-head .flag{
+  flex:none;width:22.4px;height:16px;border-radius:3px;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background:#ddd;
+}
+.country-head .flag img{width:100%;height:100%;object-fit:cover}
+.country-head .flag.italy{background:linear-gradient(90deg,#249f58 33.33%,#fff 33.33%,#fff 66.66%,#ce2b37 66.66%)}
+.country-head .flag.germany{background:linear-gradient(180deg,#151515 33.33%,#f93939 33.33%,#f93939 66.66%,#ffda2c 66.66%)}
+.country-head .flag.spain{background:linear-gradient(180deg,#f93939 25%,#ffda2c 25%,#ffda2c 75%,#f93939 75%)}
+.country-head .flag.france{background:linear-gradient(90deg,#1a47b8 33.33%,#fff 33.33%,#fff 66.66%,#f93939 66.66%)}
+.country-head .flag.europe{background:#1a47b8;display:flex;align-items:center;justify-content:center;color:#ffda2c;font-size:10px}
+.country-head .flag.russia{background:linear-gradient(180deg,#fff 33.33%,#1a47b8 33.33%,#1a47b8 66.66%,#f93939 66.66%)}
+.country-head .name{
+  flex:1;min-width:0;font-size:12px;line-height:16px;color:var(--w-100);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.country-head.collapsed .name{color:var(--w-64)}
+.country-head .chev{
+  width:16px;height:16px;flex:none;color:var(--w-64);
+  display:flex;align-items:center;justify-content:center;
+}
+.country-head .chev svg{width:100%;height:100%}
+.country-row.open .country-head .chev{transform:rotate(180deg)}
+
+.league-list{
+  padding:0 4px 4px;
+}
+.league-list .inner{
+  background:var(--bg);border-radius:4px;
+  padding:4px;display:flex;flex-direction:column;gap:4px;
+}
+.league-item{
+  display:flex;align-items:center;gap:8px;
+  height:40px;padding:10px 8px;border-radius:2px;
+  width:100%;
+}
+.league-item.selected{background:var(--w-8)}
+.league-item .star{width:16px;height:16px;flex:none;color:var(--w-64);display:flex;align-items:center;justify-content:center}
+.league-item .star svg{width:100%;height:100%}
+.league-item .name{
+  flex:1;min-width:0;font-size:12px;line-height:16px;color:var(--w-64);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.league-item.selected .name{color:var(--w-90)}
+.league-item .count{
+  flex:none;font-size:10px;line-height:14px;letter-spacing:.4px;color:var(--w-56);
+}
+
+/* ========== PLACEHOLDER FOOTER ========== */
+.placeholder-section{
+  margin:24px 8px;padding:16px;border-radius:12px;
+  background:var(--w-4);border:1px dashed var(--w-12);
+  color:var(--w-48);font-size:12px;text-align:center;
+}
+
+/* nav styles live in nav.js */
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== Status Bar ===== -->
+  <div class="statusbar">
+    <p class="time">9:41</p>
+    <img class="cellular" src="assets/9a9814626f1691496dee37fbaec4dc36714c9fc3.svg" alt="">
+    <img class="wifi" src="assets/8a2078f592bc8059bdee9a1b67c5850384630832.svg" alt="">
+    <img class="battery" src="assets/f555df63f6a65f0f822624125f6922109416d804.svg" alt="">
+  </div>
+
+  <!-- ===== Header ===== -->
+  <div class="header-bar">
+    <div class="logo-wrap">
+      <img class="vbet" src="assets/c7ee4cb442a696c4b22400e87d4d4564d77ee63d.svg" alt="VBet">
+    </div>
+    <div class="right">
+      <button class="icon-btn-pink" aria-label="announcements">
+        <img src="assets/cd2ab15627e314b76cd18186ac8debb1e046753b.svg" alt="">
+      </button>
+      <div class="balance">
+        <img class="plus" src="assets/fba9a203cde61becd3d03a28733eed924695e9e6.svg" alt="">
+        <span class="amt">2 000 000.50</span>
+        <img class="cur" src="assets/dcbe03fff8b7bff8da30b22defa876253b4ed716.svg" alt="">
+      </div>
+      <button class="icon-btn-ghost" aria-label="user">
+        <img src="assets/c51db1de3442902710310b7f412f5e50bf258747.svg" alt="">
+      </button>
+      <img class="notif-dot" src="assets/3bfbd9ba21a63ae47aae5835471dcaa057683d29.svg" alt="">
+    </div>
+  </div>
+
+  <!-- ===== My Zone subnav ===== -->
+  <div class="subnav">
+    <div class="subnav-row">
+      <button class="icon-btn-ghost" aria-label="search">
+        <img src="assets/a60c35b6330c349df1b28504b4e27f90d97d172a.svg" alt="">
+      </button>
+      <div class="my-zone">
+        <span class="label">My Zone</span>
+        <div class="stats">
+          <div class="stat">
+            <img src="assets/8870c8992c4849c49f96ffb9b4eb1a7d18919ada.svg" alt="">
+            <div class="num">3</div>
+          </div>
+          <div class="divider"></div>
+          <div class="stat">
+            <img src="assets/acd11b20fb2060636db862fa9127aba4208a4c74.svg" alt="">
+            <div class="num">2</div>
+          </div>
+          <div class="divider"></div>
+          <div class="stat">
+            <img src="assets/80e95aa265f716d0508b727c0f4d19dede41ec35.svg" alt="">
+            <div class="num">2</div>
+          </div>
+        </div>
+      </div>
+      <button class="icon-btn-ghost" aria-label="settings">
+        <img src="assets/f37caf38309d5f5ce34bd17d34b049ca71fb945f.svg" alt="">
+      </button>
+    </div>
+  </div>
+
+  <!-- Sport filter chips (shared component) -->
+  <div id="sport-bar" data-active="football"></div>
+
+  <!-- ===== Top Competitions ===== -->
+  <div class="competitions">
+    <div class="comp-chip">
+      <div class="glow"></div>
+      <div class="logo-wrap"><img src="assets/8ddde88a14c05073e82a89bb83d43439fc919b12.svg" alt="" style="position:absolute;top:12.5%;left:20%;right:20%;bottom:12.5%;width:60%;height:75%"></div>
+      <span class="name">Premier League</span>
+    </div>
+    <div class="comp-chip">
+      <div class="glow"></div>
+      <div class="logo-wrap"><img src="assets/e32fe68a922b9aee1c912779df0b087583e9564d.svg" alt="" style="position:absolute;top:12.5%;left:27.08%;right:27.08%;bottom:12.5%;width:45.84%;height:75%"></div>
+      <span class="name">Serie A</span>
+    </div>
+    <div class="comp-chip">
+      <div class="glow"></div>
+      <div class="logo-wrap"><img src="assets/9c9abf6e522c806e7fddd46e7dbcbbb32e039ba7.svg" alt="" style="position:absolute;top:12.5%;left:14.58%;right:14.58%;bottom:12.5%;width:70.84%;height:75%"></div>
+      <span class="name">LaLiga</span>
+    </div>
+    <div class="comp-chip">
+      <div class="glow"></div>
+      <div class="logo-wrap"><img src="assets/6cfb141515b99fc022440cfb2472a0072ad85e7d.svg" alt="" style="position:absolute;top:12.5%;left:12.5%;right:12.5%;bottom:12.5%;width:75%;height:75%"></div>
+      <span class="name">Bundesliga</span>
+    </div>
+    <div class="comp-chip">
+      <div class="glow blue"></div>
+      <div class="logo-wrap blue"><img src="assets/5ec45c21e4ffe2db79e7f6583459764bb960c0ec.svg" alt="" style="position:absolute;top:12.5%;left:20.42%;right:20.42%;bottom:12.5%;width:59.16%;height:75%"></div>
+      <span class="name">League 1</span>
+    </div>
+  </div>
+
+  <!-- ===== Filters Bar ===== -->
+  <div class="filters-bar">
+    <div class="filters-group">
+      <label class="filter-item">
+        <span class="lbl">Outrights</span>
+        <span class="switch"><span class="track"></span><span class="knob"></span></span>
+      </label>
+      <label class="filter-item">
+        <span class="lbl">BB</span>
+        <span class="switch"><span class="track"></span><span class="knob"></span></span>
+      </label>
+    </div>
+    <button class="filter-option">
+      <span class="ic">
+        <svg viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1.3"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5V8l2.2 1.5"/></svg>
+      </span>
+      <span class="txt">All</span>
+      <span class="ic">
+        <svg viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1.3"><path d="M4 6.5l4-3 4 3M4 9.5l4 3 4-3"/></svg>
+      </span>
+    </button>
+  </div>
+
+  <!-- ===== Country / League List ===== -->
+  <div class="country-list">
+    <!-- England (expanded) -->
+    <div class="country-row open">
+      <button class="country-head">
+        <span class="flag"><img src="assets/gw-uk-flag.png" alt=""></span>
+        <span class="name">England</span>
+        <span class="chev">
+          <svg viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.64)" stroke-width="1.3"><path d="M4 10l4-4 4 4" transform="rotate(180 8 8)"/></svg>
+        </span>
+      </button>
+      <div class="league-list">
+        <div class="inner">
+          <a class="league-item selected" href="prematch-games.html">
+            <span class="star">
+              <svg viewBox="0 0 16 16" fill="rgba(255,255,255,.9)"><path d="M8 1.5l1.9 4.1 4.5.5-3.3 3.1.9 4.4L8 11.5 4 13.6l.9-4.4-3.3-3.1 4.5-.5z"/></svg>
+            </span>
+            <span class="name">Premier League</span>
+            <span class="count">20</span>
+          </a>
+          <a class="league-item">
+            <span class="star">
+              <svg viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.64)" stroke-width="1.3"><path d="M8 1.8l1.9 4 4.4.5-3.3 3.1.9 4.3L8 11.6 4.1 13.7l.9-4.3-3.3-3.1 4.4-.5z"/></svg>
+            </span>
+            <span class="name">FA Cup</span>
+            <span class="count">14</span>
+          </a>
+          <a class="league-item">
+            <span class="star">
+              <svg viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.64)" stroke-width="1.3"><path d="M8 1.8l1.9 4 4.4.5-3.3 3.1.9 4.3L8 11.6 4.1 13.7l.9-4.3-3.3-3.1 4.4-.5z"/></svg>
+            </span>
+            <span class="name">Championship</span>
+            <span class="count">5</span>
+          </a>
+          <a class="league-item">
+            <span class="star">
+              <svg viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.64)" stroke-width="1.3"><path d="M8 1.8l1.9 4 4.4.5-3.3 3.1.9 4.3L8 11.6 4.1 13.7l.9-4.3-3.3-3.1 4.4-.5z"/></svg>
+            </span>
+            <span class="name">League One</span>
+            <span class="count">5</span>
+          </a>
+          <a class="league-item">
+            <span class="star">
+              <svg viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.64)" stroke-width="1.3"><path d="M8 1.8l1.9 4 4.4.5-3.3 3.1.9 4.3L8 11.6 4.1 13.7l.9-4.3-3.3-3.1 4.4-.5z"/></svg>
+            </span>
+            <span class="name">Premier League. Matchday Statistics</span>
+            <span class="count">5</span>
+          </a>
+          <a class="league-item">
+            <span class="star">
+              <svg viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.64)" stroke-width="1.3"><path d="M8 1.8l1.9 4 4.4.5-3.3 3.1.9 4.3L8 11.6 4.1 13.7l.9-4.3-3.3-3.1 4.4-.5z"/></svg>
+            </span>
+            <span class="name">FA Trophy</span>
+            <span class="count">4</span>
+          </a>
+          <a class="league-item">
+            <span class="star">
+              <svg viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.64)" stroke-width="1.3"><path d="M8 1.8l1.9 4 4.4.5-3.3 3.1.9 4.3L8 11.6 4.1 13.7l.9-4.3-3.3-3.1 4.4-.5z"/></svg>
+            </span>
+            <span class="name">FA WSL</span>
+            <span class="count">6</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Italy -->
+    <div class="country-row">
+      <button class="country-head collapsed">
+        <span class="flag italy"></span>
+        <span class="name">Italy</span>
+        <span class="chev">
+          <svg viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.64)" stroke-width="1.3"><path d="M4 6l4 4 4-4"/></svg>
+        </span>
+      </button>
+    </div>
+
+    <!-- Germany -->
+    <div class="country-row">
+      <button class="country-head collapsed">
+        <span class="flag germany"></span>
+        <span class="name">Germany</span>
+        <span class="chev">
+          <svg viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.64)" stroke-width="1.3"><path d="M4 6l4 4 4-4"/></svg>
+        </span>
+      </button>
+    </div>
+
+    <!-- Spain -->
+    <div class="country-row">
+      <button class="country-head collapsed">
+        <span class="flag spain"></span>
+        <span class="name">Spain</span>
+        <span class="chev">
+          <svg viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.64)" stroke-width="1.3"><path d="M4 6l4 4 4-4"/></svg>
+        </span>
+      </button>
+    </div>
+
+    <!-- France -->
+    <div class="country-row">
+      <button class="country-head collapsed">
+        <span class="flag france"></span>
+        <span class="name">France</span>
+        <span class="chev">
+          <svg viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.64)" stroke-width="1.3"><path d="M4 6l4 4 4-4"/></svg>
+        </span>
+      </button>
+    </div>
+
+    <!-- Europe -->
+    <div class="country-row">
+      <button class="country-head collapsed">
+        <span class="flag europe">★</span>
+        <span class="name">Europe</span>
+        <span class="chev">
+          <svg viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.64)" stroke-width="1.3"><path d="M4 6l4 4 4-4"/></svg>
+        </span>
+      </button>
+    </div>
+
+    <!-- Russia -->
+    <div class="country-row">
+      <button class="country-head collapsed">
+        <span class="flag russia"></span>
+        <span class="name">Russia</span>
+        <span class="chev">
+          <svg viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.64)" stroke-width="1.3"><path d="M4 6l4 4 4-4"/></svg>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== Footer placeholder ===== -->
+  <div class="placeholder-section">Payments · Regulations · Partners · App stores · Hoory AI<br>(approximated — reuses home page footer)</div>
+
+</div><!-- /.app -->
+
+<div id="app-nav" data-page="prematch"></div>
+<script src="sportbar.js"></script>
+<script src="nav.js"></script>
+<script src="betslip-popup.js"></script>
+
+</body>
+</html>

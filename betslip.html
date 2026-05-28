@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>VBet — Betslip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#010c23;
+  --bg-32:rgba(1,12,35,.32);
+  --bg-60:rgba(1,12,35,.6);
+  --main:#d80d83;
+  --main-16:rgba(216,13,131,.16);
+  --odds:#ffad29;
+  --w-100:#fff;
+  --w-90:rgba(255,255,255,.9);
+  --w-80:rgba(255,255,255,.8);
+  --w-72:rgba(255,255,255,.72);
+  --w-64:rgba(255,255,255,.64);
+  --w-56:rgba(255,255,255,.56);
+  --w-48:rgba(255,255,255,.48);
+  --w-40:rgba(255,255,255,.4);
+  --w-32:rgba(255,255,255,.32);
+  --w-24:rgba(255,255,255,.24);
+  --w-16:rgba(255,255,255,.16);
+  --w-12:rgba(255,255,255,.12);
+  --w-8:rgba(255,255,255,.08);
+  --w-4:rgba(255,255,255,.04);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:#000;font-family:'Rubik',system-ui,-apple-system,sans-serif;color:var(--w-100);font-size:14px;line-height:20px;letter-spacing:0}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input{font:inherit;color:inherit;background:none;border:0;outline:none;width:100%}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+.app{
+  width:375px;margin:0 auto;min-height:100vh;
+  background:var(--bg);position:relative;
+  overflow-x:hidden;padding-bottom:114px;
+}
+
+/* ========== STATUS BAR ========== */
+.statusbar{
+  position:relative;height:40px;width:375px;
+  background:linear-gradient(90deg,var(--w-4) 0%,var(--w-4) 100%),linear-gradient(90deg,var(--bg) 0%,var(--bg) 100%);
+}
+.statusbar .time{
+  position:absolute;left:48px;top:50%;transform:translate(-50%,-50%);
+  font-family:'SF Pro','SF Pro Display','-apple-system',sans-serif;
+  font-weight:700;font-size:14px;letter-spacing:-.3px;color:var(--w-90);text-align:center;width:54px;
+}
+.statusbar .battery{position:absolute;top:50%;right:19px;transform:translateY(-50%);width:20.926px;height:9.748px}
+.statusbar .wifi{position:absolute;top:50%;right:44.23px;transform:translateY(-50%);width:13.188px;height:9.461px}
+.statusbar .cellular{position:absolute;top:50%;right:61.72px;transform:translateY(-50%);width:14.622px;height:9.175px}
+
+/* ========== BETSLIP CONTAINER ========== */
+.betslip{
+  width:375px;
+  padding:0 8px 8px;
+  border-top:1px solid var(--w-16);
+  border-radius:8px;
+  background:linear-gradient(90deg,var(--w-4) 0%,var(--w-4) 100%),var(--bg);
+  backdrop-filter:blur(15px);
+  display:flex;flex-direction:column;
+}
+
+/* top tabs → bs-tabs.js */
+
+/* ========== MAIN ========== */
+.bs-main{
+  display:flex;flex-direction:column;gap:8px;align-items:center;
+  padding:8px 0;width:100%;
+}
+
+/* ========== TYPE TABS (Single / Multiple / System + Trash) ========== */
+.bs-type-tabs{
+  display:flex;gap:8px;align-items:center;width:100%;
+  padding:4px;border-radius:88px;
+}
+.bs-type-tab{
+  flex:1;min-width:0;height:24px;max-height:24px;min-height:24px;
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  padding:8px 12px;border-radius:999px;cursor:pointer;
+  background:var(--w-8);
+}
+.bs-type-tab.active{
+  background:var(--main-16);border:1px solid var(--main);padding:7px 11px;
+}
+.bs-type-tab .lbl{
+  font-size:12px;line-height:16px;color:var(--w-72);white-space:nowrap;padding:0 4px;
+}
+.bs-type-tab.active .lbl{color:var(--w-72)}
+.bs-trash{
+  width:32px;height:32px;min-width:32px;min-height:32px;border-radius:999px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.bs-trash img{width:16px;height:16px}
+
+/* ========== BET TICKETS ========== */
+.bs-tickets{
+  display:flex;flex-direction:column;gap:4px;align-items:flex-start;width:100%;
+}
+.bs-ticket{
+  width:100%;
+  background:var(--w-8);
+  border-radius:6px;
+  padding:4px 8px 8px;
+  display:flex;flex-direction:column;gap:4px;
+}
+.bs-ticket-title{
+  display:flex;align-items:center;justify-content:space-between;width:100%;
+  border-bottom:1px dashed var(--w-12);
+}
+.bs-ticket-date{
+  flex:1;height:32px;display:flex;align-items:center;gap:4px;
+}
+.bs-ticket-date .txt{
+  font-size:12px;line-height:16px;color:var(--w-56);letter-spacing:.4px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.bs-ticket-date .dot{width:4px;height:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.bs-ticket-date .dot img{width:4px;height:4px}
+.bs-ticket-close{
+  width:24px;height:24px;min-width:24px;min-height:24px;border-radius:999px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.bs-ticket-close img{width:16px;height:16px}
+
+.bs-ticket-selection{
+  display:flex;align-items:flex-start;justify-content:space-between;width:100%;
+}
+.bs-ticket-selection .name{
+  font-size:14px;line-height:20px;font-weight:500;color:var(--w-80);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.bs-ticket-selection .odds{
+  font-size:14px;line-height:20px;color:var(--odds);text-align:center;white-space:nowrap;
+}
+
+.bs-ticket-market{
+  display:flex;flex-direction:column;gap:2px;width:100%;
+  font-size:12px;line-height:16px;
+}
+.bs-ticket-market .mkt{color:var(--w-72);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bs-ticket-market .teams{color:var(--w-100);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.bs-stake-container{
+  display:flex;flex-direction:column;gap:8px;align-items:flex-start;width:100%;padding-top:4px;
+}
+.bs-stake-field{
+  width:100%;height:40px;border-radius:999px;background:var(--w-8);
+  display:flex;align-items:center;gap:8px;padding:0 16px;
+}
+.bs-stake-field .value{
+  flex:1;min-width:0;font-size:14px;line-height:20px;color:var(--w-80);
+  background:transparent;border:0;outline:none;
+}
+.bs-stake-field .value::placeholder{color:var(--w-56)}
+.bs-stake-field .value.placeholder{color:var(--w-56)}
+.bs-stake-field .right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.bs-stake-field .max{font-size:14px;line-height:20px;color:var(--w-56);white-space:nowrap}
+.bs-stake-field .chev{width:20px;height:20px;display:flex;align-items:center;justify-content:center}
+.bs-stake-field .chev img{width:10px;height:11.67px}
+
+.bs-possible-win{
+  display:flex;align-items:center;justify-content:space-between;width:100%;
+  padding:0 8px;font-size:12px;line-height:16px;text-align:center;
+}
+.bs-possible-win .lbl{color:var(--w-40)}
+.bs-possible-win .amt{color:var(--w-64)}
+
+/* ========== PRESETS ========== */
+.bs-presets{
+  display:flex;gap:8px;align-items:flex-start;width:100%;
+}
+.bs-presets .preset{
+  flex:1;min-width:56px;height:32px;max-height:32px;min-height:32px;
+  display:flex;align-items:center;justify-content:center;
+  padding:6px 16px;border-radius:999px;
+  background:var(--w-8);border-top:1px solid var(--w-16);
+  font-size:12px;line-height:16px;color:var(--w-90);white-space:nowrap;
+}
+
+/* ========== TOTAL STAKE ========== */
+.bs-total{
+  display:flex;align-items:center;justify-content:space-between;width:100%;
+  padding:0 8px;font-size:12px;line-height:16px;text-align:center;
+}
+.bs-total .lbl{color:var(--w-40)}
+.bs-total .amt{color:var(--w-64)}
+
+/* ========== COUNTER OFFER ========== */
+.bs-counter-offer{
+  width:100%;height:32px;border-radius:88px;
+  background:var(--w-4);
+  padding:4px 8px 4px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.bs-counter-offer .logo{
+  width:97px;height:12px;display:block;
+}
+.bs-switch{padding:2px;display:flex;align-items:flex-start}
+.bs-switch .track{
+  width:34px;height:20px;border-radius:999px;background:var(--w-32);position:relative;
+}
+.bs-switch .knob{
+  position:absolute;top:2px;left:2px;
+  width:20px;height:16px;border-radius:999px;background:var(--bg);
+  transition:left .15s ease;
+}
+.bs-switch.on .track{background:var(--main)}
+.bs-switch.on .knob{left:12px}
+
+/* ========== ODDS CHANGE SELECT ========== */
+.bs-odds-select{
+  width:100%;height:32px;border-radius:999px;background:var(--w-8);
+  padding:0 16px;
+  display:flex;align-items:center;gap:8px;
+}
+.bs-odds-select .lbl{
+  flex:1;min-width:0;font-size:12px;line-height:16px;color:var(--w-56);
+}
+.bs-odds-select .chev{width:16px;height:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.bs-odds-select .chev img{width:9.33px;height:5.33px}
+
+/* ========== ACTIONS ========== */
+.bs-actions{
+  display:flex;gap:8px;align-items:flex-start;width:100%;
+}
+.bs-place-bet{
+  flex:1;min-width:88px;height:40px;max-height:40px;min-height:40px;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 24px;border-radius:999px;
+  background:var(--w-8);
+  font-size:14px;line-height:20px;color:var(--w-24);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;
+}
+.bs-share{
+  width:40px;height:40px;min-width:40px;min-height:40px;border-radius:999px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.bs-share img{width:20px;height:20px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== Status Bar ===== -->
+  <div class="statusbar">
+    <p class="time">9:41</p>
+    <img class="cellular" src="assets/9a9814626f1691496dee37fbaec4dc36714c9fc3.svg" alt="">
+    <img class="wifi" src="assets/8a2078f592bc8059bdee9a1b67c5850384630832.svg" alt="">
+    <img class="battery" src="assets/f555df63f6a65f0f822624125f6922109416d804.svg" alt="">
+  </div>
+
+  <!-- ===== Betslip ===== -->
+  <div class="betslip">
+
+    <!-- Top tabs (component) -->
+    <div data-bs-tabs="betslip"></div>
+    <script src="bs-tabs.js"></script>
+
+    <!-- Main -->
+    <div class="bs-main">
+
+      <!-- Type tabs -->
+      <div class="bs-type-tabs">
+        <div class="bs-type-tab active"><span class="lbl">Single</span></div>
+        <a class="bs-type-tab" href="betslip-multiple.html"><span class="lbl">Multiple</span></a>
+        <div class="bs-type-tab"><span class="lbl">System</span></div>
+        <button class="bs-trash" aria-label="clear all"><img src="assets/bs-trash.svg" alt=""></button>
+      </div>
+
+      <!-- Bet tickets -->
+      <div class="bs-tickets">
+
+        <!-- Ticket 1: Fulham -->
+        <div class="bs-ticket">
+          <div class="bs-ticket-title">
+            <div class="bs-ticket-date">
+              <span class="txt">03.04.2026</span>
+              <span class="dot"><img src="assets/bs-dots-h.svg" alt=""></span>
+              <span class="txt">19:00</span>
+            </div>
+            <button class="bs-ticket-close" aria-label="remove"><img src="assets/bs-x-close.svg" alt=""></button>
+          </div>
+          <div class="bs-ticket-selection">
+            <p class="name">Fulham</p>
+            <p class="odds">2.50</p>
+          </div>
+          <div class="bs-ticket-market">
+            <p class="mkt">Match Result (Early Payout)</p>
+            <p class="teams">Fulham - Aston Villa</p>
+          </div>
+          <div class="bs-stake-container">
+            <div class="bs-stake-field">
+              <input class="value" type="text" value="12">
+              <div class="right">
+                <span class="max">MAX</span>
+                <span class="chev"><img src="assets/bs-chevron-down-double.svg" alt=""></span>
+              </div>
+            </div>
+            <div class="bs-possible-win">
+              <span class="lbl">Possible Win:</span>
+              <span class="amt">$ 30.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ticket 2: Atletico Madrid -->
+        <div class="bs-ticket">
+          <div class="bs-ticket-title">
+            <div class="bs-ticket-date">
+              <span class="txt">03.04.2026</span>
+              <span class="dot"><img src="assets/bs-dots-h.svg" alt=""></span>
+              <span class="txt">19:00</span>
+            </div>
+            <button class="bs-ticket-close" aria-label="remove"><img src="assets/bs-x-close.svg" alt=""></button>
+          </div>
+          <div class="bs-ticket-selection">
+            <p class="name">Atletico Madrid</p>
+            <p class="odds">3.29</p>
+          </div>
+          <div class="bs-ticket-market">
+            <p class="mkt">Match Result</p>
+            <p class="teams">Atletico Madrid - Arsenal</p>
+          </div>
+          <div class="bs-stake-container">
+            <div class="bs-stake-field">
+              <input class="value" type="text" value="2 000">
+              <div class="right">
+                <span class="max">MAX</span>
+              </div>
+            </div>
+            <div class="bs-possible-win">
+              <span class="lbl">Possible Win:</span>
+              <span class="amt">$ 6 580.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ticket 3: Aston Villa -->
+        <div class="bs-ticket">
+          <div class="bs-ticket-title">
+            <div class="bs-ticket-date">
+              <span class="txt">03.04.2026</span>
+              <span class="dot"><img src="assets/bs-dots-h.svg" alt=""></span>
+              <span class="txt">19:00</span>
+            </div>
+            <button class="bs-ticket-close" aria-label="remove"><img src="assets/bs-x-close.svg" alt=""></button>
+          </div>
+          <div class="bs-ticket-selection">
+            <p class="name">Aston Villa</p>
+            <p class="odds">1.70</p>
+          </div>
+          <div class="bs-ticket-market">
+            <p class="mkt">Match Result (Early Payout)</p>
+            <p class="teams">Fulham - Aston Villa</p>
+          </div>
+          <div class="bs-stake-container">
+            <div class="bs-stake-field">
+              <input class="value" type="text" placeholder="Enter stake amount">
+              <div class="right">
+                <span class="max">MAX</span>
+              </div>
+            </div>
+            <div class="bs-possible-win">
+              <span class="lbl">Possible Win:</span>
+              <span class="amt">$ 0.00</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /bs-tickets -->
+
+      <!-- Presets -->
+      <div class="bs-presets">
+        <button class="preset">100</button>
+        <button class="preset">500</button>
+        <button class="preset">1 000</button>
+      </div>
+
+      <!-- Total stake -->
+      <div class="bs-total">
+        <span class="lbl">Total Stake:</span>
+        <span class="amt">$ 2 012.00</span>
+      </div>
+
+      <!-- Counter Offer -->
+      <div class="bs-counter-offer">
+        <img class="logo" src="assets/bs-counter-offer-logo.svg" alt="CounterOffer">
+        <div class="bs-switch"><div class="track"><div class="knob"></div></div></div>
+      </div>
+
+      <!-- Odds change select -->
+      <div class="bs-odds-select">
+        <span class="lbl">Always ask when odds change</span>
+        <span class="chev"><img src="assets/bs-chevron-down.svg" alt=""></span>
+      </div>
+
+      <!-- Actions -->
+      <div class="bs-actions">
+        <button class="bs-place-bet">Accept Odds changes and Place a Bet</button>
+        <button class="bs-share" aria-label="share"><img src="assets/bs-share.svg" alt=""></button>
+      </div>
+
+    </div><!-- /bs-main -->
+  </div><!-- /betslip -->
+
+  <div id="app-nav" data-page="betslip"></div>
+</div><!-- /.app -->
+<script src="nav.js"></script>
+</body>
+</html>
