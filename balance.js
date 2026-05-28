@@ -82,7 +82,7 @@
 
 .bal-pop-host{
   position:fixed; left:50%; transform:translateX(-50%);
-  top:92px; width:100%; max-width:430px; padding:0 8px;
+  top:92px; width:100%; max-width:440px; padding:0 8px;
   z-index:90; pointer-events:none;
 }
 .bal-pop-card{
@@ -120,7 +120,7 @@
 
 .bal-dep-host{
   position:fixed; left:50%; transform:translateX(-50%);
-  top:0; width:100%; max-width:430px; height:100vh;
+  top:0; width:100%; max-width:440px; height:100vh;
   z-index:100; pointer-events:none;
   overflow:hidden;
 }
