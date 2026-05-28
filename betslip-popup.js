@@ -13,7 +13,7 @@
   const css = `
 .bsp-host{
   position:fixed; left:50%; transform:translateX(-50%);
-  bottom:96px; width:375px; padding:0 8px;
+  bottom:96px; width:100%; padding:0 8px;
   z-index:80; pointer-events:none;
 }
 .bsp-card{

@@ -4,7 +4,7 @@
   style.textContent = `
 .bottom-fixed{
   position:fixed;left:50%;transform:translateX(-50%);bottom:0;
-  width:375px;background:linear-gradient(0.187deg,var(--bg) 89.121%,rgba(1,12,35,0) 99.246%);
+  width:100%;background:linear-gradient(0.187deg,var(--bg) 89.121%,rgba(1,12,35,0) 99.246%);
   z-index:50;
 }
 .bottom-nav{
@@ -39,7 +39,7 @@
 .home-indicator::after{content:"";width:134px;height:5px;border-radius:3px;background:#fff}
 .sln-group{
   position:fixed;left:50%;transform:translateX(-50%);
-  width:375px;height:48px;bottom:122px;z-index:60;pointer-events:none;
+  width:100%;height:48px;bottom:122px;z-index:60;pointer-events:none;
 }
 .sln-clock{
   position:absolute;left:0;top:0;width:48px;height:48px;overflow:hidden;
