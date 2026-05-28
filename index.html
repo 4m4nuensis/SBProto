@@ -133,31 +133,35 @@ a{color:inherit;text-decoration:none}
 /* ========== BANNER ========== */
 .banner-wrap{position:relative;padding:0 8px;width:100%}
 .banner-card{
-  position:relative;width:100%;max-width:359px;margin:0 auto;
-  height:192px;border-radius:12px;overflow:hidden;
+  position:relative;width:100%;height:192px;border-radius:12px;overflow:hidden;
   border:1.176px solid var(--w-8);
   background:#010c23;
   display:flex;flex-direction:column;justify-content:space-between;
 }
 /* ---- New banner layers ---- */
+/* Portraits/trophy use fixed pixel sizes so they don't scale with the
+ * banner width — the banner card stretches edge-to-edge but the art
+ * stays anchored: Mbappé to the left, Rice to the right, trophy
+ * centered. Designed against the original 359px banner width. */
 .bnr-bg{position:absolute;inset:0;border-radius:12px;pointer-events:none;z-index:0;overflow:hidden}
 .bnr-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.48;border-radius:12px}
 .bnr-dark{position:absolute;inset:0;background:rgba(0,2,5,0.08);pointer-events:none;z-index:0;border-radius:12px}
 .bnr-trophy{
-  position:absolute;left:29.63%;top:-7.66px;width:39.79%;height:191px;
+  position:absolute;left:50%;transform:translateX(-50%);top:-7.66px;
+  width:143px;height:191px;
   filter:blur(0.95px);pointer-events:none;z-index:1;
 }
 .bnr-trophy img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.16}
 .bnr-ar-player{
-  position:absolute;left:62.76%;top:42.82px;width:35.63%;height:134px;
+  position:absolute;right:6px;top:42.82px;width:128px;height:134px;
   overflow:hidden;pointer-events:none;z-index:2;
 }
 .bnr-ar-player img{
   position:absolute;height:100%;left:-54.64%;top:0;width:209.29%;max-width:none;display:block;
 }
 .bnr-mbappe{
-  position:absolute;left:-12.56%;top:37.82px;
-  width:61.56%;height:197px;
+  position:absolute;left:-45px;top:37.82px;
+  width:221px;height:197px;
   pointer-events:none;z-index:3;
 }
 .bnr-mbappe img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
