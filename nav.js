@@ -92,6 +92,24 @@
 .sln-ticket .badge{
   position:absolute;left:37.5px;top:7px;transform:translate(-50%,-50%);
   font-size:12px;font-weight:700;line-height:16px;color:#fff;white-space:nowrap;
+  background:#d80d83; min-width:16px; height:16px; padding:0 4px; border-radius:999px;
+  display:flex;align-items:center;justify-content:center;
+  transform-origin:center; will-change:transform;
+}
+.sln-ticket .badge[hidden]{display:none}
+/* attention bump: scale up + glow when a new draft arrives */
+@keyframes sln-bump{
+  0%   { transform:translate(-50%,-50%) scale(1);   box-shadow:0 0 0 0 rgba(216,13,131,.7); }
+  35%  { transform:translate(-50%,-50%) scale(1.55); box-shadow:0 0 0 8px rgba(216,13,131,0); }
+  70%  { transform:translate(-50%,-50%) scale(.92); }
+  100% { transform:translate(-50%,-50%) scale(1); }
+}
+.sln-ticket .badge.bump{ animation:sln-bump .55s cubic-bezier(.22,.61,.36,1); }
+.sln-ticket.flash{ animation:sln-ring .9s ease-out; }
+@keyframes sln-ring{
+  0%   { box-shadow:0 0 0 0 rgba(216,13,131,.0), inset 0 0 0 0 rgba(216,13,131,0); }
+  20%  { box-shadow:0 0 18px 4px rgba(216,13,131,.55), inset 0 0 0 1px rgba(216,13,131,.8); }
+  100% { box-shadow:0 0 0 0 rgba(216,13,131,0), inset 0 0 0 0 rgba(216,13,131,0); }
 }
 `;
   document.head.appendChild(style);
@@ -101,6 +119,9 @@
   if (!placeholder) return;
 
   const page = placeholder.dataset.page || 'home'; // 'home' | 'live' | 'prematch' | 'betslip' | 'history'
+
+  const initialCount = (window.BetslipStore && window.BetslipStore.getDraftCount()) || 0;
+  const initialHref  = initialCount > 1 ? 'betslip-multiple.html' : 'betslip.html';
 
   function slnItem(label, href, key) {
     const active = page === key ? ' active' : '';
@@ -122,9 +143,9 @@ ${page !== 'casino' ? `<div class="sln-group">
       <div class="ic"><img src="assets/st-dots.svg" alt=""></div>
     </div>
   </div>
-  <a class="sln-ticket" href="betslip.html" aria-label="Open betslip">
+  <a class="sln-ticket" href="${initialHref}" aria-label="Open betslip" data-bs-ticket>
     <div class="ic"><img src="assets/st-ticket.svg" alt=""></div>
-    <span class="badge">21</span>
+    <span class="badge" data-bs-badge${initialCount === 0 ? ' hidden' : ''}>${initialCount}</span>
   </a>
 </div>` : ''}
 <div class="bottom-fixed">
@@ -161,4 +182,29 @@ ${page !== 'casino' ? `<div class="sln-group">
   </div>
   <div class="home-indicator"></div>
 </div>`;
+
+  /* ─── live update badge when DRAFTS change ──────────────────────────────── */
+  if (window.BetslipStore) {
+    let lastDraftCount = window.BetslipStore.getDraftCount();
+    const updateBadge = () => {
+      const ticket = document.querySelector('.sln-ticket[data-bs-ticket]');
+      const badge  = ticket && ticket.querySelector('[data-bs-badge]');
+      if (!badge || !ticket) return;
+      const n = window.BetslipStore.getDraftCount();
+      const grew = n > lastDraftCount;
+      lastDraftCount = n;
+      badge.textContent = String(n);
+      if (n === 0) badge.setAttribute('hidden', '');
+      else badge.removeAttribute('hidden');
+      ticket.setAttribute('href', n > 1 ? 'betslip-multiple.html' : 'betslip.html');
+      if (grew) {
+        badge.classList.remove('bump'); ticket.classList.remove('flash');
+        // force reflow so the animation restarts even on consecutive bumps
+        void badge.offsetWidth;
+        badge.classList.add('bump');
+        ticket.classList.add('flash');
+      }
+    };
+    window.BetslipStore.subscribeDrafts(updateBadge);
+  }
 })();

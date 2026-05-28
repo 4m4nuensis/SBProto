@@ -124,6 +124,19 @@ body.bsp-open .sln-group{
   transition:opacity .2s;
 }
 .sln-group{ transition:opacity .2s; }
+
+/* Flying chip that travels from a tapped odd to the ticket icon */
+.bsp-fly{
+  position:fixed; z-index:120; pointer-events:none;
+  background:#d80d83; color:#fff;
+  border-radius:999px; padding:4px 10px;
+  font:600 12px/16px 'Rubik',system-ui,sans-serif;
+  white-space:nowrap; box-shadow:0 8px 24px rgba(216,13,131,.5);
+  transform:translate(-50%,-50%) scale(1);
+  transition:transform .42s cubic-bezier(.45,.05,.55,.95), opacity .25s ease-out, left .42s cubic-bezier(.45,.05,.55,.95), top .42s cubic-bezier(.45,.05,.55,.95);
+  will-change:left,top,transform,opacity;
+}
+.bsp-fly.gone{ opacity:0; transform:translate(-50%,-50%) scale(.35); }
 `;
   const styleEl = document.createElement('style');
   styleEl.textContent = css;
@@ -308,21 +321,99 @@ body.bsp-open .sln-group{
     placeBtn.textContent = 'Place Bet';
   }
 
+  /* ──────────────── fly-to-icon animation ──────────────── */
+  function getTicketTarget() {
+    const el = document.querySelector('.sln-ticket[data-bs-ticket]');
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  }
+  function flyToTicket(fromEl, label) {
+    const target = getTicketTarget();
+    if (!target || !fromEl) return Promise.resolve();
+    const r = fromEl.getBoundingClientRect();
+    const start = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    const chip = document.createElement('div');
+    chip.className = 'bsp-fly';
+    chip.textContent = label || '+1';
+    chip.style.left = start.x + 'px';
+    chip.style.top  = start.y + 'px';
+    document.body.appendChild(chip);
+    // next frame → animate to target
+    return new Promise(resolve => {
+      requestAnimationFrame(() => {
+        chip.style.left = target.x + 'px';
+        chip.style.top  = target.y + 'px';
+        chip.classList.add('gone');
+        setTimeout(() => { chip.remove(); resolve(); }, 460);
+      });
+    });
+  }
+
+  function popupBetSnapshot() {
+    return {
+      selection: nameEl.textContent,
+      market:    mktEl.textContent,
+      teams:     teamsEl.textContent,
+      odds:      currentOdds,
+      stake:     parseStake(stakeIn.value),
+      date:      dateEl.textContent,
+      time:      timeEl.textContent,
+    };
+  }
+  function ctxToBet(ctx) {
+    return {
+      selection: ctx.selection,
+      market:    ctx.market,
+      teams:     ctx.teams,
+      odds:      ctx.odds,
+      stake:     0,
+      date:      dateEl.textContent,
+      time:      timeEl.textContent,
+    };
+  }
+
+  function addDraftWithFly(bet, fromEl) {
+    if (!window.BetslipStore) return;
+    flyToTicket(fromEl, (Number(bet.odds) || 0).toFixed(2));
+    // Add to store immediately; animation is decorative.
+    window.BetslipStore.addDraft(bet);
+  }
+
   /* ──────────────── wire events ──────────────── */
   document.addEventListener('click', function (e) {
     const oddBtn = e.target.closest(ODD_SELECTOR);
     if (!oddBtn) return;
-    // Guard: must contain odds info (.o for 1x2, .to-bet-odds for outright)
     if (!oddBtn.querySelector('.o, .to-bet-odds')) return;
     e.preventDefault();
     e.stopPropagation();
 
-    // Toggle off if tapping the same odd again
-    if (currentOddBtn === oddBtn && host.classList.contains('open')) {
-      close();
+    const ctx = extractContext(oddBtn);
+    const store = window.BetslipStore;
+    const draftCount = store ? store.getDraftCount() : 0;
+    const popupOpen  = host.classList.contains('open');
+
+    // 1. Tapping the same odd again toggles the popup off (single-bet mode only).
+    if (popupOpen && currentOddBtn === oddBtn) { close(); return; }
+
+    // 2. Already in multi-bet mode (drafts exist) → just queue directly.
+    if (draftCount > 0 && !popupOpen) {
+      addDraftWithFly(ctxToBet(ctx), oddBtn);
       return;
     }
-    const ctx = extractContext(oddBtn);
+
+    // 3. Popup open with bet #1, user tapped a different odd → enter multi-bet.
+    //    Queue the popup's current bet and the new one, close popup.
+    if (popupOpen && currentOddBtn !== oddBtn) {
+      const firstBet  = popupBetSnapshot();
+      const firstFrom = currentOddBtn || oddBtn;
+      close();
+      addDraftWithFly(firstBet, firstFrom);
+      addDraftWithFly(ctxToBet(ctx), oddBtn);
+      return;
+    }
+
+    // 4. Default: single-bet popup for the first tap.
     open(ctx, oddBtn);
   }, true); // capture phase to beat parent anchor navigation
 
@@ -333,6 +424,20 @@ body.bsp-open .sln-group{
 
   placeBtn.addEventListener('click', function () {
     if (host.classList.contains('placing')) return;
+    if (!currentOdds || currentOdds <= 0) return;
+
+    if (window.BetslipStore) {
+      window.BetslipStore.addBet({
+        selection: nameEl.textContent,
+        market:    mktEl.textContent,
+        teams:     teamsEl.textContent,
+        odds:      currentOdds,
+        stake:     parseStake(stakeIn.value),
+        date:      dateEl.textContent,
+        time:      timeEl.textContent,
+      });
+    }
+
     host.classList.add('placing');
     placeBtn.textContent = 'Bet Placed ✓';
     placingTimer = setTimeout(close, 1100);

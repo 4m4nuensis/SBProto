@@ -105,6 +105,15 @@ a{color:inherit;text-decoration:none}
 .bs-tickets{
   display:flex;flex-direction:column;gap:4px;align-items:flex-start;width:100%;
 }
+.bs-empty{
+  width:100%;padding:32px 16px;border-radius:8px;
+  background:var(--w-4);border:1px dashed var(--w-12);
+  display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;
+}
+.bs-empty .ttl{font-size:14px;line-height:20px;color:var(--w-72);font-weight:500}
+.bs-empty .sub{font-size:12px;line-height:16px;color:var(--w-48)}
+/* Hide trailing draft-mode controls when there are no live drafts (always, for now) */
+.bs-presets, .bs-total, .bs-counter-offer, .bs-odds-select, .bs-actions{display:none !important}
 .bs-ticket{
   width:100%;
   background:var(--w-8);
@@ -276,107 +285,13 @@ a{color:inherit;text-decoration:none}
         <button class="bs-trash" aria-label="clear all"><img src="assets/bs-trash.svg" alt=""></button>
       </div>
 
-      <!-- Bet tickets -->
-      <div class="bs-tickets">
-
-        <!-- Ticket 1: Fulham -->
-        <div class="bs-ticket">
-          <div class="bs-ticket-title">
-            <div class="bs-ticket-date">
-              <span class="txt">03.04.2026</span>
-              <span class="dot"><img src="assets/bs-dots-h.svg" alt=""></span>
-              <span class="txt">19:00</span>
-            </div>
-            <button class="bs-ticket-close" aria-label="remove"><img src="assets/bs-x-close.svg" alt=""></button>
-          </div>
-          <div class="bs-ticket-selection">
-            <p class="name">Fulham</p>
-            <p class="odds">2.50</p>
-          </div>
-          <div class="bs-ticket-market">
-            <p class="mkt">Match Result (Early Payout)</p>
-            <p class="teams">Fulham - Aston Villa</p>
-          </div>
-          <div class="bs-stake-container">
-            <div class="bs-stake-field">
-              <input class="value" type="text" value="12">
-              <div class="right">
-                <span class="max">MAX</span>
-                <span class="chev"><img src="assets/bs-chevron-down-double.svg" alt=""></span>
-              </div>
-            </div>
-            <div class="bs-possible-win">
-              <span class="lbl">Possible Win:</span>
-              <span class="amt">$ 30.00</span>
-            </div>
-          </div>
+      <!-- Bet tickets: betslip drafts are not implemented in this prototype -->
+      <div class="bs-tickets" id="bs-tickets">
+        <div class="bs-empty">
+          <p class="ttl">No bets in the betslip</p>
+          <p class="sub">Drafts aren't wired up yet. Placed bets appear under Open Bets.</p>
         </div>
-
-        <!-- Ticket 2: Atletico Madrid -->
-        <div class="bs-ticket">
-          <div class="bs-ticket-title">
-            <div class="bs-ticket-date">
-              <span class="txt">03.04.2026</span>
-              <span class="dot"><img src="assets/bs-dots-h.svg" alt=""></span>
-              <span class="txt">19:00</span>
-            </div>
-            <button class="bs-ticket-close" aria-label="remove"><img src="assets/bs-x-close.svg" alt=""></button>
-          </div>
-          <div class="bs-ticket-selection">
-            <p class="name">Atletico Madrid</p>
-            <p class="odds">3.29</p>
-          </div>
-          <div class="bs-ticket-market">
-            <p class="mkt">Match Result</p>
-            <p class="teams">Atletico Madrid - Arsenal</p>
-          </div>
-          <div class="bs-stake-container">
-            <div class="bs-stake-field">
-              <input class="value" type="text" value="2 000">
-              <div class="right">
-                <span class="max">MAX</span>
-              </div>
-            </div>
-            <div class="bs-possible-win">
-              <span class="lbl">Possible Win:</span>
-              <span class="amt">$ 6 580.00</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Ticket 3: Aston Villa -->
-        <div class="bs-ticket">
-          <div class="bs-ticket-title">
-            <div class="bs-ticket-date">
-              <span class="txt">03.04.2026</span>
-              <span class="dot"><img src="assets/bs-dots-h.svg" alt=""></span>
-              <span class="txt">19:00</span>
-            </div>
-            <button class="bs-ticket-close" aria-label="remove"><img src="assets/bs-x-close.svg" alt=""></button>
-          </div>
-          <div class="bs-ticket-selection">
-            <p class="name">Aston Villa</p>
-            <p class="odds">1.70</p>
-          </div>
-          <div class="bs-ticket-market">
-            <p class="mkt">Match Result (Early Payout)</p>
-            <p class="teams">Fulham - Aston Villa</p>
-          </div>
-          <div class="bs-stake-container">
-            <div class="bs-stake-field">
-              <input class="value" type="text" placeholder="Enter stake amount">
-              <div class="right">
-                <span class="max">MAX</span>
-              </div>
-            </div>
-            <div class="bs-possible-win">
-              <span class="lbl">Possible Win:</span>
-              <span class="amt">$ 0.00</span>
-            </div>
-          </div>
-        </div>
-
-      </div><!-- /bs-tickets -->
+      </div>
 
       <!-- Presets -->
       <div class="bs-presets">
@@ -414,6 +329,7 @@ a{color:inherit;text-decoration:none}
 
   <div id="app-nav" data-page="betslip"></div>
 </div><!-- /.app -->
+<script src="betslip-store.js"></script>
 <script src="nav.js"></script>
 </body>
 </html>

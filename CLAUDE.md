@@ -1,0 +1,68 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Running the project
+
+```bash
+node server.js        # serves on http://localhost:8000
+```
+
+No build step, no package manager, no dependencies. Open any `.html` file directly via the server (e.g. `http://localhost:8000/index.html`). The server adds `Cache-Control: no-cache` on all responses.
+
+## Architecture overview
+
+This is a **pure static prototype** of a mobile sportsbook app (375 px wide, dark theme). There is no framework, no bundler, and no separate CSS files — all styling is inline `<style>` blocks inside each HTML file.
+
+### Pages and their roles
+
+| File | View |
+|---|---|
+| `index.html` | Sports home / lobby |
+| `home.html` | Casino home |
+| `live.html` | Live betting list |
+| `live-single-game.html` | Live single-game detail |
+| `prematch-menu.html` | Pre-match sports/league menu |
+| `prematch-games.html` | Pre-match games list |
+| `prematch-single-game.html` | Pre-match single-game detail |
+| `betslip.html` | Betslip (single/multiple tabs) |
+| `betslip-multiple.html` | Multiple-bet betslip variant |
+| `betslip-open-bets.html` | Open bets tab |
+
+### Shared JavaScript modules
+
+Each JS file is an IIFE that injects its own CSS via `document.createElement('style')` and then replaces a placeholder element with rendered HTML. They are included via `<script src="...">` at the bottom of the pages that need them.
+
+- **`nav.js`** — Injects the bottom navigation bar and sport-line subnav. Reads `#app-nav[data-page]` to set the active tab. Valid values: `home`, `live`, `prematch`, `betslip`, `history`, `casino`.
+- **`sportbar.js`** — Injects the horizontal sport-filter chip row. Reads `#sport-bar[data-active]` to highlight the selected sport. Valid values: `football`, `basketball`, `baseball`, `boxing`, `amfootball`, `hockey`, `tabletennis`, `tennis`.
+- **`bs-tabs.js`** — Injects the Betslip / Open Bets tab switcher on betslip pages. Targets `[data-bs-tabs]` with value `betslip` or `openbets`.
+- **`betslip-popup.js`** — Floating bet-placement popup. Activates on any click of `.bet-opt`, `.gw-bet-opt`, `.to-bet-opt`, or `.opt` that contains a child `.o` or `.to-bet-odds` element. Extracts team names and odds from the surrounding DOM using `CONTEXT_SELECTOR` and `ODD_SELECTOR` logic. Renders above the bottom nav at `z-index:80`. Hides the sport-line subnav (`body.bsp-open .sln-group`) while open.
+
+### Design tokens
+
+All pages declare identical CSS custom properties in `:root`. Key tokens:
+- `--bg: #010c23` — primary background
+- `--main: #d80d83` — brand pink (CTAs, active states)
+- `--odds: #ffad29` — odds text colour
+- `--green: #249f58` / `--red: #b4132b` — win/loss states
+- White opacity scale: `--w-4` through `--w-100` (`rgba(255,255,255, N)`)
+- Dark overlay scale: `--d-32` through `--d-80`
+
+`prematch-menu.html` additionally defines per-sport accent colours (`--football`, `--basketball`, etc.), which match the `sportbar.js` accent dot colours.
+
+### Asset naming
+
+Assets in `assets/` fall into two categories:
+- **Hash-named** (e.g. `8870c8992c4849c49f96ffb9b4eb1a7d18919ada.svg`) — referenced directly by SHA hash; treat as immutable.
+- **Semantic-named** (e.g. `banner-arsenal-player.png`, `jk-ball-soccer.png`, `bn-sport-icon.svg`) — human-readable; safe to add new ones following the existing naming pattern.
+
+### Bet option markup contract
+
+`betslip-popup.js` relies on a specific DOM shape for 1X2 buttons:
+```html
+<div class="bet-opt">
+  <span class="l">1</span>   <!-- label: "1", "x", "2" -->
+  <span class="o">1.25</span> <!-- odds value -->
+</div>
+```
+Outright options use class `to-bet-opt` with children `.to-bet-team` and `.to-bet-odds`. Breaking this structure will prevent the popup from parsing odds or identifying the selection.
