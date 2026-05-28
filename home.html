@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>VBet — Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#010c23;
+  --bg-60:rgba(1,12,35,.6);
+  --bg-64:rgba(1,12,35,.64);
+  --main:#d80d83;
+  --main-40:rgba(216,13,131,.4);
+  --main-16:rgba(216,13,131,.16);
+  --odds:#ffad29;
+  --green:#249f58;
+  --green-bright:#34c759;
+  --red:#b4132b;
+  --tertiary:#ffad29;
+  --w-100:#fff;
+  --w-90:rgba(255,255,255,.9);
+  --w-80:rgba(255,255,255,.8);
+  --w-72:rgba(255,255,255,.72);
+  --w-64:rgba(255,255,255,.64);
+  --w-56:rgba(255,255,255,.56);
+  --w-48:rgba(255,255,255,.48);
+  --w-32:rgba(255,255,255,.32);
+  --w-24:rgba(255,255,255,.24);
+  --w-16:rgba(255,255,255,.16);
+  --w-12:rgba(255,255,255,.12);
+  --w-8:rgba(255,255,255,.08);
+  --w-6:rgba(255,255,255,.06);
+  --w-4:rgba(255,255,255,.04);
+  --d-32:rgba(0,2,5,.32);
+  --d-40:rgba(0,2,5,.4);
+  --d-56:rgba(0,2,5,.56);
+  --d-80:rgba(0,2,5,.8);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:#000;font-family:'Rubik',system-ui,-apple-system,sans-serif;color:var(--w-100);font-size:14px;line-height:20px;letter-spacing:0}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+img,svg{display:block;max-width:100%}
+ul{list-style:none}
+a{color:inherit;text-decoration:none}
+
+.app{
+  width:375px;margin:0 auto;min-height:100vh;
+  background:var(--bg);position:relative;padding-bottom:114px;
+  overflow-x:hidden;
+}
+
+/* ========== STATUS BAR ========== */
+.statusbar{
+  position:relative;height:40px;width:375px;
+  background:linear-gradient(90deg,var(--w-4) 0%,var(--w-4) 100%),linear-gradient(90deg,var(--bg) 0%,var(--bg) 100%);
+}
+.statusbar .time{
+  position:absolute;left:48px;top:50%;transform:translate(-50%,-50%);
+  font-family:'SF Pro','SF Pro Display','-apple-system',sans-serif;
+  font-weight:700;font-size:14px;letter-spacing:-.3px;color:var(--w-90);text-align:center;width:54px;
+}
+.statusbar .battery{position:absolute;top:50%;right:19px;transform:translateY(-50%);width:20.926px;height:9.748px}
+.statusbar .wifi{position:absolute;top:50%;right:44.23px;transform:translateY(-50%);width:13.188px;height:9.461px}
+.statusbar .cellular{position:absolute;top:50%;right:61.72px;transform:translateY(-50%);width:14.622px;height:9.175px}
+
+/* ========== HEADER ========== */
+.header-bar{
+  width:100%;padding:8px 8px 8px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(90deg,var(--w-8) 0%,var(--w-8) 100%),linear-gradient(90deg,var(--bg-60) 0%,var(--bg-60) 100%);
+  backdrop-filter:blur(21px);
+  filter:drop-shadow(0 4px 4px rgba(0,0,0,.4));
+}
+.header-bar .vbet{width:56px;height:16px;display:block}
+.header-bar .logo-wrap{width:75px;height:32px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.header-bar .right{display:flex;align-items:center;gap:4px;position:relative}
+.icon-btn-pink{
+  width:32px;height:32px;border-radius:999px;background:var(--main);
+  display:flex;align-items:center;justify-content:center;
+  border-top:1px solid var(--w-24);overflow:hidden;
+}
+.icon-btn-pink img{width:16px;height:16px}
+.icon-btn-ghost{
+  width:32px;height:32px;border-radius:999px;background:var(--w-8);
+  display:flex;align-items:center;justify-content:center;
+  border-top:1px solid var(--w-16);overflow:hidden;
+}
+.icon-btn-ghost img{width:16px;height:16px}
+.balance{
+  height:32px;border-radius:88px;background:var(--w-8);
+  display:flex;align-items:center;gap:4px;padding:0 8px;
+}
+.balance .plus{width:16px;height:16px}
+.balance .amt{font-size:12px;line-height:16px;color:var(--w-100);font-weight:400;white-space:nowrap}
+.balance .cur{width:12px;height:12px}
+.header-bar .notif-dot{position:absolute;left:193px;top:0;width:8px;height:8px}
+
+/* ========== MY ZONE SUBNAV ========== */
+.subnav{
+  width:100%;padding:16px 8px;
+  display:flex;flex-direction:column;gap:16px;align-items:flex-start;justify-content:center;
+  background:linear-gradient(90deg,var(--w-4) 0%,var(--w-4) 100%),linear-gradient(90deg,var(--bg) 0%,var(--bg) 100%);
+  backdrop-filter:blur(4px);
+  filter:drop-shadow(0 4px 4px rgba(0,0,0,.1));
+}
+.subnav-row{display:flex;align-items:flex-start;gap:8px;width:100%}
+.subnav .my-zone{
+  flex:none;width:279px;height:32px;border:1px solid var(--main-40);border-radius:32px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:4px 16px;
+  background:radial-gradient(ellipse 150px 8px at center bottom, rgba(216,13,131,0.4), transparent 70%);
+}
+.subnav .my-zone .label{font-size:14px;line-height:20px;color:var(--w-72)}
+.subnav .my-zone .stats{display:flex;align-items:center;gap:8px}
+.subnav .my-zone .stat{display:flex;align-items:center;gap:2px}
+.subnav .my-zone .stat img{width:16px;height:16px;display:block}
+.subnav .my-zone .stat .num{
+  background:var(--d-40);border-radius:8px;width:20px;height:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;line-height:16px;color:var(--w-72);
+}
+.subnav .my-zone .divider{height:16px;width:1px;background:var(--w-16)}
+
+/* ========== ELITE BAR ========== */
+.elite-bar{
+  margin:8px;height:32px;border-radius:16px;
+  background:linear-gradient(90deg,#d80d83 0%,#a30864 100%);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 8px 0 12px;
+  box-shadow:0 4px 12px rgba(216,13,131,.3);
+}
+.elite-bar .left{display:flex;align-items:center;gap:6px}
+.elite-bar .left .lbl{font-weight:700;font-size:12px;letter-spacing:1.5px;color:#fff}
+.elite-bar .badge{
+  width:18px;height:20px;background:#fff;color:var(--main);
+  border-radius:3px 3px 6px 6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;
+}
+.elite-bar .right{display:flex;align-items:center;gap:8px}
+.elite-bar .chev-pill{
+  width:24px;height:20px;border-radius:6px;background:rgba(255,255,255,.16);
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;
+}
+.elite-bar .green-pills{display:flex;align-items:center;gap:4px}
+.elite-bar .gp{
+  height:22px;padding:0 6px;border-radius:6px;background:var(--green-bright);
+  display:flex;align-items:center;gap:4px;color:#fff;font-size:11px;font-weight:700;
+}
+.elite-bar .gp.txt{padding:0 8px}
+
+/* ========== HERO BANNER ========== */
+.hero{
+  margin:8px;border-radius:12px;overflow:hidden;position:relative;
+  height:240px;
+  background:
+    radial-gradient(circle at 75% 50%, rgba(168,75,180,.7), transparent 50%),
+    linear-gradient(180deg,#3d1430 0%,#1a0a1f 60%,#0a0518 100%);
+}
+.hero .wheel{
+  position:absolute;right:-40px;top:50%;transform:translateY(-50%);
+  width:180px;height:180px;border-radius:50%;
+  background:
+    repeating-conic-gradient(from 0deg,
+      #d4a04a 0deg 30deg,
+      #b88536 30deg 60deg);
+  border:6px solid #8b5e1f;
+  box-shadow:0 0 40px rgba(216,13,131,.5),inset 0 0 20px rgba(0,0,0,.4);
+}
+.hero .wheel::before{
+  content:"";position:absolute;inset:25%;border-radius:50%;background:#2a1810;
+  display:flex;align-items:center;justify-content:center;
+}
+.hero .wheel::after{
+  content:"T";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:#d4a04a;font-size:40px;font-weight:700;text-shadow:0 0 10px rgba(212,160,74,.8);
+}
+.hero .content{
+  position:relative;z-index:1;padding:20px 12px;color:#fff;
+  display:flex;flex-direction:column;gap:4px;max-width:65%;
+}
+.hero .brand{font-family:'Rubik',serif;font-style:italic;font-size:22px;font-weight:600;color:#d8a4b3;line-height:1.1}
+.hero .sub{font-size:13px;color:rgba(255,255,255,.9);margin-bottom:6px}
+.hero .prize{font-size:24px;font-weight:700;line-height:1;letter-spacing:-.5px;white-space:nowrap}
+.hero .desc{font-size:11px;color:rgba(255,255,255,.7);line-height:1.3;max-width:160px;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.hero .info-rows{margin-top:6px;display:flex;flex-direction:column;gap:3px}
+.hero .info-row{display:flex;gap:6px;align-items:center;font-size:8.5px;text-transform:uppercase;letter-spacing:.3px;color:#fff;line-height:1.2}
+.hero .info-row .num{background:rgba(255,255,255,.16);border-radius:3px;padding:1px 4px;font-weight:700;flex-shrink:0;font-size:9px}
+.hero .page-ind{
+  position:absolute;top:8px;right:8px;
+  background:rgba(216,13,131,.9);color:#fff;font-size:11px;font-weight:600;
+  padding:2px 10px;border-radius:12px;
+}
+
+/* ========== PROMOTIONS BANNER ========== */
+.promo-banner{
+  margin:8px;border-radius:12px;overflow:hidden;
+  background:linear-gradient(90deg,#0e1735 0%,#1a2348 100%);
+  height:88px;display:flex;align-items:center;gap:12px;padding:0 16px;
+  position:relative;
+}
+.promo-banner .gift{
+  width:80px;height:80px;flex-shrink:0;
+  background:linear-gradient(180deg,#d80d83 0%,#7a0848 100%);
+  border-radius:8px;position:relative;
+  box-shadow:0 6px 16px rgba(216,13,131,.4);
+}
+.promo-banner .gift::before{
+  content:"";position:absolute;left:50%;top:0;transform:translateX(-50%);
+  width:14px;height:100%;background:rgba(255,255,255,.5);
+}
+.promo-banner .gift::after{
+  content:"";position:absolute;left:0;top:30%;width:100%;height:8px;background:rgba(255,255,255,.5);
+}
+.promo-banner .ttl{
+  font-family:'Rubik',sans-serif;font-weight:700;font-size:28px;
+  letter-spacing:-.5px;color:#fff;flex:1;
+}
+
+/* ========== JACKPOT CARD ========== */
+.jackpot-wrap{
+  margin:8px;position:relative;
+  display:flex;gap:8px;overflow:hidden;
+}
+.jackpot{
+  min-width:359px;width:359px;
+  border-radius:12px;padding:16px 12px;
+  background:
+    radial-gradient(circle at 50% 100%,rgba(216,13,131,.15) 0%,transparent 60%),
+    linear-gradient(180deg,#0a1130 0%,#050a1f 100%);
+  border:1px solid var(--w-8);
+  position:relative;flex-shrink:0;
+}
+.jackpot .top{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:11px;font-weight:700;letter-spacing:1.2px;color:var(--w-80);
+  margin-bottom:4px;
+}
+.jackpot .info{width:16px;height:16px;border-radius:50%;border:1px solid var(--w-32);
+  display:flex;align-items:center;justify-content:center;color:var(--w-56);font-size:10px}
+.jackpot .symbols{
+  position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+  display:flex;gap:4px;font-size:32px;line-height:1;pointer-events:none;
+}
+.jackpot .mega{
+  margin:8px auto;width:90%;max-width:320px;height:56px;
+  border:1.5px solid var(--odds);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:rgba(255,173,41,.04);
+}
+.jackpot .mega .lbl{font-size:11px;font-weight:700;color:var(--w-80);letter-spacing:1.2px}
+.jackpot .mega .val{font-size:22px;font-weight:700;color:#fff;line-height:1}
+.jackpot .mega .icon{font-size:22px;color:var(--odds)}
+.jackpot .mega .fire{font-size:18px}
+.jackpot .row{display:flex;justify-content:space-between;gap:8px;margin-top:8px}
+.jackpot .tier{
+  flex:1;display:flex;align-items:center;gap:8px;
+  padding:8px;border-radius:8px;background:rgba(255,255,255,.03);
+}
+.jackpot .tier .icon{
+  width:28px;height:28px;border-radius:6px;
+  background:linear-gradient(135deg,#ffad29 0%,#c2750a 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;color:#fff;
+}
+.jackpot .tier .icon.minor{background:linear-gradient(135deg,#b4132b 0%,#7a0a1a 100%)}
+.jackpot .tier .txt{display:flex;flex-direction:column;font-size:11px;line-height:1.2}
+.jackpot .tier .tlbl{color:var(--w-56);font-weight:700;letter-spacing:.8px}
+.jackpot .tier .tval{color:#fff;font-weight:600;font-size:13px}
+.jackpot-wrap .arrow{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:24px;height:24px;border-radius:50%;background:var(--w-8);
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;
+  z-index:3;
+}
+.jackpot-wrap .arrow.left{left:4px}
+.jackpot-wrap .arrow.right{right:4px}
+
+/* ========== CATEGORY ICONS ========== */
+.cat-icons{
+  display:flex;gap:12px;padding:16px 8px;overflow-x:auto;scrollbar-width:none;
+  width:100%;
+}
+.cat-icons::-webkit-scrollbar{display:none}
+.cat{
+  flex:none;width:64px;display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.cat .circle{
+  width:64px;height:64px;border-radius:50%;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle,rgba(216,13,131,.5) 0%,rgba(216,13,131,.05) 70%);
+  border:1px solid var(--main);
+  box-shadow:0 0 16px rgba(216,13,131,.5),inset 0 0 8px rgba(216,13,131,.3);
+}
+.cat.gold .circle{
+  background:radial-gradient(circle,rgba(255,173,41,.5) 0%,rgba(255,173,41,.05) 70%);
+  border-color:var(--odds);box-shadow:0 0 16px rgba(255,173,41,.5),inset 0 0 8px rgba(255,173,41,.3);
+}
+.cat.green .circle{
+  background:radial-gradient(circle,rgba(36,159,88,.5) 0%,rgba(36,159,88,.05) 70%);
+  border-color:var(--green);box-shadow:0 0 16px rgba(36,159,88,.5),inset 0 0 8px rgba(36,159,88,.3);
+}
+.cat.cyan .circle{
+  background:radial-gradient(circle,rgba(20,180,200,.5) 0%,rgba(20,180,200,.05) 70%);
+  border-color:#14b4c8;box-shadow:0 0 16px rgba(20,180,200,.5),inset 0 0 8px rgba(20,180,200,.3);
+}
+.cat .ic{font-size:28px;filter:drop-shadow(0 0 8px currentColor)}
+.cat .lbl{font-size:11px;font-weight:600;color:#fff;text-align:center;letter-spacing:.5px;text-transform:uppercase;line-height:1.2;width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ========== SECTION TITLE ========== */
+.sec-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 12px 8px;
+}
+.sec-head h2{
+  font-size:16px;font-weight:500;color:#fff;
+}
+.sec-head .all{
+  font-size:14px;color:var(--w-72);display:flex;align-items:center;gap:4px;
+}
+.sec-head .all::after{content:"›";font-size:16px}
+
+/* ========== TILE GRID ========== */
+.tile-row{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:4px;
+  padding:0 8px;
+}
+.tile{
+  aspect-ratio:1/1;border-radius:8px;overflow:hidden;position:relative;
+  display:flex;align-items:flex-end;justify-content:center;
+  padding:8px;color:#fff;
+  text-align:center;
+}
+.tile .name{
+  font-size:12px;font-weight:700;text-align:center;
+  text-shadow:0 1px 4px rgba(0,0,0,.6);
+  line-height:1.1;width:100%;
+}
+.tile .badge{
+  position:absolute;top:8px;right:8px;
+  background:var(--green-bright);color:#fff;
+  padding:2px 8px;border-radius:4px;
+  font-size:10px;font-weight:600;
+}
+.tile .provider{
+  position:absolute;top:6px;left:6px;
+  font-size:9px;font-weight:700;letter-spacing:.5px;color:#fff;
+  background:rgba(0,0,0,.4);padding:2px 6px;border-radius:4px;
+  text-transform:uppercase;
+}
+
+/* Tile gradients to mimic actual game art */
+.t-vbet21{background:linear-gradient(135deg,#ff8a3d 0%,#e6470c 50%,#a02b00 100%)}
+.t-vbet22{background:linear-gradient(135deg,#e64dab 0%,#c2167d 50%,#7a0c4d 100%)}
+.t-hot-seven{background:linear-gradient(135deg,#1a1a3e 0%,#0a0a1f 100%)}
+.t-diamond{background:linear-gradient(135deg,#ffb84d 0%,#e89a1a 50%,#a96b00 100%)}
+.t-shining{background:linear-gradient(135deg,#e02828 0%,#8c0e0e 100%)}
+.t-royal{background:linear-gradient(135deg,#2a4794 0%,#142244 100%)}
+.t-olympus{background:linear-gradient(135deg,#4a8fb8 0%,#1a4870 100%)}
+.t-sugar1000{background:linear-gradient(135deg,#b85cd1 0%,#7a2da3 100%)}
+.t-starlight{background:linear-gradient(135deg,#4aa8d4 0%,#1a6498 100%)}
+.t-bonbon{background:linear-gradient(135deg,#ff5e8a 0%,#e02463 100%)}
+.t-sugar{background:linear-gradient(135deg,#ff85b8 0%,#d44a8a 100%)}
+.t-bonbon2{background:linear-gradient(135deg,#ffa84d 0%,#d96b18 100%)}
+.t-super-scatter{background:linear-gradient(135deg,#5a98c8 0%,#1d558a 100%)}
+.t-olympus1000{background:linear-gradient(135deg,#7ab8d4 0%,#3a78a8 100%)}
+.t-sweet-bonanza{background:linear-gradient(135deg,#4ad6e0 0%,#1a98b8 100%)}
+
+/* Active/focused tile (Sugar Rush 1000 example) */
+.tile.focused{
+  background:rgba(0,0,0,.6) !important;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  padding:8px;
+}
+.tile.focused .star{
+  position:absolute;top:8px;left:8px;
+  width:18px;height:18px;border-radius:50%;
+  border:1px solid var(--w-32);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:var(--w-56);
+}
+.tile.focused .info{
+  position:absolute;top:8px;right:8px;
+  width:18px;height:18px;border-radius:50%;
+  background:var(--w-16);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:11px;
+}
+.tile.focused .ttl{font-size:13px;font-weight:600;color:#fff;text-align:center;margin-top:8px}
+.tile.focused .btns{display:flex;gap:6px;width:100%;justify-content:center}
+.tile.focused .btn{
+  flex:1;max-width:50px;height:24px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:500;
+}
+.tile.focused .btn.demo{background:var(--w-8);color:var(--w-80)}
+.tile.focused .btn.play{background:var(--main);color:#fff;font-weight:600}
+
+/* ========== SECTION SPACING ========== */
+.section{padding-top:8px;padding-bottom:8px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== Status Bar ===== -->
+  <div class="statusbar">
+    <p class="time">9:41</p>
+    <img class="cellular" src="assets/9a9814626f1691496dee37fbaec4dc36714c9fc3.svg" alt="">
+    <img class="wifi" src="assets/8a2078f592bc8059bdee9a1b67c5850384630832.svg" alt="">
+    <img class="battery" src="assets/f555df63f6a65f0f822624125f6922109416d804.svg" alt="">
+  </div>
+
+  <!-- ===== Header ===== -->
+  <div class="header-bar">
+    <div class="logo-wrap">
+      <img class="vbet" src="assets/c7ee4cb442a696c4b22400e87d4d4564d77ee63d.svg" alt="VBet">
+    </div>
+    <div class="right">
+      <button class="icon-btn-pink" aria-label="announcements">
+        <img src="assets/cd2ab15627e314b76cd18186ac8debb1e046753b.svg" alt="">
+      </button>
+      <div class="balance">
+        <img class="plus" src="assets/fba9a203cde61becd3d03a28733eed924695e9e6.svg" alt="">
+        <span class="amt">2 000 000.50</span>
+        <img class="cur" src="assets/dcbe03fff8b7bff8da30b22defa876253b4ed716.svg" alt="">
+      </div>
+      <button class="icon-btn-ghost" aria-label="user">
+        <img src="assets/c51db1de3442902710310b7f412f5e50bf258747.svg" alt="">
+      </button>
+      <img class="notif-dot" src="assets/3bfbd9ba21a63ae47aae5835471dcaa057683d29.svg" alt="">
+    </div>
+  </div>
+
+  <!-- ===== My Zone subnav ===== -->
+  <div class="subnav">
+    <div class="subnav-row">
+      <button class="icon-btn-ghost" aria-label="search">
+        <img src="assets/a60c35b6330c349df1b28504b4e27f90d97d172a.svg" alt="">
+      </button>
+      <div class="my-zone">
+        <span class="label">My Zone</span>
+        <div class="stats">
+          <div class="stat">
+            <img src="assets/8870c8992c4849c49f96ffb9b4eb1a7d18919ada.svg" alt="">
+            <div class="num">3</div>
+          </div>
+          <div class="divider"></div>
+          <div class="stat">
+            <img src="assets/acd11b20fb2060636db862fa9127aba4208a4c74.svg" alt="">
+            <div class="num">2</div>
+          </div>
+          <div class="divider"></div>
+          <div class="stat">
+            <img src="assets/80e95aa265f716d0508b727c0f4d19dede41ec35.svg" alt="">
+            <div class="num">2</div>
+          </div>
+        </div>
+      </div>
+      <button class="icon-btn-ghost" aria-label="settings">
+        <img src="assets/f37caf38309d5f5ce34bd17d34b049ca71fb945f.svg" alt="">
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== ELITE Bar ===== -->
+  <div class="elite-bar">
+    <div class="left">
+      <div class="badge">2</div>
+      <span class="lbl">ELITE</span>
+    </div>
+    <div class="right">
+      <div class="chev-pill">«</div>
+      <div class="green-pills">
+        <div class="gp">$</div>
+        <div class="gp">🎁</div>
+        <div class="gp txt">+2%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Hero Banner ===== -->
+  <div class="hero">
+    <div class="page-ind">1 / 16</div>
+    <div class="wheel"></div>
+    <div class="content">
+      <div class="brand"><em>Tik-Tak</em></div>
+      <div class="sub">Winning spins</div>
+      <div class="prize">10,000,000 ₴</div>
+      <div class="desc">Tournament fund &amp; many other prizes</div>
+      <div class="info-rows">
+        <div class="info-row"><span class="num">1</span><span>SPIN VIA FAST SHIFT FOR A 1,000 ₴ DEPOSIT</span></div>
+        <div class="info-row"><span class="num">2</span><span>SPINS FOR FREE EVERY DAY</span></div>
+        <div class="info-row"><span class="num">2</span><span>SPINS FROM DAILY GAMES</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Promotions Banner ===== -->
+  <div class="promo-banner">
+    <div class="gift"></div>
+    <div class="ttl">PROMOTIONS</div>
+  </div>
+
+  <!-- ===== Betconstruct Jackpot ===== -->
+  <div class="jackpot-wrap">
+    <button class="arrow left" aria-label="prev">‹</button>
+    <div class="jackpot">
+      <div class="top">
+        <span>BETCONSTRUCT JACKPOT</span>
+        <span class="info">i</span>
+      </div>
+      <div class="symbols">🍒 🍋 ⭐ 💎</div>
+      <div class="mega">
+        <span class="icon">🃏</span>
+        <span class="lbl">MEGA</span>
+        <span class="val">1,122,757.1 $</span>
+        <span class="fire">🔥</span>
+      </div>
+      <div class="row">
+        <div class="tier">
+          <div class="icon">7</div>
+          <div class="txt">
+            <span class="tlbl">MAJOR</span>
+            <span class="tval">145,921.56 $</span>
+          </div>
+        </div>
+        <div class="tier">
+          <div class="icon minor">📕</div>
+          <div class="txt">
+            <span class="tlbl">MINOR</span>
+            <span class="tval">1,972.63 $</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="arrow right" aria-label="next">›</button>
+  </div>
+
+  <!-- ===== Category Icons ===== -->
+  <div class="cat-icons">
+    <div class="cat">
+      <div class="circle"><span class="ic">👑</span></div>
+      <div class="lbl">Exclusi…</div>
+    </div>
+    <div class="cat gold">
+      <div class="circle"><span class="ic">💰</span></div>
+      <div class="lbl">Big Wins</div>
+    </div>
+    <div class="cat">
+      <div class="circle"><span class="ic">⚽</span></div>
+      <div class="lbl">Sports</div>
+    </div>
+    <div class="cat green">
+      <div class="circle"><span class="ic">🏷️</span></div>
+      <div class="lbl">Promos</div>
+    </div>
+    <div class="cat cyan">
+      <div class="circle"><span class="ic">🏟️</span></div>
+      <div class="lbl">Match …</div>
+    </div>
+    <div class="cat gold">
+      <div class="circle"><span class="ic">🎰</span></div>
+      <div class="lbl">Slots</div>
+    </div>
+  </div>
+
+  <!-- ===== Recommended For You ===== -->
+  <section class="section">
+    <div class="sec-head"><h2>RECOMMENDED FOR YOU</h2></div>
+    <div class="tile-row">
+      <div class="tile t-vbet21">
+        <div class="provider">XK</div>
+        <div class="badge">Exclusive</div>
+        <div class="name">VBET 21</div>
+      </div>
+      <div class="tile t-vbet22">
+        <div class="badge">Exclusive</div>
+        <div class="name">VBET 22</div>
+      </div>
+      <div class="tile t-hot-seven">
+        <div class="provider">Pascal</div>
+        <div class="name">20 HOT SEVENS</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Casino games ===== -->
+  <section class="section">
+    <div class="sec-head"><h2>Casino games</h2><a class="all" href="#">All</a></div>
+    <div class="tile-row">
+      <div class="tile t-diamond">
+        <div class="provider">XK</div>
+        <div class="name">DIAMOND FLASH</div>
+      </div>
+      <div class="tile t-shining">
+        <div class="provider">JC</div>
+        <div class="name">SHINING CROWN</div>
+      </div>
+      <div class="tile t-royal">
+        <div class="name">Royal Crown</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Buy Bonus ===== -->
+  <section class="section">
+    <div class="sec-head"><h2>Buy Bonus</h2></div>
+    <div class="tile-row">
+      <div class="tile t-olympus">
+        <div class="name">GATES of OLYMPUS</div>
+      </div>
+      <div class="tile focused">
+        <div class="star">☆</div>
+        <div class="info">i</div>
+        <div class="ttl">Sugar Rush 1000</div>
+        <div class="btns">
+          <div class="btn demo">Demo</div>
+          <div class="btn play">Play</div>
+        </div>
+      </div>
+      <div class="tile t-starlight">
+        <div class="name">Starlight Princess 1000</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Sugar Pop ===== -->
+  <section class="section">
+    <div class="sec-head"><h2>Sugar Pop</h2></div>
+    <div class="tile-row">
+      <div class="tile t-bonbon">
+        <div class="badge" style="background:#ffd700;color:#000">BUY BONUS</div>
+        <div class="name">Bonbon Pop x1000</div>
+      </div>
+      <div class="tile t-sugar">
+        <div class="name">SUGAR RUSH</div>
+      </div>
+      <div class="tile t-bonbon2">
+        <div class="name">BON BON</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Top games from Pragmatic Play ===== -->
+  <section class="section">
+    <div class="sec-head"><h2>Top games from Pragmatic Play</h2></div>
+    <div class="tile-row">
+      <div class="tile t-super-scatter">
+        <div class="badge" style="background:rgba(0,0,0,.5)">DROPS &amp; WINS</div>
+        <div class="name">Gates of Olympus SUPER SCATTER</div>
+      </div>
+      <div class="tile t-olympus1000">
+        <div class="name">GATES of OLYMPUS 1000</div>
+      </div>
+      <div class="tile t-sweet-bonanza">
+        <div class="name">SWEET BONANZA 1000</div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /.app -->
+
+<div id="app-nav" data-page="casino"></div>
+<script src="nav.js"></script>
+</body>
+</html>
