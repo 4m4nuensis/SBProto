@@ -120,7 +120,11 @@
 
 .bal-dep-host{
   position:fixed; left:50%; transform:translateX(-50%);
-  top:0; width:100%; max-width:440px; height:100vh;
+  top:0; width:100%; max-width:440px;
+  /* Use dynamic viewport height so the bottom Deposit button stays
+   * visible when the browser address bar is shown. Fall back to 100vh
+   * on browsers that don't support dvh. */
+  height:100vh; height:100dvh;
   z-index:100; pointer-events:none;
   overflow:hidden;
 }
@@ -134,11 +138,6 @@
   display:flex; flex-direction:column;
 }
 .bal-dep-host.open .bal-dep-screen{ transform:translateX(0); }
-
-.bal-dep-status{
-  height:40px; flex-shrink:0;
-  background:linear-gradient(90deg,rgba(255,255,255,.04) 0%,rgba(255,255,255,.04) 100%),var(--bg,#010c23);
-}
 
 .bal-dep-header{
   flex-shrink:0;
@@ -229,7 +228,9 @@
 .bal-quick button:hover{ background:rgba(255,255,255,.12); color:#fff; }
 
 .bal-dep-footer{
-  flex-shrink:0; padding:12px 16px 24px;
+  flex-shrink:0;
+  /* Extra bottom padding accounts for iOS home-indicator / Android gesture area */
+  padding:12px 16px calc(24px + env(safe-area-inset-bottom, 0px));
   border-top:1px solid rgba(255,255,255,.08);
   background:var(--bg,#010c23);
 }
@@ -321,7 +322,6 @@ body.bal-dep-open{ overflow:hidden; }
     depHost.className = 'bal-dep-host';
     depHost.innerHTML = `
       <div class="bal-dep-screen" role="dialog" aria-label="Deposit">
-        <div class="bal-dep-status"></div>
         <div class="bal-dep-header">
           <button class="bal-dep-back" aria-label="Back">
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
