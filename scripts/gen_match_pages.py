@@ -74,6 +74,45 @@ MATCHES = [
         "o_1": 4.75, "o_x": 3.60, "o_2": 1.62,
         "minute": 45, "seed": 70126,
     },
+    # ── Home-page "Top Events" cards ──────────────────────────────────────────
+    {
+        "id": "70127",
+        "home": "Fulham",      "home_full": "Fulham F. C.",         "home_logo": "sew-fulham.png",
+        "away": "Aston Villa", "away_full": "Aston Villa F. C.",    "away_logo": "sew-aston-villa.png",
+        "score_h": 2, "score_a": 0,
+        "period_text": "2nd Half | 65'",
+        "o_1": 1.20, "o_x": 6.50, "o_2": 15.00,
+        "minute": 65, "seed": 70127,
+    },
+    {
+        "id": "70128",
+        "home": "Arsenal", "home_full": "Arsenal F. C.", "home_logo": "team-arsenal.svg",
+        "away": "Chelsea", "away_full": "Chelsea F. C.", "away_logo": "team-chelsea.svg",
+        "score_h": 1, "score_a": 1,
+        "period_text": "1st Half | 42'",
+        "o_1": 2.05, "o_x": 3.40, "o_2": 3.25,
+        "minute": 42, "seed": 70128,
+    },
+    # ── Home-page "Top Live Events" cards ─────────────────────────────────────
+    {
+        "id": "70129",
+        "home": "Liverpool", "home_full": "Liverpool F. C.",          "home_logo": "team-liverpool.svg",
+        "away": "Man City",  "away_full": "Manchester City F. C.",    "away_logo": "team-mancity.svg",
+        "score_h": 1, "score_a": 0,
+        "period_text": "1st Half | 33'",
+        "o_1": 2.10, "o_x": 3.40, "o_2": 3.25,
+        "minute": 33, "seed": 70129,
+    },
+    {
+        "id": "70130",
+        # No bundled crest for these two — generator renders an empty logo chip.
+        "home": "Real Madrid", "home_full": "Real Madrid C. F.", "home_logo": None,
+        "away": "Barcelona",   "away_full": "FC Barcelona",      "away_logo": None,
+        "score_h": 2, "score_a": 1,
+        "period_text": "2nd Half | 68'",
+        "o_1": 1.95, "o_x": 3.60, "o_2": 3.90,
+        "minute": 68, "seed": 70130,
+    },
 ]
 
 
@@ -500,15 +539,17 @@ def build_page(template: str, match: dict) -> str:
         f'<title>VBet — Live · {match["home_full"]} vs {match["away_full"]}</title>',
     )
     # 2) Logos & names in event card header.
-    # Replace via unique sentinels first so a substituted value (e.g. the new
-    # home logo) doesn't get re-substituted by the away replacement.
+    # Replace the whole logo div so teams without a bundled crest (home_logo
+    # is None) render an empty .logo chip rather than a broken <img>.
+    def logo_div(logo):
+        return f'<div class="logo"><img src="assets/{logo}" alt=""></div>' if logo else '<div class="logo"></div>'
     out = (out
-        .replace('src="assets/team-mancity.svg"', 'src="assets/__HOME_LOGO__"')
-        .replace('src="assets/team-chelsea.svg"', 'src="assets/__AWAY_LOGO__"')
+        .replace('<div class="logo"><img src="assets/team-mancity.svg" alt=""></div>', '__HOME_LOGO_DIV__')
+        .replace('<div class="logo"><img src="assets/team-chelsea.svg" alt=""></div>', '__AWAY_LOGO_DIV__')
         .replace('<p class="name">Manchester City</p>', '<p class="name">__HOME_NAME__</p>')
         .replace('<p class="name">Chelsea F. C.</p>',   '<p class="name">__AWAY_NAME__</p>')
-        .replace('__HOME_LOGO__', match["home_logo"])
-        .replace('__AWAY_LOGO__', match["away_logo"])
+        .replace('__HOME_LOGO_DIV__', logo_div(match["home_logo"]))
+        .replace('__AWAY_LOGO_DIV__', logo_div(match["away_logo"]))
         .replace('__HOME_NAME__', match["home_full"])
         .replace('__AWAY_NAME__', match["away_full"])
     )
