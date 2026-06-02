@@ -95,9 +95,12 @@
   border-radius:16px; padding:12px;
   display:flex; flex-direction:column; gap:8px;
   box-shadow:0 16px 48px rgba(0,0,0,.55);
-  pointer-events:auto;
+  /* When closed, let clicks fall through to whatever is underneath
+   * (e.g. the back button on detail pages). The host is also
+   * pointer-events:none, but the card sat on top and intercepted. */
+  pointer-events:none;
 }
-.bal-pop-host.open .bal-pop-card{ transform:translateY(0) scale(1); opacity:1; }
+.bal-pop-host.open .bal-pop-card{ transform:translateY(0) scale(1); opacity:1; pointer-events:auto; }
 
 .bal-row{
   display:flex; flex-direction:column; gap:2px;
