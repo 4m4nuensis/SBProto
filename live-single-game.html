@@ -255,35 +255,69 @@ a{color:inherit;text-decoration:none}
 .markets{padding:0 8px;display:flex;flex-direction:column;gap:4px}
 .market{
   background:var(--w-4);border:1px solid var(--w-8);border-radius:4px;
-  padding:8px;display:flex;flex-direction:column;gap:16px;
+  padding:8px;display:flex;flex-direction:column;gap:12px;
 }
-.market.collapsed{padding:10px 8px 10px 12px;flex-direction:row;align-items:center;gap:8px}
-.market .title-row{display:flex;align-items:center;justify-content:space-between;width:100%}
+.market .title-row{display:flex;align-items:center;justify-content:space-between;width:100%;cursor:pointer;user-select:none}
 .market .title-row .left{display:flex;align-items:center;gap:4px;flex:1;min-width:0}
 .market .pin{
   width:24px;height:24px;border-radius:999px;
   display:flex;align-items:center;justify-content:center;color:var(--w-72);
 }
 .market .pin svg{width:16px;height:16px}
-.market .title{font-size:12px;line-height:16px;color:var(--w-72);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.market.collapsed .title{font-size:14px;line-height:20px;color:var(--w-90)}
+.market .title{font-size:14px;line-height:20px;color:var(--w-90);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .market .badge{
   font-size:10px;line-height:14px;letter-spacing:.4px;font-weight:500;
   background:var(--main);color:#fff;padding:1px 6px;border-radius:999px;flex:none;
 }
 .market .chev{
   width:24px;height:24px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--w-72);
+  transition:transform .18s ease;
 }
 .market .chev svg{width:16px;height:16px}
-.market.collapsed .chev svg{transform:rotate(180deg)}
-.market .opts{display:flex;gap:8px;width:100%}
+.market.collapsed .chev{transform:rotate(180deg)}
+.market.collapsed{gap:0;padding:10px 8px 10px 12px}
+.market.collapsed .body{display:none}
+.market .body{display:flex;flex-direction:column;gap:6px}
+
+/* 1×N option row (1X2, Yes/No, Double Chance, …) */
+.market .opts{display:flex;gap:6px;width:100%}
 .market .opt{
   flex:1;min-width:0;background:var(--w-4);border:1px solid var(--w-4);
   border-radius:4px;padding:8px 12px;
-  display:flex;align-items:center;justify-content:space-between;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
 }
-.market .opt .l{font-size:12px;line-height:16px;color:var(--w-32)}
-.market .opt .o{font-size:14px;line-height:20px;color:var(--odds)}
+.market .opt.col{flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px 8px}
+.market .opt .l{font-size:12px;line-height:16px;color:var(--w-48)}
+.market .opt .o{font-size:14px;line-height:20px;color:var(--odds);font-weight:500}
+.market .opt.selected{background:var(--main);border-color:var(--main)}
+.market .opt.selected .l,
+.market .opt.selected .o{color:#fff}
+
+/* Table style — used for Over/Under and handicap ladders */
+.market .otbl{display:grid;width:100%;gap:4px;font-size:13px;line-height:16px}
+.market .otbl.cols-2{grid-template-columns:1fr 1fr}
+.market .otbl.cols-3{grid-template-columns:48px 1fr 1fr}
+.market .otbl.cols-3w{grid-template-columns:1fr 1fr 1fr}
+.market .otbl.cols-4{grid-template-columns:48px 1fr 1fr 1fr}
+.market .otbl .h{
+  padding:8px 4px;text-align:center;color:var(--w-56);
+  background:var(--w-4);border-radius:4px;
+}
+.market .otbl .lbl{
+  padding:10px 4px;text-align:center;color:var(--w-56);
+  background:var(--w-4);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+}
+.market .otbl .cell{
+  padding:10px 12px;background:var(--w-4);border:1px solid var(--w-4);
+  border-radius:4px;
+  display:flex;align-items:center;justify-content:flex-end;
+  color:var(--odds);font-weight:500;font-size:14px;cursor:pointer;
+}
+.market .otbl .cell.center{justify-content:center}
+.market .otbl .cell.lr{justify-content:space-between}
+.market .otbl .cell.lr .lbl-inline{color:var(--w-56);font-size:12px;font-weight:400}
+.market .otbl .cell.selected{background:var(--main);border-color:var(--main);color:#fff}
 
 /* ====== PLACEHOLDER ====== */
 .placeholder-section{margin:24px 8px;padding:16px;border-radius:12px;background:var(--w-4);border:1px dashed var(--w-12);color:var(--w-48);font-size:12px;text-align:center}
@@ -441,84 +475,279 @@ a{color:inherit;text-decoration:none}
   </div>
 
   <!-- Markets List -->
-  <div class="markets">
-    <!-- Expanded: Match Result -->
-    <div class="market">
+  <div class="markets" id="markets">
+    <!-- Match Result (1X2, expanded by default) -->
+    <div class="market" data-market="match-result">
       <div class="title-row">
         <div class="left">
-          <button class="pin" aria-label="pin">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()">
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg>
           </button>
           <span class="title">Match Result</span>
         </div>
         <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
       </div>
-      <div class="opts">
-        <button class="opt"><span class="l">1</span><span class="o">1.25</span></button>
-        <button class="opt"><span class="l">X</span><span class="o">6.21</span></button>
-        <button class="opt"><span class="l">2</span><span class="o">1.25</span></button>
+      <div class="body">
+        <div class="opts">
+          <button class="opt"><span class="l">1</span><span class="o">1.85</span></button>
+          <button class="opt"><span class="l">X</span><span class="o">4.30</span></button>
+          <button class="opt"><span class="l">2</span><span class="o">3.45</span></button>
+        </div>
       </div>
     </div>
 
-    <!-- Collapsed markets -->
-    <div class="market collapsed">
-      <span class="title">Result (Early Payout)</span>
-      <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+    <!-- Result (Early Payout) -->
+    <div class="market collapsed" data-market="early-payout">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg>
+          </button>
+          <span class="title">Result (Early Payout)</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="opts">
+          <button class="opt col"><span class="l">Man City</span><span class="o">1.92</span></button>
+          <button class="opt col"><span class="l">Draw</span><span class="o">4.10</span></button>
+          <button class="opt col"><span class="l">Chelsea</span><span class="o">3.60</span></button>
+        </div>
+      </div>
     </div>
 
-    <div class="market collapsed">
-      <span class="title">Double Chance</span>
-      <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+    <!-- Double Chance -->
+    <div class="market collapsed" data-market="double-chance">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg>
+          </button>
+          <span class="title">Double Chance</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="opts">
+          <button class="opt col"><span class="l">1X</span><span class="o">1.28</span></button>
+          <button class="opt col"><span class="l">12</span><span class="o">1.21</span></button>
+          <button class="opt col"><span class="l">X2</span><span class="o">1.96</span></button>
+        </div>
+      </div>
     </div>
 
-    <div class="market collapsed">
-      <span class="title">Total Goals</span>
-      <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+    <!-- Total Goals — Over/Under ladder -->
+    <div class="market collapsed" data-market="total-goals">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg>
+          </button>
+          <span class="title">Total Goals</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="otbl cols-3">
+          <div class="lbl"></div><div class="h">Over</div><div class="h">Under</div>
+          <div class="lbl">0.5</div><button class="cell center">1.04</button><button class="cell center">11.00</button>
+          <div class="lbl">1.5</div><button class="cell center">1.18</button><button class="cell center">4.40</button>
+          <div class="lbl">2.5</div><button class="cell center">1.62</button><button class="cell center">2.25</button>
+          <div class="lbl">3.5</div><button class="cell center selected">2.55</button><button class="cell center">1.50</button>
+          <div class="lbl">4.5</div><button class="cell center">4.80</button><button class="cell center">1.18</button>
+          <div class="lbl">5.5</div><button class="cell center">9.50</button><button class="cell center">1.05</button>
+        </div>
+      </div>
     </div>
 
-    <div class="market collapsed">
-      <span class="title">Goals Asian Handicap</span>
-      <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+    <!-- Goals Asian Handicap -->
+    <div class="market collapsed" data-market="asian-handicap">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg>
+          </button>
+          <span class="title">Goals Asian Handicap</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="otbl cols-2">
+          <div class="h">Man City</div><div class="h">Chelsea</div>
+          <button class="cell lr"><span class="lbl-inline">-2.75</span>4.90</button><button class="cell lr"><span class="lbl-inline">+2.75</span>1.17</button>
+          <button class="cell lr"><span class="lbl-inline">-2.25</span>3.40</button><button class="cell lr"><span class="lbl-inline">+2.25</span>1.30</button>
+          <button class="cell lr"><span class="lbl-inline">-1.75</span>2.42</button><button class="cell lr"><span class="lbl-inline">+1.75</span>1.55</button>
+          <button class="cell lr"><span class="lbl-inline">-1.25</span>1.78</button><button class="cell lr"><span class="lbl-inline">+1.25</span>2.00</button>
+          <button class="cell lr selected"><span class="lbl-inline">-0.75</span>1.42</button><button class="cell lr"><span class="lbl-inline">+0.75</span>2.75</button>
+          <button class="cell lr"><span class="lbl-inline">-0.25</span>1.22</button><button class="cell lr"><span class="lbl-inline">+0.25</span>4.10</button>
+        </div>
+      </div>
     </div>
 
-    <div class="market collapsed">
-      <span class="title">Goals Handicap 3 Way</span>
-      <span class="badge">New</span>
-      <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+    <!-- Goals Handicap 3 Way -->
+    <div class="market collapsed" data-market="handicap-3way">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg>
+          </button>
+          <span class="title">Goals Handicap 3 Way</span>
+          <span class="badge">New</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="otbl cols-3w">
+          <div class="h">Man City</div><div class="h">Tie: Chelsea</div><div class="h">Chelsea</div>
+          <button class="cell lr"><span class="lbl-inline">-2</span>5.20</button><button class="cell lr"><span class="lbl-inline">+2</span>3.80</button><button class="cell lr"><span class="lbl-inline">+2</span>1.62</button>
+          <button class="cell lr"><span class="lbl-inline">-1</span>2.45</button><button class="cell lr"><span class="lbl-inline">+1</span>3.20</button><button class="cell lr"><span class="lbl-inline">+1</span>2.30</button>
+          <button class="cell lr"><span class="lbl-inline">0</span>1.85</button><button class="cell lr"><span class="lbl-inline">0</span>4.30</button><button class="cell lr"><span class="lbl-inline">0</span>3.45</button>
+        </div>
+      </div>
     </div>
 
-    <div class="market collapsed">
-      <span class="title">Total Goals 3 Way</span>
-      <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+    <!-- Total Goals 3 Way -->
+    <div class="market collapsed" data-market="total-3way">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg>
+          </button>
+          <span class="title">Total Goals 3 Way</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="otbl cols-4">
+          <div class="lbl"></div><div class="h">Over</div><div class="h">Exactly</div><div class="h">Under</div>
+          <div class="lbl">2</div><button class="cell center">1.52</button><button class="cell center">3.80</button><button class="cell center">3.40</button>
+          <div class="lbl">3</div><button class="cell center selected">2.40</button><button class="cell center">3.60</button><button class="cell center">1.78</button>
+          <div class="lbl">4</div><button class="cell center">4.30</button><button class="cell center">5.50</button><button class="cell center">1.32</button>
+          <div class="lbl">5</div><button class="cell center">9.00</button><button class="cell center">11.00</button><button class="cell center">1.08</button>
+        </div>
+      </div>
     </div>
 
-    <div class="market collapsed">
-      <span class="title">Goals In Both Halves</span>
-      <span class="badge">New</span>
-      <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+    <!-- Goals In Both Halves -->
+    <div class="market collapsed" data-market="both-halves">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg>
+          </button>
+          <span class="title">Goals In Both Halves</span>
+          <span class="badge">New</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="opts">
+          <button class="opt col"><span class="l">Yes</span><span class="o">1.72</span></button>
+          <button class="opt col"><span class="l">No</span><span class="o">2.05</span></button>
+        </div>
+      </div>
     </div>
 
-    <div class="market collapsed">
-      <span class="title">First Team To Score</span>
-      <span class="badge">New</span>
-      <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+    <!-- First Team To Score -->
+    <div class="market collapsed" data-market="first-score">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg>
+          </button>
+          <span class="title">First Team To Score</span>
+          <span class="badge">New</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="opts">
+          <button class="opt col"><span class="l">Man City</span><span class="o">1.70</span></button>
+          <button class="opt col"><span class="l">No Goal</span><span class="o">17.00</span></button>
+          <button class="opt col"><span class="l">Chelsea</span><span class="o">2.55</span></button>
+        </div>
+      </div>
     </div>
 
-    <div class="market collapsed">
-      <span class="title">Last Team To Score</span>
-      <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+    <!-- Last Team To Score -->
+    <div class="market collapsed" data-market="last-score">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg>
+          </button>
+          <span class="title">Last Team To Score</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="opts">
+          <button class="opt col"><span class="l">Man City</span><span class="o">1.92</span></button>
+          <button class="opt col"><span class="l">No Goal</span><span class="o">17.00</span></button>
+          <button class="opt col"><span class="l">Chelsea</span><span class="o">2.30</span></button>
+        </div>
+      </div>
     </div>
 
-    <div class="market collapsed">
-      <span class="title">Goal Time Intervals</span>
-      <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+    <!-- Goal Time Intervals -->
+    <div class="market collapsed" data-market="goal-intervals">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg>
+          </button>
+          <span class="title">Goal Time Intervals</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="otbl cols-2">
+          <div class="h">Interval</div><div class="h">Odds</div>
+          <div class="lbl">68'-75'</div><button class="cell center">2.30</button>
+          <div class="lbl">76'-82'</div><button class="cell center">2.55</button>
+          <div class="lbl">83'-90'</div><button class="cell center">2.10</button>
+          <div class="lbl">No more goals</div><button class="cell center">3.40</button>
+        </div>
+      </div>
     </div>
 
-    <div class="market collapsed">
-      <span class="title">Both Teams To Score</span>
-      <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+    <!-- Both Teams To Score -->
+    <div class="market collapsed" data-market="btts">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg>
+          </button>
+          <span class="title">Both Teams To Score</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="opts">
+          <button class="opt col"><span class="l">Yes</span><span class="o">1.36</span></button>
+          <button class="opt col"><span class="l">No</span><span class="o">3.05</span></button>
+        </div>
+      </div>
     </div>
   </div>
+
+  <script>
+    /* Click anywhere on the market header (or the row when collapsed)
+     * toggles .collapsed. Bet-option clicks bubble up through the popup
+     * handler in betslip-popup.js — no need to intercept them here. */
+    (function(){
+      const root = document.getElementById('markets');
+      if (!root) return;
+      root.addEventListener('click', function(e){
+        const titleRow = e.target.closest('.title-row');
+        if (!titleRow) return;
+        // never toggle when the pin button was clicked
+        if (e.target.closest('.pin')) return;
+        const m = titleRow.closest('.market');
+        if (m) m.classList.toggle('collapsed');
+      });
+    })();
+  </script>
 
   <div class="placeholder-section">Footer — payments, regulations, partners, app stores, Hoory AI<br>(approximated — reuses home page footer)</div>
 
