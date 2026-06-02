@@ -10,14 +10,13 @@
  * step and, if that step's screen is the current page, mounts the relevant
  * coachmark(s); advancing a step may navigate to another page.
  *
- * Steps (index → screen):
- *   0 prefs      → onboarding-preferences.html  (owned by that page's inline UI)
- *   1 suggest    → onboarding-preferences.html  (match-suggestion popup)
- *   2 deposit    → index.html   spotlight the "+" deposit button + welcome banner
- *   3 balance    → index.html   three tooltips on the balance pill / dropdown rows
- *   4 event      → picked match page   1X2 market → betslip → place (freebet)
- *   5 openbets1  → picked match page   tooltip on the open-bets clock
- *   6 openbets2  → betslip-open-bets.html   tooltip on the Open Bets tab → finale
+ * Steps:
+ *   prefs / suggest  → onboarding-preferences.html  (owned by that page's UI)
+ *   deposit          → index.html   full-screen welcome pop-up + "+" spotlight
+ *   balance          → index.html   three tooltips on the balance pill / dropdown
+ *   event            → picked match  match intro → 1X2 market → betslip → place
+ *   openbets1        → picked match  tooltip on the open-bets clock
+ *   openbets2        → open-bets.html  tooltip on the open bet → success screen
  *
  * Launch: visit onboarding-preferences.html (or any page with ?onboarding=start).
  * Replay/reset: ?onboarding=reset, or OnboardingTour.reset() in the console.
@@ -59,7 +58,8 @@
     const path = (location.pathname || '').toLowerCase();
     const file = path.slice(path.lastIndexOf('/') + 1) || 'index.html';
     if (file.indexOf('onboarding-preferences') === 0) return 'prefs';
-    if (file.indexOf('betslip-open-bets') === 0) return 'openbets';
+    // both the 1-tab (open-bets.html) and 2-tab (betslip-open-bets.html) screens
+    if (file.indexOf('open-bets') === 0 || file.indexOf('betslip-open-bets') === 0) return 'openbets';
     if (/-match-\d+\.html$/.test(file)) return 'match';
     if (file === '' || file === 'index.html') return 'home';
     const nav = document.getElementById('app-nav');
@@ -70,31 +70,39 @@
 
   function urlForPage(key, state) {
     if (key === 'home') return 'index.html';
-    if (key === 'openbets') return 'betslip-open-bets.html';
+    if (key === 'openbets') return 'open-bets.html';   // the 1-tab screen the clock icon links to
     if (key === 'prefs') return 'onboarding-preferences.html';
     if (key === 'match') return ((state && state.pickedMatch) || FALLBACK_MATCH).href;
     return null;
   }
 
   /* ──────────────── step / mark config ──────────────── */
-  // Marks describe one spotlight + tooltip. `trigger` controls how it advances:
+  // Marks describe one spotlight + tooltip (or a full-screen pop-up when
+  // `fullscreen` is set). `trigger` controls how a coachmark advances:
   //   'next'        — a Next button (info marks the user reads)
+  //   'cta'         — a full-screen pop-up's primary button
   //   'deposit'     — cash balance increased (a deposit completed)
   //   'balancesOpen'— the balances dropdown opened
   //   'betslipOpen' — the floating betslip popup opened
   //   'placedBet'   — a bet was placed (BetslipStore count grew)
+  // Copy may contain {home}/{away}, filled with the picked match's team names.
   const STEPS = [
     { id: 'prefs',    page: 'prefs',    screen: true },
     { id: 'suggest',  page: 'prefs',    screen: true },
 
-    { id: 'deposit',  page: 'home', banner: true, marks: [
-      { target: '.bal-plus-btn', copy: "Press '+' to top up your balance.",
+    { id: 'deposit',  page: 'home', marks: [
+      { id: 'welcome', fullscreen: true, trigger: 'cta',
+        art: '🎁', badge: '+$5 FREEBET',
+        title: 'Welcome bonus!',
+        copy: "You've been awarded a welcome bonus. Deposit $5 and we'll match it with $5 in freebets to play with.",
+        cta: 'Top up now' },
+      { id: 'plus', target: '.bal-plus-btn', copy: 'Press the green + to top up your balance.',
         place: 'below', trigger: 'deposit', allowTargetClick: true },
     ] },
 
     { id: 'balance',  page: 'home', marks: [
       { target: '.bal-pill', copy: 'Tap to see your balance.',
-        place: 'below', trigger: 'balancesOpen', allowTargetClick: true, openBalances: true },
+        place: 'below', trigger: 'balancesOpen', allowTargetClick: true },
       { target: '[data-bal-cash]', copy: 'This is your cash balance.',
         place: 'below', trigger: 'next', requiresOpen: 'balances' },
       { target: '.bal-bottom-row', copy: 'Here you can see your bonuses and your total balance including bonus.',
@@ -102,13 +110,17 @@
     ] },
 
     { id: 'event',    page: 'match', marks: [
-      { target: '.market[data-market="match-result"] .title', copy: 'This is the Match Result market — pick who you think will win.',
+      { id: 'intro', target: '.event-card', copy: "This is your match screen — here you'll find the teams, kick-off time and key stats.",
         place: 'below', trigger: 'next' },
-      { target: '.market[data-market="match-result"] .opts .opt', copy: 'Tap an outcome to add it to your betslip. Your first bet is a freebet!',
+      { id: 'market', target: '.market[data-market="match-result"] .title', copy: 'This is the Match Result market — pick who you think will win.',
+        place: 'below', trigger: 'next' },
+      { id: 'out1', target: '.market[data-market="match-result"] .opts .opt:nth-child(1)', copy: 'Tap here if you believe {home} wins.',
+        place: 'below', trigger: 'next', allowTargetClick: true, jumpOnBetslip: true },
+      { id: 'outX', target: '.market[data-market="match-result"] .opts .opt:nth-child(2)', copy: "Tap here if you think it'll be a draw.",
+        place: 'below', trigger: 'next', allowTargetClick: true, jumpOnBetslip: true },
+      { id: 'out2', target: '.market[data-market="match-result"] .opts .opt:nth-child(3)', copy: 'Tap here if you believe {away} wins — your first bet is on us!',
         place: 'below', trigger: 'betslipOpen', allowTargetClick: true },
-      { target: '.bsp-stake input', copy: 'Input your stake here.',
-        place: 'above', trigger: 'next', requiresOpen: 'betslip' },
-      { target: '.bsp-place', copy: 'Press here to place your bet.',
+      { id: 'betslip', target: '.bsp-card', copy: 'Input your stake here, then press Place Bet to place your bet.',
         place: 'above', trigger: 'placedBet', requiresOpen: 'betslip', allowTargetClick: true },
     ] },
 
@@ -118,7 +130,7 @@
     ] },
 
     { id: 'openbets2', page: 'openbets', marks: [
-      { target: '.bs-top-tab.active', copy: 'You can view your open bets here.',
+      { target: '.bo-card', copy: 'Here are your open bets — you can track them or cash out any time.',
         place: 'below', trigger: 'next', nextLabel: 'Finish' },
     ], finale: true },
   ];
@@ -172,46 +184,46 @@
 .ob-tip[data-place="below"] .ob-arrow{ top:-7px; border-bottom:7px solid #0a1633; }
 .ob-tip[data-place="above"] .ob-arrow{ bottom:-7px; border-top:7px solid #010c23; }
 
-/* welcome banner (deposit step) */
-.ob-banner{
-  position:fixed; left:50%; transform:translateX(-50%); top:64px;
-  width:100%; max-width:440px; padding:0 8px; z-index:2; pointer-events:none;
-}
-.ob-banner .ob-banner-card{
-  pointer-events:auto;
-  background:linear-gradient(120deg,#d80d83 0%,#9d0a60 100%);
-  border-top:1px solid rgba(255,255,255,.3);
-  border-radius:14px; padding:12px 14px;
-  box-shadow:0 16px 40px rgba(216,13,131,.4);
-  display:flex; flex-direction:column; gap:10px;
-  font:400 13px/18px 'Rubik',system-ui,sans-serif; color:#fff;
-}
-.ob-banner .ob-banner-ttl{ font-weight:600; font-size:14px; display:flex; align-items:center; gap:6px; }
-.ob-banner .ob-banner-sub{ color:rgba(255,255,255,.92); }
-.ob-banner .ob-banner-hint{ font-size:12px; color:rgba(255,255,255,.86); }
-.ob-banner .ob-banner-hint b{ font-weight:700; }
-.ob-banner .ob-banner-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:2px; }
-.ob-banner .ob-banner-skip{
-  background:none; border:0; color:rgba(255,255,255,.8); font:inherit; font-size:12px;
-  cursor:pointer; padding:6px 2px;
-}
-.ob-banner .ob-banner-skip:hover{ color:#fff; }
-.ob-banner .ob-topup{
-  background:#fff; color:#b00a6c; border:0; font:inherit; font-weight:600; font-size:13px;
-  padding:8px 18px; border-radius:999px; cursor:pointer;
-}
-.ob-banner.ob-hidden{ opacity:0; pointer-events:none; }
-
-/* finale */
-.ob-finale{
+/* full-screen pop-up (welcome bonus) + finale share a base look */
+.ob-screen, .ob-finale{
   position:fixed; inset:0; z-index:9100; pointer-events:auto;
-  background:radial-gradient(120% 80% at 50% 0%, #1a0b2e 0%, #010c23 60%);
+  background:radial-gradient(130% 90% at 50% 0%, #2a0b3e 0%, #010c23 58%);
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   text-align:center; padding:32px 28px;
   font-family:'Rubik',system-ui,sans-serif; color:#fff;
   opacity:0; transition:opacity .3s ease;
 }
-.ob-finale.ob-show{ opacity:1; }
+.ob-screen.ob-show, .ob-finale.ob-show{ opacity:1; }
+
+.ob-screen-art{
+  width:148px; height:148px; border-radius:50%; margin-bottom:6px;
+  background:radial-gradient(circle at 50% 38%, rgba(216,13,131,.55), rgba(216,13,131,.06) 70%);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 0 70px rgba(216,13,131,.5);
+  animation:ob-pop .5s cubic-bezier(.22,.61,.36,1);
+}
+.ob-screen-art .em{ font-size:80px; line-height:1; filter:drop-shadow(0 8px 16px rgba(0,0,0,.45)); }
+@keyframes ob-pop{ 0%{ transform:scale(.6); opacity:0 } 100%{ transform:scale(1); opacity:1 } }
+.ob-screen-badge{
+  margin:8px 0 4px; padding:6px 16px; border-radius:999px;
+  background:var(--main,#d80d83); color:#fff; font-weight:700; font-size:13px; letter-spacing:.6px;
+  box-shadow:0 8px 22px rgba(216,13,131,.5);
+}
+.ob-screen-ttl{ font-size:30px; line-height:36px; font-weight:700; margin:12px 0 8px; }
+.ob-screen-copy{ font-size:15px; line-height:22px; color:rgba(255,255,255,.78); max-width:300px; margin:0 0 28px; }
+.ob-screen-cta, .ob-finale .ob-fin-cta{
+  width:100%; max-width:320px; height:52px; border-radius:999px;
+  background:var(--main,#d80d83); border:0; border-top:1px solid rgba(255,255,255,.24);
+  color:#fff; font:inherit; font-weight:600; font-size:16px; cursor:pointer;
+  box-shadow:0 12px 30px rgba(216,13,131,.45);
+}
+.ob-screen-cta:active{ transform:translateY(1px); }
+.ob-screen-skip, .ob-finale .ob-fin-later{
+  margin-top:14px; background:none; border:0; color:rgba(255,255,255,.5);
+  font:inherit; font-size:13px; cursor:pointer;
+}
+.ob-screen-skip:hover, .ob-finale .ob-fin-later:hover{ color:rgba(255,255,255,.85); }
+
 .ob-finale .ob-burst{ font-size:56px; line-height:1; margin-bottom:8px; }
 .ob-finale h2{ font-size:24px; font-weight:700; margin:0 0 8px; }
 .ob-finale p{ font-size:14px; line-height:20px; color:rgba(255,255,255,.72); margin:0 0 6px; max-width:300px; }
@@ -221,26 +233,16 @@
   display:flex; align-items:center; gap:10px; font-size:14px;
 }
 .ob-finale .ob-prize b{ color:#ffad29; }
-.ob-finale .ob-fin-cta{
-  width:100%; max-width:320px; height:50px; border-radius:999px;
-  background:var(--main,#d80d83); border:0; border-top:1px solid rgba(255,255,255,.24);
-  color:#fff; font:inherit; font-weight:600; font-size:15px; cursor:pointer;
-  box-shadow:0 10px 28px rgba(216,13,131,.4);
-}
-.ob-finale .ob-fin-later{
-  margin-top:14px; background:none; border:0; color:rgba(255,255,255,.5);
-  font:inherit; font-size:13px; cursor:pointer;
-}
-.ob-finale .ob-fin-later:hover{ color:rgba(255,255,255,.85); }
 `;
 
   /* ──────────────── overlay DOM ──────────────── */
-  let root, spot, tip, tipCopy, tipArrow, skipBtn, nextBtn, banner;
+  let root, spot, tip, tipCopy, tipArrow, skipBtn, nextBtn;
   let tickTimer = null;
   let current = null;     // { step, markIdx, mark, baseCash, baseBets }
   let mountToken = 0;     // invalidates async waits across (re)mounts
 
   function buildOverlay() {
+    if (root) return;
     const style = document.createElement('style');
     style.textContent = css;
     document.head.appendChild(style);
@@ -265,37 +267,16 @@
     skipBtn  = tip.querySelector('.ob-skip');
     nextBtn  = tip.querySelector('.ob-next');
 
-    banner = document.createElement('div');
-    banner.className = 'ob-banner ob-hidden';
-    banner.innerHTML =
-      '<div class="ob-banner-card">' +
-        '<div class="ob-banner-ttl">🎁 Welcome bonus</div>' +
-        '<div class="ob-banner-sub">Congrats — you\'ve been awarded a welcome bonus. Deposit $5 and get $5 in freebets!</div>' +
-        '<div class="ob-banner-hint">Press the green <b>+</b> to top up your balance.</div>' +
-        '<div class="ob-banner-row">' +
-          '<button class="ob-banner-skip" type="button">Skip tour</button>' +
-          '<button class="ob-topup" type="button">Top up now</button>' +
-        '</div>' +
-      '</div>';
-
     root.appendChild(spot);
     root.appendChild(tip);
-    root.appendChild(banner);
     document.body.appendChild(root);
 
-    // Keep tooltip / banner clicks from reaching the page — otherwise the
-    // balances dropdown's own click-outside handler (balance.js) would close it
-    // the moment the user presses Next.
+    // Keep tooltip clicks from reaching the page — otherwise the balances
+    // dropdown's own click-outside handler (balance.js) would close it the
+    // moment the user presses Next.
     tip.addEventListener('click', e => e.stopPropagation());
-    banner.addEventListener('click', e => e.stopPropagation());
-
     skipBtn.addEventListener('click', endTour);
     nextBtn.addEventListener('click', () => advance());
-    banner.querySelector('.ob-banner-skip').addEventListener('click', endTour);
-    banner.querySelector('.ob-topup').addEventListener('click', () => {
-      const plus = document.querySelector('.bal-plus-btn');
-      if (plus) plus.click();
-    });
     window.addEventListener('resize', reposition, { passive: true });
     window.addEventListener('scroll', reposition, { passive: true, capture: true });
   }
@@ -309,6 +290,25 @@
   function balancesOpen()     { return !!document.querySelector('.bal-pop-host.open'); }
   function betslipOpen()      { return !!document.querySelector('.bsp-host.open'); }
   function popupClosed()      { return !document.body.classList.contains('bsp-open'); }
+
+  // Home / away names of the picked match, for {home}/{away} in tooltip copy.
+  function teamNames() {
+    const s = readState();
+    const label = s && s.pickedMatch && s.pickedMatch.label;
+    if (label && label.indexOf(' vs ') !== -1) {
+      const p = label.split(' vs ');
+      return { home: p[0].trim(), away: p[1].trim() };
+    }
+    const names = document.querySelectorAll('.teams-row .team-block .name');
+    if (names.length >= 2) {
+      return { home: names[0].textContent.trim(), away: names[1].textContent.trim() };
+    }
+    return { home: 'the home team', away: 'the away team' };
+  }
+  function fillCopy(s) {
+    const t = teamNames();
+    return String(s || '').replace(/\{home\}/g, t.home).replace(/\{away\}/g, t.away);
+  }
 
   function resolveTarget(mark) {
     if (!mark) return null;
@@ -330,7 +330,7 @@
 
   /* ──────────────── render / position ──────────────── */
   function reposition() {
-    if (!current || !current.mark) return;
+    if (!current || !current.mark || current.mark.fullscreen) return;
     const el = resolveTarget(current.mark);
     if (!el) { spot.classList.add('ob-hidden'); tip.classList.add('ob-hidden'); return; }
     const r = el.getBoundingClientRect();
@@ -341,16 +341,11 @@
     spot.style.height = (r.height + pad * 2) + 'px';
     spot.classList.remove('ob-hidden');
 
-    // banner steps show no floating tip — the banner carries the copy
-    if (current.noTip) { tip.classList.add('ob-hidden'); return; }
-
-    // tip placement (clamped to the 440px frame), with vertical flip on overflow
+    // tip placement (clamped to the frame), with vertical flip on overflow
     tip.classList.remove('ob-hidden');
     let place = current.mark.place || 'below';
     const tipW = tip.offsetWidth, tipH = tip.offsetHeight;
     const gut = 8;
-    // The app frame is max-width 440 but never wider than the viewport — clamp
-    // to whichever is smaller so tips can't overflow a narrow screen.
     const FRAME = Math.min(440, window.innerWidth);
     const frameLeft = Math.max(0, (window.innerWidth - FRAME) / 2);
     let top = place === 'above' ? r.top - tipH - 12 : r.bottom + 12;
@@ -368,15 +363,22 @@
   }
 
   function applyVisibility() {
-    // Hide the whole overlay while the full-screen deposit modal is in use,
-    // so the user can interact with it unobstructed.
+    // Hide the spotlight overlay while the full-screen deposit modal is in use.
     if (depositModalOpen()) root.classList.add('ob-suppressed');
     else root.classList.remove('ob-suppressed');
   }
 
   function checkAutoAdvance() {
     if (!current || !current.mark) return;
-    const t = current.mark.trigger;
+    const mark = current.mark;
+    // A real outcome tap during the explanatory market tooltips opens the
+    // betslip — jump straight to the betslip/stake tooltip.
+    if (mark.jumpOnBetslip && betslipOpen()) {
+      const step = STEPS[current.step];
+      const i = step.marks.findIndex(m => m.id === 'betslip');
+      if (i >= 0) { mountMark(current.step, i); return; }
+    }
+    const t = mark.trigger;
     if (t === 'deposit' && num('vbet:balance') > current.baseCash) {
       creditFreebet();
       advance();
@@ -428,22 +430,50 @@
     } catch (_) {}
   }
 
+  /* ──────────────── full-screen pop-up marks ──────────────── */
+  function removeScreen() {
+    const el = document.querySelector('.ob-screen');
+    if (el) el.remove();
+  }
+  function renderScreen(mark) {
+    removeScreen();
+    const el = document.createElement('div');
+    el.className = 'ob-screen';
+    el.innerHTML =
+      '<div class="ob-screen-art"><span class="em">' + (mark.art || '🎁') + '</span></div>' +
+      (mark.badge ? '<div class="ob-screen-badge">' + mark.badge + '</div>' : '') +
+      '<h2 class="ob-screen-ttl">' + (mark.title || '') + '</h2>' +
+      '<p class="ob-screen-copy">' + fillCopy(mark.copy) + '</p>' +
+      '<button class="ob-screen-cta" type="button">' + (mark.cta || 'Continue') + '</button>' +
+      '<button class="ob-screen-skip" type="button">Skip tour</button>';
+    document.body.appendChild(el);
+    setTimeout(() => el.classList.add('ob-show'), 20);
+    el.querySelector('.ob-screen-cta').addEventListener('click', onScreenCta);
+    el.querySelector('.ob-screen-skip').addEventListener('click', endTour);
+  }
+  function onScreenCta() {
+    const mark = current && current.mark;
+    removeScreen();
+    advance();
+    // The welcome pop-up's CTA also opens the deposit flow straight away.
+    if (mark && mark.id === 'welcome') {
+      const plus = document.querySelector('.bal-plus-btn');
+      if (plus) plus.click();
+    }
+  }
+
   /* ──────────────── mount / advance ──────────────── */
   function mountMark(stepIdx, markIdx) {
     const step = STEPS[stepIdx];
     const mark = step.marks[markIdx];
-    const token = ++mountToken;
-    const bannerMark = !!(step.banner && markIdx === 0);
+    ++mountToken;
     current = {
-      step: stepIdx, markIdx, mark, noTip: bannerMark,
+      step: stepIdx, markIdx, mark,
       baseCash: num('vbet:balance'),
       baseBets: betsCount(),
     };
 
-    // The deposit step shows the welcome banner instead of a floating tip
-    // (the banner carries the same copy, the CTA and a Skip control).
-    if (bannerMark) banner.classList.remove('ob-hidden');
-    else banner.classList.add('ob-hidden');
+    if (mark.fullscreen) { renderScreen(mark); return; }
 
     // Next button visibility + label
     if (mark.trigger === 'next') {
@@ -452,17 +482,13 @@
     } else {
       nextBtn.classList.add('ob-hidden');
     }
-    tipCopy.textContent = mark.copy;
+    tipCopy.textContent = fillCopy(mark.copy);
 
-    // open the balances dropdown if this mark needs it
-    if (mark.openBalances) { /* user is told to tap; nothing forced */ }
     if (mark.requiresOpen === 'balances') ensureBalancesOpen();
 
     spot.classList.add('ob-hidden');
     tip.classList.add('ob-hidden');
     startTicking();
-    // token reserved for future async waits; keeps mounts cancellable
-    void token;
   }
 
   function advance() {
@@ -521,7 +547,7 @@
     if (tickTimer != null) { clearInterval(tickTimer); tickTimer = null; }
     if (spot) spot.classList.add('ob-hidden');
     if (tip) tip.classList.add('ob-hidden');
-    if (banner) banner.classList.add('ob-hidden');
+    removeScreen();
   }
 
   function endTour() {
@@ -556,11 +582,9 @@
   // ?onboarding=reset has already wiped state before the preferences page's
   // inline gallery script reads it — otherwise the reset races the gallery.
   let redirecting = false;
-  // Defer the actual navigation: redirecting synchronously during initial parse
-  // can abort the in-flight page load. The state reset above stays synchronous
-  // (so the prefs page's inline gallery reads post-reset state), the redirect
-  // just runs a tick later.
   function gotoPrefs() {
+    // Defer the navigation: redirecting synchronously during initial parse can
+    // abort the in-flight page load. The state reset stays synchronous.
     redirecting = true;
     setTimeout(function () { location.href = 'onboarding-preferences.html'; }, 0);
   }
@@ -587,10 +611,16 @@
 
   function resume() {
     if (redirecting) return;
-
-    const state = readState();
+    let state = readState();
     if (!state || !state.active) return;        // self-gate: dormant
     if (PAGE === 'prefs') return;               // the prefs page drives steps 0–1
+
+    // If the user reached the open-bets page by tapping the clock icon (rather
+    // than the tooltip's button), the step is still 'openbets1' — bump it so the
+    // tour continues to the success screen right here.
+    if (PAGE === 'openbets' && state.step === stepIndexById('openbets1')) {
+      state = writeState({ step: stepIndexById('openbets2') });
+    }
 
     const step = STEPS[state.step];
     if (!step || step.screen) return;
