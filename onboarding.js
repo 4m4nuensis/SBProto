@@ -151,10 +151,11 @@
 
 .ob-tip{
   position:fixed; left:0; top:0; z-index:3; max-width:300px; width:max-content;
-  background:linear-gradient(0deg,rgba(255,255,255,.05),rgba(255,255,255,.05)),#010c23;
-  border-top:1px solid rgba(255,255,255,.18);
+  background:linear-gradient(0deg,rgba(216,13,131,.06),rgba(216,13,131,.06)),#010c23;
+  border:1px solid rgba(216,13,131,.55);
+  border-top:1px solid rgba(216,13,131,.8);
   border-radius:12px; padding:12px 14px 10px;
-  box-shadow:0 16px 48px rgba(0,0,0,.6);
+  box-shadow:0 16px 40px rgba(0,0,0,.55), 0 0 22px 2px rgba(216,13,131,.5);
   pointer-events:auto;
   font:400 13px/18px 'Rubik',system-ui,sans-serif; color:#fff;
 }
