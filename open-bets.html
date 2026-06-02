@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>VBet — Open Bets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#010c23;
+  --bg-32:rgba(1,12,35,.32);
+  --bg-60:rgba(1,12,35,.6);
+  --main:#d80d83;
+  --main-16:rgba(216,13,131,.16);
+  --odds:#ffad29;
+  --w-100:#fff;
+  --w-90:rgba(255,255,255,.9);
+  --w-80:rgba(255,255,255,.8);
+  --w-72:rgba(255,255,255,.72);
+  --w-64:rgba(255,255,255,.64);
+  --w-56:rgba(255,255,255,.56);
+  --w-48:rgba(255,255,255,.48);
+  --w-40:rgba(255,255,255,.4);
+  --w-32:rgba(255,255,255,.32);
+  --w-24:rgba(255,255,255,.24);
+  --w-16:rgba(255,255,255,.16);
+  --w-12:rgba(255,255,255,.12);
+  --w-8:rgba(255,255,255,.08);
+  --w-4:rgba(255,255,255,.04);
+  --d-90:rgba(0,2,5,.9);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:#010c23;font-family:'Rubik',system-ui,-apple-system,sans-serif;color:var(--w-100);font-size:14px;line-height:20px;letter-spacing:0}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+.app{
+  width:100%;max-width:440px;margin:0 auto;min-height:100vh;
+  background:var(--bg);position:relative;
+  overflow-x:hidden;padding-bottom:114px;
+}
+
+/* ========== STATUS BAR ========== */
+.statusbar{
+  position:relative;height:40px;width:100%;
+  background:linear-gradient(90deg,var(--w-4) 0%,var(--w-4) 100%),linear-gradient(90deg,var(--bg) 0%,var(--bg) 100%);
+}
+.statusbar .time{
+  position:absolute;left:48px;top:50%;transform:translate(-50%,-50%);
+  font-family:'SF Pro','SF Pro Display','-apple-system',sans-serif;
+  font-weight:700;font-size:14px;letter-spacing:-.3px;color:var(--w-90);text-align:center;width:54px;
+}
+.statusbar .battery{position:absolute;top:50%;right:19px;transform:translateY(-50%);width:20.926px;height:9.748px}
+.statusbar .wifi{position:absolute;top:50%;right:44.23px;transform:translateY(-50%);width:13.188px;height:9.461px}
+.statusbar .cellular{position:absolute;top:50%;right:61.72px;transform:translateY(-50%);width:14.622px;height:9.175px}
+
+/* ========== BETSLIP CONTAINER ========== */
+.betslip{
+  width:100%;
+  padding:0 8px 8px;
+  border-top:1px solid var(--w-16);
+  border-radius:8px;
+  background:linear-gradient(90deg,var(--w-4) 0%,var(--w-4) 100%),var(--bg);
+  backdrop-filter:blur(15px);
+  display:flex;flex-direction:column;
+}
+
+/* top tabs → bs-tabs.js */
+
+/* ========== MAIN ========== */
+.bs-main{
+  display:flex;flex-direction:column;gap:8px;align-items:center;
+  padding:8px 0;width:100%;
+}
+
+/* ========== HISTORY BUTTON ========== */
+.bs-history{
+  width:100%;height:32px;
+  display:flex;align-items:center;justify-content:center;
+  padding:6px 16px;border-radius:999px;
+  background:var(--w-8);border-top:1px solid var(--w-16);
+  font-size:12px;line-height:16px;color:var(--w-90);
+}
+
+/* ========== OPEN BET CARD ========== */
+.bo-card{
+  width:100%;background:var(--w-8);border-radius:6px;
+  padding:8px;display:flex;flex-direction:column;gap:8px;
+}
+.bo-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:4px 0 8px 8px;
+  border-bottom:1px dashed var(--bg);
+}
+.bo-head .left{display:flex;align-items:center;gap:8px}
+.bo-head .title-col{display:flex;flex-direction:column;justify-content:center}
+.bo-head .title{font-size:14px;line-height:20px;font-weight:500;color:var(--w-80)}
+.bo-head .date{display:flex;align-items:center;gap:4px;margin-top:0}
+.bo-head .date .t{font-size:12px;line-height:16px;letter-spacing:.4px;color:var(--w-56);white-space:nowrap}
+.bo-head .dot{width:4px;height:4px;display:flex;align-items:center;justify-content:center}
+.bo-head .dot img{width:4px;height:4px}
+.bo-head .right{display:flex;align-items:center;gap:2px}
+.bo-head .end-col{display:flex;flex-direction:column;align-items:flex-end;justify-content:center}
+.bo-head .status{font-size:14px;line-height:20px;font-weight:500;color:var(--odds);text-align:right;white-space:nowrap}
+.bo-head .id-row{display:flex;align-items:center;gap:4px}
+.bo-head .id-row .lbl{font-size:12px;line-height:16px;letter-spacing:.4px;color:var(--w-56)}
+.bo-head .id-row .val{font-size:12px;line-height:16px;letter-spacing:.4px;color:var(--w-56);font-weight:700}
+
+/* 32px circular icon button */
+.bo-icbtn{
+  width:32px;height:32px;border-radius:999px;
+  display:flex;align-items:center;justify-content:center;flex:none;
+}
+.bo-icbtn.ghost{background:var(--w-8);border-top:1px solid var(--w-16)}
+.bo-icbtn svg{width:16px;height:16px;color:var(--w-80)}
+
+/* stat rows */
+.bo-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 8px;font-size:12px;line-height:16px;text-align:center;
+}
+.bo-row .lbl{color:var(--w-40)}
+.bo-row .val{color:var(--w-64)}
+
+/* divider + cashout area */
+.bo-cashout-wrap{
+  border-top:1px dashed var(--bg);
+  display:flex;flex-direction:column;gap:4px;
+  padding:8px 0 4px;
+}
+.bo-cashout-wrap--inline{flex-direction:row;gap:4px}
+
+/* cashout button (white, full-width) */
+.bo-cashout{
+  width:100%;height:32px;
+  display:flex;align-items:center;justify-content:center;
+  padding:6px 16px;border-radius:999px;
+  background:var(--w-90);border-top:1px solid var(--w-24);
+  font-size:12px;line-height:16px;color:var(--d-90);
+}
+.bo-cashout-wrap--inline .bo-cashout{flex:1 0 0}
+
+/* cashout rule activated link */
+.bo-rule{
+  display:flex;align-items:center;
+  padding:8px;border-bottom:1px solid var(--w-8);
+}
+.bo-rule .link{display:flex;align-items:center;gap:4px;color:var(--w-80)}
+.bo-rule .link svg{width:16px;height:16px}
+.bo-rule .link span{font-size:12px;line-height:16px;text-decoration:underline}
+
+/* action row variant A: icons left, More Info right */
+.bo-actions{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding:0 8px;
+}
+.bo-actions .icons{flex:1;min-width:0;display:flex;align-items:center;gap:8px}
+
+/* more info row (right aligned only) */
+.bo-more-row{
+  display:flex;align-items:center;justify-content:flex-end;
+  padding:0 8px;
+}
+.bo-more{
+  display:flex;align-items:center;gap:6px;
+  height:32px;padding:6px 16px;border-radius:999px;
+  font-size:12px;line-height:16px;color:var(--w-90);
+}
+.bo-more svg{width:16px;height:16px;color:var(--w-90)}
+
+/* placed-bet selection summary inside each open-bet card */
+.bo-selection{
+  display:flex;flex-direction:column;gap:2px;
+  padding:4px 8px 8px;
+  border-bottom:1px dashed var(--bg);
+}
+.bo-selection .top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.bo-selection .name{
+  font-size:14px;line-height:20px;font-weight:500;color:var(--w-90);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;
+}
+.bo-selection .odds{font-size:14px;line-height:20px;color:var(--odds);white-space:nowrap;flex-shrink:0}
+.bo-selection .mkt{font-size:12px;line-height:16px;color:var(--w-56);letter-spacing:.4px}
+.bo-selection .teams{
+  font-size:12px;line-height:16px;color:var(--w-72);letter-spacing:.4px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+
+/* empty state */
+.bo-empty{
+  width:100%;padding:32px 16px;border-radius:8px;
+  background:var(--w-4);border:1px dashed var(--w-12);
+  display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;
+}
+.bo-empty .ttl{font-size:14px;line-height:20px;color:var(--w-72);font-weight:500}
+.bo-empty .sub{font-size:12px;line-height:16px;color:var(--w-48)}
+
+
+.ob-head{display:flex;align-items:center;gap:8px;padding:12px 8px 4px;width:100%}
+.ob-title{flex:1;font-size:16px;line-height:24px;font-weight:600;color:var(--w-100);margin:0}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== Status Bar ===== -->  <!-- ===== Betslip ===== -->
+  <div class="betslip">
+
+    <!-- Simple header: back + title (no betslip tab) -->
+    <div class="ob-head">
+      <a class="back-btn" href="index.html" aria-label="back">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 4l-4 4 4 4"/></svg>
+      </a>
+      <h1 class="ob-title">Open Bets</h1>
+    </div>
+
+    <!-- Main -->
+    <div class="bs-main">
+
+      <!-- Go to Bet History -->
+      <button class="bs-history">Go to Bet History</button>
+
+      <!-- Placed bets (rendered by inline script below from BetslipStore) -->
+      <div id="bo-list" style="display:flex;flex-direction:column;gap:8px;width:100%"></div>
+
+
+    </div><!-- /bs-main -->
+  </div><!-- /betslip -->
+
+  <div id="app-nav" data-page="history"></div>
+</div><!-- /.app -->
+<script src="betslip-store.js"></script>
+<script src="back-button.js"></script>
+<script src="nav.js"></script>
+<script>
+(function () {
+  const list = document.getElementById('bo-list');
+  if (!list) return;
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function fmtMoney(n) {
+    const v = Number(n) || 0;
+    const parts = v.toFixed(2).split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return '$ ' + parts.join('.');
+  }
+  function shortId(id) {
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) hash = ((hash << 5) - hash + id.charCodeAt(i)) | 0;
+    return String(Math.abs(hash)).padStart(10, '0').slice(0, 10);
+  }
+
+  /* shared SVG snippets */
+  const ICON_COPY   = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="4.5" width="8" height="9" rx="1.5"/><path d="M5 4.5V3a1.5 1.5 0 0 1 1.5-1.5h6A1.5 1.5 0 0 1 14 3v8a1.5 1.5 0 0 1-1.5 1.5H10"/></svg>`;
+  const ICON_SHARE  = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 5l3-3 3 3M13.5 2v8M4.5 6h-.5A2 2 0 0 0 2 8v4A2 2 0 0 0 4 14h7A2 2 0 0 0 13 12v-1.5" transform="translate(-.5 -.5)"/></svg>`;
+  const ICON_REPEAT = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6l2.5-2.5L7 6M4.5 3.5V10a2.5 2.5 0 0 0 2.5 2.5h2M14 10l-2.5 2.5L9 10M11.5 12.5V6A2.5 2.5 0 0 0 9 3.5H7"/></svg>`;
+  const ICON_EDIT   = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z"/><path d="M9.5 4.5l2 2"/></svg>`;
+  const ICON_CHEV   = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.5l3.5 3.5 3.5-3.5"/></svg>`;
+  const ICON_INFO   = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 5.5v3"/><circle cx="8" cy="11" r=".5" fill="currentColor"/></svg>`;
+
+  function dateRow(b) {
+    return (b.date || b.time)
+      ? `<span class="t">${esc(b.date)}</span>
+         <span class="dot"><img src="assets/bs-dots-h.svg" alt=""></span>
+         <span class="t">${esc(b.time)}</span>`
+      : `<span class="t">Just now</span>`;
+  }
+
+  function headerHTML(b, title) {
+    return `
+      <div class="bo-head">
+        <div class="left">
+          <div class="title-col">
+            <span class="title">${esc(title)}</span>
+            <div class="date">${dateRow(b)}</div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="end-col">
+            <span class="status">Unsettled</span>
+            <div class="id-row">
+              <span class="lbl">ID</span>
+              <span class="dot"><img src="assets/bs-dots-h.svg" alt=""></span>
+              <span class="val">${esc(shortId(b.id))}</span>
+            </div>
+          </div>
+          <button class="bo-icbtn" aria-label="copy">${ICON_COPY}</button>
+        </div>
+      </div>`;
+  }
+
+  function actionsHTML() {
+    return `
+      <div class="bo-actions">
+        <div class="icons">
+          <button class="bo-icbtn" aria-label="share">${ICON_SHARE}</button>
+          <button class="bo-icbtn" aria-label="repeat">${ICON_REPEAT}</button>
+          <button class="bo-icbtn" aria-label="edit">${ICON_EDIT}</button>
+        </div>
+        <button class="bo-more">More Info ${ICON_CHEV}</button>
+      </div>`;
+  }
+
+  function singleCardHTML(b) {
+    return `
+      <div class="bo-card" data-id="${esc(b.id)}">
+        ${headerHTML(b, 'Single')}
+        <div class="bo-selection">
+          <div class="top">
+            <span class="name">${esc(b.selection)}</span>
+            <span class="odds">${(Number(b.odds) || 0).toFixed(2)}</span>
+          </div>
+          <span class="mkt">${esc(b.market)}</span>
+          <span class="teams">${esc(b.teams)}</span>
+        </div>
+        <div class="bo-row"><span class="lbl">Stake:</span><span class="val">${fmtMoney(b.stake)}</span></div>
+        <div class="bo-row"><span class="lbl">Total Odds:</span><span class="val">${(Number(b.odds) || 0).toFixed(2)}</span></div>
+        <div class="bo-row"><span class="lbl">Possible Win:</span><span class="val">${fmtMoney(b.stake * b.odds)}</span></div>
+        <div class="bo-cashout-wrap">
+          <button class="bo-cashout" data-cashout="${esc(b.id)}">Cashout ${fmtMoney(b.stake * 0.9)}</button>
+        </div>
+        ${actionsHTML()}
+      </div>`;
+  }
+
+  /* Multi-bet card — matches Figma node 3582:869 */
+  function multiCardHTML(b) {
+    const n = (b.legs || []).length;
+    const totalOdds = Number(b.totalOdds) || (b.legs || []).reduce((a, l) => a * (Number(l.odds) || 1), 1);
+    const possibleWin = (Number(b.stake) || 0) * totalOdds;
+    // Borrow the first leg's date/time for the header — typical multi rolls into the earliest event.
+    const head = Object.assign({}, b, {
+      date: (b.legs && b.legs[0] && b.legs[0].date) || b.date || '',
+      time: (b.legs && b.legs[0] && b.legs[0].time) || b.time || '',
+    });
+    return `
+      <div class="bo-card" data-id="${esc(b.id)}">
+        ${headerHTML(head, 'Multiple Bet (' + n + ')')}
+        <div class="bo-row"><span class="lbl">Stake:</span><span class="val">${fmtMoney(b.stake)}</span></div>
+        <div class="bo-row"><span class="lbl">Total Odds:</span><span class="val">${totalOdds.toFixed(2)}</span></div>
+        <div class="bo-row"><span class="lbl">Possible Win:</span><span class="val">${fmtMoney(possibleWin)}</span></div>
+        <div class="bo-cashout-wrap">
+          <button class="bo-cashout" data-cashout="${esc(b.id)}">Cashout ${fmtMoney(possibleWin * 0.6)}</button>
+          <div class="bo-rule">
+            <div class="link">${ICON_INFO}<span>Cashout Rule is Activated!</span></div>
+          </div>
+        </div>
+        ${actionsHTML()}
+      </div>`;
+  }
+
+  function cardHTML(b) {
+    return b && b.type === 'multi' ? multiCardHTML(b) : singleCardHTML(b);
+  }
+
+  function emptyHTML() {
+    return `
+      <div class="bo-empty">
+        <p class="ttl">No open bets</p>
+        <p class="sub">Tap any odds across the app and place a bet to see it here.</p>
+      </div>`;
+  }
+
+  function render() {
+    if (!window.BetslipStore) { list.innerHTML = emptyHTML(); return; }
+    const bets = window.BetslipStore.getBets();
+    list.innerHTML = bets.length ? bets.map(cardHTML).join('') : emptyHTML();
+  }
+
+  // Cashout → remove from store (treat as settled-out for the prototype)
+  list.addEventListener('click', function (e) {
+    const btn = e.target.closest('[data-cashout]');
+    if (!btn || !window.BetslipStore) return;
+    window.BetslipStore.removeBet(btn.getAttribute('data-cashout'));
+  });
+
+  if (window.BetslipStore) window.BetslipStore.subscribe(render);
+  render();
+})();
+</script>
+</body>
+</html>

@@ -51,9 +51,14 @@
 .sln-clock .ic{width:20px;height:20px;flex-shrink:0}
 .sln-clock .ic img{width:100%;height:100%;display:block}
 .sln-clock .badge{
-  position:absolute;left:9px;top:7px;transform:translate(-50%,-50%);
-  font-size:12px;font-weight:700;line-height:16px;color:#fff;white-space:nowrap;
+  position:absolute;left:11px;top:8px;transform:translate(-50%,-50%);
+  font-size:11px;font-weight:700;line-height:14px;color:#fff;white-space:nowrap;
+  background:#d80d83; min-width:14px; height:14px; padding:0 4px; border-radius:999px;
+  display:flex;align-items:center;justify-content:center;
+  transform-origin:center; will-change:transform;
 }
+.sln-clock .badge[hidden]{display:none}
+.sln-clock .badge.bump{ animation:sln-bump .55s cubic-bezier(.22,.61,.36,1); }
 .sln-nav{
   position:absolute;left:50%;transform:translateX(-50%);top:0;
   max-width:279px;overflow-x:auto;scrollbar-width:none;
@@ -122,6 +127,7 @@
 
   const initialCount = (window.BetslipStore && window.BetslipStore.getDraftCount()) || 0;
   const initialHref  = initialCount > 1 ? 'betslip-multiple.html' : 'betslip.html';
+  const initialOpen  = (window.BetslipStore && window.BetslipStore.getCount()) || 0;
 
   function slnItem(label, href, key) {
     const active = page === key ? ' active' : '';
@@ -131,10 +137,10 @@
 
   placeholder.outerHTML = `
 ${page !== 'casino' ? `<div class="sln-group">
-  <div class="sln-clock">
+  <a class="sln-clock" href="open-bets.html" aria-label="Open bets" data-bs-clock>
     <div class="ic"><img src="assets/st-clock.svg" alt=""></div>
-    <span class="badge">4</span>
-  </div>
+    <span class="badge" data-open-badge${initialOpen === 0 ? ' hidden' : ''}>${initialOpen}</span>
+  </a>
   <div class="sln-nav">
     ${slnItem('Home',     'index.html',         'home')}
     ${slnItem('Live',     'live.html',          'live')}
@@ -206,5 +212,25 @@ ${page !== 'casino' ? `<div class="sln-group">
       }
     };
     window.BetslipStore.subscribeDrafts(updateBadge);
+
+    /* ─── clock badge tracks PLACED (open) bets ─────────────────────────── */
+    let lastOpenCount = window.BetslipStore.getCount();
+    const updateClock = () => {
+      const clock = document.querySelector('.sln-clock[data-bs-clock]');
+      const badge = clock && clock.querySelector('[data-open-badge]');
+      if (!badge) return;
+      const n = window.BetslipStore.getCount();
+      const grew = n > lastOpenCount;
+      lastOpenCount = n;
+      badge.textContent = String(n);
+      if (n === 0) badge.setAttribute('hidden', '');
+      else badge.removeAttribute('hidden');
+      if (grew) {
+        badge.classList.remove('bump');
+        void badge.offsetWidth;
+        badge.classList.add('bump');
+      }
+    };
+    window.BetslipStore.subscribe(updateClock);
   }
 })();

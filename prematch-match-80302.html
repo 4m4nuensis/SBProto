@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>VBet — Prematch · Liverpool F. C. vs Arsenal F. C.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#010c23;
+  --bg-60:rgba(1,12,35,.6);
+  --bg-64:rgba(1,12,35,.64);
+  --main:#d80d83;
+  --main-40:rgba(216,13,131,.4);
+  --odds:#ffad29;
+  --green:#046744;
+  --red:#b4132b;
+  --yellow:#ffad29;
+  --w-100:#fff;
+  --w-90:rgba(255,255,255,.9);
+  --w-80:rgba(255,255,255,.8);
+  --w-72:rgba(255,255,255,.72);
+  --w-64:rgba(255,255,255,.64);
+  --w-56:rgba(255,255,255,.56);
+  --w-48:rgba(255,255,255,.48);
+  --w-32:rgba(255,255,255,.32);
+  --w-24:rgba(255,255,255,.24);
+  --w-16:rgba(255,255,255,.16);
+  --w-12:rgba(255,255,255,.12);
+  --w-8:rgba(255,255,255,.08);
+  --w-6:rgba(255,255,255,.06);
+  --w-4:rgba(255,255,255,.04);
+  --w-2:rgba(255,255,255,.02);
+  --d-8:rgba(0,2,5,.08);
+  --d-16:rgba(0,2,5,.16);
+  --d-24:rgba(0,2,5,.24);
+  --d-32:rgba(0,2,5,.32);
+  --d-40:rgba(0,2,5,.4);
+  --d-56:rgba(0,2,5,.56);
+  --d-80:rgba(0,2,5,.8);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:#010c23;font-family:'Rubik',system-ui,-apple-system,sans-serif;color:var(--w-100);font-size:14px;line-height:20px;letter-spacing:0}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+.app{width:100%;max-width:440px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;padding-bottom:114px;overflow-x:hidden}
+
+/* status bar */
+.statusbar{position:relative;height:40px;width:100%;background:var(--bg)}
+.statusbar .time{position:absolute;left:48px;top:50%;transform:translate(-50%,-50%);font-family:'SF Pro','-apple-system',sans-serif;font-weight:700;font-size:14px;letter-spacing:-.3px;color:var(--w-90);text-align:center;width:54px}
+.statusbar .battery{position:absolute;top:50%;right:19px;transform:translateY(-50%);width:20.926px;height:9.748px}
+.statusbar .wifi{position:absolute;top:50%;right:44.23px;transform:translateY(-50%);width:13.188px;height:9.461px}
+.statusbar .cellular{position:absolute;top:50%;right:61.72px;transform:translateY(-50%);width:14.622px;height:9.175px}
+
+/* header */
+.header-bar{
+  width:100%;padding:8px 8px 8px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(90deg,var(--w-8) 0%,var(--w-8) 100%),linear-gradient(90deg,var(--bg-60) 0%,var(--bg-60) 100%);
+  backdrop-filter:blur(21px);filter:drop-shadow(0 4px 4px rgba(0,0,0,.4));
+}
+.header-bar .vbet{width:56px;height:16px;display:block}
+.header-bar .logo-wrap{width:75px;height:32px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.header-bar .right{display:flex;align-items:center;gap:4px;position:relative}
+.icon-btn-pink{width:32px;height:32px;border-radius:999px;background:var(--main);display:flex;align-items:center;justify-content:center;border-top:1px solid var(--w-24);overflow:hidden}
+.icon-btn-pink img{width:16px;height:16px}
+.icon-btn-ghost{width:32px;height:32px;border-radius:999px;background:var(--w-8);display:flex;align-items:center;justify-content:center;border-top:1px solid var(--w-16);overflow:hidden}
+.icon-btn-ghost img{width:16px;height:16px}
+.balance{height:32px;border-radius:88px;background:var(--w-8);display:flex;align-items:center;gap:4px;padding:0 8px}
+.balance .plus{width:16px;height:16px}
+.balance .amt{font-size:12px;line-height:16px;color:var(--w-100);white-space:nowrap}
+.balance .cur{width:12px;height:12px}
+.header-bar .notif-dot{position:absolute;left:193px;top:0;width:8px;height:8px}
+
+/* my zone */
+.subnav{width:100%;padding:12px 8px;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--w-4);backdrop-filter:blur(4px)}
+.subnav .my-zone{
+  flex:none;width:279px;height:32px;border:1px solid var(--main-40);border-radius:32px;
+  display:flex;align-items:center;justify-content:space-between;padding:4px 16px;
+  background:radial-gradient(ellipse 150px 8px at center bottom, rgba(216,13,131,0.4), transparent 70%);
+}
+.subnav .my-zone .label{font-size:14px;line-height:20px;color:var(--w-72)}
+.subnav .my-zone .stats{display:flex;align-items:center;gap:8px}
+.subnav .my-zone .stat{display:flex;align-items:center;gap:2px}
+.subnav .my-zone .stat img{width:16px;height:16px;display:block}
+.subnav .my-zone .stat .num{background:var(--d-40);border-radius:8px;width:20px;height:16px;display:flex;align-items:center;justify-content:center;font-size:12px;line-height:16px;color:var(--w-72)}
+.subnav .my-zone .divider{height:16px;width:1px;background:var(--w-16)}
+
+/* ====== PREMATCH EVENT HEADER CARD ====== */
+.event-wrap{padding:8px}
+.event-card{position:relative;border-radius:8px;overflow:hidden}
+
+/* top bar of card */
+.event-top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px;background:var(--w-4);
+  border-radius:8px 8px 0 0;
+  opacity:0.8;
+}
+/* .back-btn supplied by back-button.js (shared component) */
+/* 160px segmented control */
+.seg{
+  width:160px;flex:none;
+  background:var(--bg);padding:4px;border-radius:999px;
+  display:flex;align-items:center;gap:4px;
+}
+.seg-item{
+  flex:1;height:28px;padding:4px 10px;border-radius:32px;
+  font-size:12px;line-height:16px;letter-spacing:0;color:var(--w-48);
+  display:flex;align-items:center;justify-content:center;white-space:nowrap;
+}
+.seg-item.active{background:var(--w-4);border:1px solid var(--w-4);color:var(--w-90)}
+.event-top .icons{display:flex;align-items:center;gap:4px;flex:none}
+.event-top .icbtn{
+  width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--w-72);
+}
+.event-top .icbtn svg{width:12px;height:12px}
+
+/* main area: stadium bg + teams */
+.event-main{
+  position:relative;padding:16px 0 0;
+  display:flex;flex-direction:column;gap:0;
+  background:url('assets/sew-bg.png') center/cover no-repeat;
+}
+.event-main::before{
+  content:"";position:absolute;inset:0;
+  backdrop-filter:blur(8px);
+  background:var(--d-8);
+  z-index:0;
+}
+.event-main > *{position:relative;z-index:1}
+/* extra bg tint layer (from figma: w-4 + bg image + d-8 blur) */
+.event-main .bg-tint{
+  position:absolute;inset:0;z-index:0;
+  background:var(--w-4);
+}
+
+.teams-row{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;padding:0 0 16px;
+}
+.team-block{flex:0 0 120px;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative}
+.team-block .logo{width:56px;height:56px;display:flex;align-items:center;justify-content:center}
+.team-block .logo img{width:100%;height:100%;object-fit:contain}
+.team-block .name{
+  font-size:14px;line-height:20px;font-weight:500;color:var(--w-100);text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;
+}
+.team-block .fav{
+  position:absolute;top:0;width:24px;height:24px;border-radius:4px;background:var(--w-8);
+  display:flex;align-items:center;justify-content:center;color:var(--w-80);
+}
+.team-block.left .fav{left:0}
+.team-block.right .fav{right:0}
+.team-block .fav svg{width:12px;height:12px}
+
+/* date/time pill in center */
+.date-pill{
+  flex:0 0 96px;padding-top:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.date-pill .inner{
+  padding:8px;border-radius:8px;background:var(--d-16);backdrop-filter:blur(6px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  white-space:nowrap;
+}
+.date-pill .date{
+  font-size:12px;line-height:16px;letter-spacing:.4px;color:var(--w-72);
+}
+.date-pill .kick-off{
+  font-size:18px;line-height:24px;font-weight:600;color:var(--w-100);
+}
+
+/* form dots + stats row */
+.event-form{display:flex;gap:2px;align-items:stretch;width:100%}
+.form-panel{
+  flex:1;min-width:0;padding:8px 16px;
+  backdrop-filter:blur(6px);background:var(--d-24);
+  display:flex;flex-direction:column;gap:4px;
+}
+.form-panel.left{border-radius:0 0 0 8px;align-items:flex-start}
+.form-panel.right{border-radius:0 0 8px 0;align-items:flex-end}
+
+/* 5 colored dots (form indicators) */
+.form-dots{display:flex;align-items:center;gap:5px}
+.dot{
+  width:8px;height:8px;border-radius:999px;flex:none;
+}
+.dot.win{background:var(--green)}
+.dot.lose{background:var(--red)}
+.dot.draw{background:var(--yellow)}
+
+/* Pos / Pts stats text */
+.form-stats{
+  display:flex;align-items:center;gap:8px;
+  font-size:10px;line-height:14px;letter-spacing:.4px;color:var(--w-56);white-space:nowrap;
+}
+.form-stats strong{font-weight:700;color:var(--w-56)}
+
+/* ====== BET INSIGHTS ROW ====== */
+.section-pad{padding:8px}
+.bet-insights{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 8px 8px 12px;background:var(--w-4);
+  border:1px solid var(--w-8);border-radius:4px;
+}
+.bet-insights .label{font-size:14px;line-height:20px;color:var(--w-80)}
+.bet-insights .plus-btn{
+  width:24px;height:24px;border-radius:999px;
+  display:flex;align-items:center;justify-content:center;color:var(--w-80);
+}
+.bet-insights .plus-btn svg{width:16px;height:16px}
+
+/* ====== TABS CONTAINER ====== */
+.tabs-container{
+  position:relative;display:flex;align-items:center;
+  padding-bottom:4px;
+  border-radius:4px 4px 0 0;
+}
+.tabs-container .search-btn{
+  flex:none;width:32px;height:32px;border-radius:999px;background:var(--w-8);
+  display:flex;align-items:center;justify-content:center;
+  margin-left:8px;
+}
+.tabs-container .search-btn img{width:16px;height:16px;display:block}
+.tabs-scroll{
+  flex:1;min-width:0;display:flex;align-items:center;gap:4px;
+  overflow-x:auto;scrollbar-width:none;
+  padding:4px 0 4px 8px;
+}
+.tabs-scroll::-webkit-scrollbar{display:none}
+.tab-item{
+  flex:none;height:28px;padding:6px;border-radius:999px;
+  display:flex;align-items:center;gap:4px;
+  font-size:12px;line-height:16px;letter-spacing:.4px;color:var(--w-56);white-space:nowrap;
+}
+.tab-item.active{background:var(--w-16);color:var(--w-100)}
+.tab-item .tab-icon{width:14px;height:14px;display:block;opacity:.56}
+/* Right-side fade overlay with BB + toggle */
+.tabs-right{
+  position:absolute;right:0;top:0;height:32px;
+  display:flex;align-items:center;gap:4px;
+  padding:4px 8px 4px 16px;
+  background:linear-gradient(to left, #000c24 94.643%, rgba(0,12,36,0) 102.38%);
+}
+.tabs-right .bb-icon{width:24px;height:24px;display:block}
+/* Toggle switch (off) */
+.toggle-switch{position:relative;width:28px;height:16px;border-radius:999px;background:var(--w-32);flex:none}
+.toggle-switch .knob{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:999px;background:var(--bg)}
+
+/* ====== MARKETS LIST ====== */
+.markets{padding:0 8px;display:flex;flex-direction:column;gap:4px}
+.market{
+  background:var(--w-4);border:1px solid var(--w-8);border-radius:4px;
+  padding:8px;display:flex;flex-direction:column;gap:16px;
+}
+.market.collapsed{padding:10px 8px 10px 12px;flex-direction:row;align-items:center;gap:8px}
+.market .title-row{display:flex;align-items:center;justify-content:space-between;width:100%}
+.market .title-row .left{display:flex;align-items:center;gap:4px;flex:1;min-width:0}
+.market .pin{
+  width:24px;height:24px;border-radius:999px;
+  display:flex;align-items:center;justify-content:center;color:var(--w-72);
+}
+.market .pin svg{width:16px;height:16px}
+.market .title{font-size:12px;line-height:16px;color:var(--w-72);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.market.collapsed .title{font-size:14px;line-height:20px;color:var(--w-90)}
+.market .badge{
+  font-size:10px;line-height:14px;letter-spacing:.4px;font-weight:500;
+  background:var(--main);color:#fff;padding:1px 6px;border-radius:999px;flex:none;
+}
+.market .chev{
+  width:24px;height:24px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--w-72);
+}
+.market .chev svg{width:16px;height:16px}
+.market.collapsed .chev{margin-left:auto}
+.market.collapsed .chev svg{transform:rotate(180deg)}
+.market .opts{display:flex;gap:8px;width:100%}
+.market .opt{
+  flex:1;min-width:0;background:var(--w-4);border:1px solid var(--w-4);
+  border-radius:4px;padding:8px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.market .opt .l{font-size:12px;line-height:16px;color:var(--w-32)}
+.market .opt .o{font-size:14px;line-height:20px;color:var(--odds)}
+
+/* nav styles live in nav.js */
+
+/* ── market body/table styles shared with live pages ──────────────────── */
+.market{display:flex;flex-direction:column;gap:12px}
+.market.collapsed{gap:0;padding:10px 8px 10px 12px}
+.market .title-row{cursor:pointer;user-select:none}
+.market.collapsed .body{display:none}
+.market.collapsed .chev{transform:rotate(180deg)}
+.market .body{display:flex;flex-direction:column;gap:6px}
+.market .chev{transition:transform .18s ease}
+.market .opt{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.market .opt.col{flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px 8px}
+.market .opt.selected,.market .opt.col.selected{background:var(--main);border-color:var(--main)}
+.market .opt.selected .l,.market .opt.selected .o{color:#fff}
+.otbl{display:grid;width:100%;gap:4px;font-size:13px;line-height:16px}
+.otbl.cols-2{grid-template-columns:1fr 1fr}
+.otbl.cols-3{grid-template-columns:48px 1fr 1fr}
+.otbl.cols-3w{grid-template-columns:1fr 1fr 1fr}
+.otbl.cols-4{grid-template-columns:48px 1fr 1fr 1fr}
+.otbl .h{padding:8px 4px;text-align:center;color:var(--w-56);background:var(--w-4);border-radius:4px}
+.otbl .lbl{padding:10px 4px;text-align:center;color:var(--w-56);background:var(--w-4);border-radius:4px;display:flex;align-items:center;justify-content:center}
+.otbl .cell{padding:10px 12px;background:var(--w-4);border:1px solid var(--w-4);border-radius:4px;display:flex;align-items:center;justify-content:flex-end;color:var(--odds);font-weight:500;font-size:14px;cursor:pointer}
+.otbl .cell.center{justify-content:center}
+.otbl .cell.lr{justify-content:space-between}
+.otbl .cell.lr .lbl-inline{color:var(--w-56);font-size:12px;font-weight:400}
+.otbl .cell.selected{background:var(--main);border-color:var(--main);color:#fff}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Status Bar -->  <!-- Header -->
+  <div class="header-bar">
+    <div class="logo-wrap"><img class="vbet" src="assets/c7ee4cb442a696c4b22400e87d4d4564d77ee63d.svg" alt="VBet"></div>
+    <div class="right">
+      <button class="icon-btn-pink"><img src="assets/cd2ab15627e314b76cd18186ac8debb1e046753b.svg" alt=""></button>
+      <div class="balance">
+        <img class="plus" src="assets/fba9a203cde61becd3d03a28733eed924695e9e6.svg" alt="">
+        <span class="amt">2 000 000.50</span>
+        <img class="cur" src="assets/dcbe03fff8b7bff8da30b22defa876253b4ed716.svg" alt="">
+      </div>
+      <button class="icon-btn-ghost"><img src="assets/c51db1de3442902710310b7f412f5e50bf258747.svg" alt=""></button>
+      <img class="notif-dot" src="assets/3bfbd9ba21a63ae47aae5835471dcaa057683d29.svg" alt="">
+    </div>
+  </div>
+
+  <!-- My Zone -->
+  <div class="subnav">
+    <button class="icon-btn-ghost"><img src="assets/a60c35b6330c349df1b28504b4e27f90d97d172a.svg" alt=""></button>
+    <div class="my-zone">
+      <span class="label">My Zone</span>
+      <div class="stats">
+        <div class="stat"><img src="assets/8870c8992c4849c49f96ffb9b4eb1a7d18919ada.svg" alt=""><div class="num">3</div></div>
+        <div class="divider"></div>
+        <div class="stat"><img src="assets/acd11b20fb2060636db862fa9127aba4208a4c74.svg" alt=""><div class="num">2</div></div>
+        <div class="divider"></div>
+        <div class="stat"><img src="assets/80e95aa265f716d0508b727c0f4d19dede41ec35.svg" alt=""><div class="num">2</div></div>
+      </div>
+    </div>
+    <button class="icon-btn-ghost"><img src="assets/f37caf38309d5f5ce34bd17d34b049ca71fb945f.svg" alt=""></button>
+  </div>
+
+  <!-- Prematch Event Header Card -->
+  <div class="event-wrap">
+    <div class="event-card">
+
+      <!-- Top bar -->
+      <div class="event-top">
+        <a class="back-btn" href="prematch-games.html" aria-label="back">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5l-5 5 5 5"/></svg>
+        </a>
+        <div class="seg">
+          <button class="seg-item active">Event</button>
+          <button class="seg-item">Stats</button>
+        </div>
+        <div class="icons">
+          <button class="icbtn" aria-label="bell"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M6 1.5a3 3 0 0 0-3 3v1.5L2 7.5h8L9 6V4.5a3 3 0 0 0-3-3zM4.5 9a1.5 1.5 0 0 0 3 0"/></svg></button>
+          <button class="icbtn" aria-label="favorite"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M6 1.5l1.4 3 3.3.4-2.5 2.3.7 3.2L6 8.7 3.1 10.4l.7-3.2L1.3 4.9l3.3-.4z"/></svg></button>
+        </div>
+      </div>
+
+      <!-- Main area: stadium bg + teams + date/time -->
+      <div class="event-main">
+        <div class="bg-tint"></div>
+
+        <div class="teams-row">
+          <!-- Man City -->
+          <div class="team-block left">
+            <button class="fav" aria-label="favorite">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M6 1.5l1.4 3 3.3.4-2.5 2.3.7 3.2L6 8.7 3.1 10.4l.7-3.2L1.3 4.9l3.3-.4z"/></svg>
+            </button>
+            <div class="logo"><img src="assets/team-liverpool.svg" alt="Liverpool"></div>
+            <p class="name">Liverpool F. C.</p>
+          </div>
+
+          <!-- Date / time pill -->
+          <div class="date-pill">
+            <div class="inner">
+              <span class="date">29 MAY 2026</span>
+              <span class="kick-off">19:45</span>
+            </div>
+          </div>
+
+          <!-- Chelsea -->
+          <div class="team-block right">
+            <button class="fav" aria-label="favorite">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M6 1.5l1.4 3 3.3.4-2.5 2.3.7 3.2L6 8.7 3.1 10.4l.7-3.2L1.3 4.9l3.3-.4z"/></svg>
+            </button>
+            <div class="logo"><img src="assets/team-arsenal.svg" alt="Arsenal"></div>
+            <p class="name">Arsenal F. C.</p>
+          </div>
+        </div>
+
+        <!-- Form dots + position stats -->
+        <div class="event-form">
+          <!-- Man City stats -->
+          <div class="form-panel left">
+            <div class="form-dots">
+              <div class="dot win"></div>
+              <div class="dot lose"></div>
+              <div class="dot win"></div>
+              <div class="dot lose"></div>
+              <div class="dot win"></div>
+            </div>
+            <div class="form-stats">
+              <span>Pos: <strong>2</strong></span>
+              <span>Pts: <strong>74</strong></span>
+            </div>
+          </div>
+          <!-- Chelsea stats -->
+          <div class="form-panel right">
+            <div class="form-dots">
+              <div class="dot win"></div>
+              <div class="dot lose"></div>
+              <div class="dot draw"></div>
+              <div class="dot win"></div>
+              <div class="dot win"></div>
+            </div>
+            <div class="form-stats">
+              <span>Pos: <strong>15</strong></span>
+              <span>Pts: <strong>28</strong></span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /.event-main -->
+    </div><!-- /.event-card -->
+  </div><!-- /.event-wrap -->
+
+  <!-- Bet Insights -->
+  <div class="section-pad">
+    <div class="bet-insights">
+      <span class="label">Bet-Insights</span>
+      <button class="plus-btn" aria-label="expand">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabs Container -->
+  <div class="tabs-container">
+    <button class="search-btn" aria-label="search">
+      <img src="assets/tabs-search.svg" alt="">
+    </button>
+    <div class="tabs-scroll">
+      <button class="tab-item">
+        <img class="tab-icon" src="assets/tabs-star.svg" alt="">
+        Multiple Sets
+      </button>
+      <button class="tab-item active">All</button>
+      <button class="tab-item">Match</button>
+      <button class="tab-item">Totals</button>
+      <button class="tab-item">Handicaps</button>
+      <button class="tab-item">Halves</button>
+      <button class="tab-item">Minutes</button>
+    </div>
+    <div class="tabs-right">
+      <img class="bb-icon" src="assets/tabs-bb.svg" alt="BB">
+      <div class="toggle-switch"><span class="knob"></span></div>
+    </div>
+  </div>
+
+  <!-- Markets List -->
+  <!-- Markets List -->
+  <div class="markets" id="markets">
+    <div class="market" data-market="match-result">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg></button>
+          <span class="title">Match Result</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="opts">
+          <button class="opt"><span class="l">1</span><span class="o">2.20</span></button>
+          <button class="opt"><span class="l">X</span><span class="o">3.30</span></button>
+          <button class="opt"><span class="l">2</span><span class="o">3.10</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="market collapsed" data-market="double-chance">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg></button>
+          <span class="title">Double Chance</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="opts">
+          <button class="opt col"><span class="l">1X</span><span class="o">1.35</span></button>
+          <button class="opt col"><span class="l">12</span><span class="o">1.31</span></button>
+          <button class="opt col"><span class="l">X2</span><span class="o">1.63</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="market collapsed" data-market="btts">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg></button>
+          <span class="title">Both Teams To Score</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="opts">
+          <button class="opt col"><span class="l">Yes</span><span class="o">2.00</span></button>
+          <button class="opt col"><span class="l">No</span><span class="o">2.22</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="market collapsed" data-market="total-goals">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg></button>
+          <span class="title">Total Goals</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="otbl cols-3">
+          <div class="lbl"></div><div class="h">Over</div><div class="h">Under</div>
+          <div class="lbl">0.5</div><button class="cell center">1.14</button><button class="cell center">15.77</button>
+          <div class="lbl">1.5</div><button class="cell center">1.41</button><button class="cell center">4.26</button>
+          <div class="lbl">2.5</div><button class="cell center selected">2.09</button><button class="cell center">2.15</button>
+          <div class="lbl">3.5</div><button class="cell center">3.71</button><button class="cell center">1.48</button>
+          <div class="lbl">4.5</div><button class="cell center">7.73</button><button class="cell center">1.23</button>
+          <div class="lbl">5.5</div><button class="cell center">18.68</button><button class="cell center">1.12</button>
+        </div>
+      </div>
+    </div>
+    <div class="market collapsed" data-market="asian-handicap">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg></button>
+          <span class="title">Goals Asian Handicap</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="otbl cols-2">
+          <div class="h">Liverpool</div><div class="h">Arsenal</div>
+          <button class="cell lr"><span class="lbl-inline">-2.75</span>1.17</button><button class="cell lr"><span class="lbl-inline">+2.75</span>10.50</button>
+          <button class="cell lr"><span class="lbl-inline">-2.25</span>1.22</button><button class="cell lr"><span class="lbl-inline">+2.25</span>7.44</button>
+          <button class="cell lr"><span class="lbl-inline">-1.75</span>1.37</button><button class="cell lr"><span class="lbl-inline">+1.75</span>4.54</button>
+          <button class="cell lr"><span class="lbl-inline">-1.25</span>1.55</button><button class="cell lr"><span class="lbl-inline">+1.25</span>3.27</button>
+          <button class="cell lr selected"><span class="lbl-inline">-0.75</span>1.78</button><button class="cell lr"><span class="lbl-inline">+0.75</span>2.55</button>
+          <button class="cell lr"><span class="lbl-inline">-0.25</span>2.11</button><button class="cell lr"><span class="lbl-inline">+0.25</span>2.09</button>
+          <button class="cell lr"><span class="lbl-inline">+0.25</span>2.57</button><button class="cell lr"><span class="lbl-inline">-0.25</span>1.78</button>
+          <button class="cell lr"><span class="lbl-inline">+0.75</span>3.29</button><button class="cell lr"><span class="lbl-inline">-0.75</span>1.54</button>
+        </div>
+      </div>
+    </div>
+    <div class="market collapsed" data-market="handicap-3way">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg></button>
+          <span class="title">Goals Handicap 3 Way</span><span class="badge">New</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="otbl cols-3w">
+          <div class="h">Liverpool</div><div class="h">Tie: Arsenal</div><div class="h">Arsenal</div>
+          <button class="cell lr"><span class="lbl-inline">-2</span>1.36</button><button class="cell lr"><span class="lbl-inline">-2</span>6.38</button><button class="cell lr"><span class="lbl-inline">+2</span>21.20</button>
+          <button class="cell lr"><span class="lbl-inline">-1</span>1.76</button><button class="cell lr"><span class="lbl-inline">-1</span>5.40</button><button class="cell lr"><span class="lbl-inline">+1</span>5.32</button>
+          <button class="cell lr"><span class="lbl-inline">0</span>2.52</button><button class="cell lr"><span class="lbl-inline">0</span>5.40</button><button class="cell lr"><span class="lbl-inline">0</span>2.80</button>
+          <button class="cell lr"><span class="lbl-inline">+1</span>4.40</button><button class="cell lr"><span class="lbl-inline">+1</span>5.40</button><button class="cell lr"><span class="lbl-inline">-1</span>1.90</button>
+        </div>
+      </div>
+    </div>
+    <div class="market collapsed" data-market="total-3way">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg></button>
+          <span class="title">Total Goals 3 Way</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="otbl cols-4">
+          <div class="lbl"></div><div class="h">Over</div><div class="h">Exactly</div><div class="h">Under</div>
+          <div class="lbl">2</div><button class="cell center selected">2.11</button><button class="cell center">4.49</button><button class="cell center">4.30</button>
+          <div class="lbl">3</div><button class="cell center">3.74</button><button class="cell center">4.99</button><button class="cell center">2.17</button>
+          <div class="lbl">4</div><button class="cell center">7.80</button><button class="cell center">7.39</button><button class="cell center">1.50</button>
+          <div class="lbl">5</div><button class="cell center">18.86</button><button class="cell center">13.69</button><button class="cell center">1.24</button>
+        </div>
+      </div>
+    </div>
+    <div class="market collapsed" data-market="both-halves">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg></button>
+          <span class="title">Goals In Both Halves</span><span class="badge">New</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="opts">
+          <button class="opt col"><span class="l">Yes</span><span class="o">2.79</span></button>
+          <button class="opt col"><span class="l">No</span><span class="o">1.59</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="market collapsed" data-market="first-score">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg></button>
+          <span class="title">First Team To Score</span><span class="badge">New</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="opts">
+          <button class="opt col"><span class="l">Liverpool</span><span class="o">2.55</span></button>
+          <button class="opt col"><span class="l">No Goal</span><span class="o">13.44</span></button>
+          <button class="opt col"><span class="l">Arsenal</span><span class="o">3.59</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="market collapsed" data-market="last-score">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg></button>
+          <span class="title">Last Team To Score</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="opts">
+          <button class="opt col"><span class="l">Liverpool</span><span class="o">2.50</span></button>
+          <button class="opt col"><span class="l">No Goal</span><span class="o">15.80</span></button>
+          <button class="opt col"><span class="l">Arsenal</span><span class="o">3.48</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="market collapsed" data-market="correct-score">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg></button>
+          <span class="title">Correct Score</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="otbl cols-2">
+          <div class="h">Liverpool win</div><div class="h">Arsenal win / Draw</div>
+          <button class="cell lr"><span class="lbl-inline">1-0</span>10.97</button><button class="cell lr"><span class="lbl-inline">1-1</span>9.72</button>
+          <button class="cell lr"><span class="lbl-inline">2-1</span>12.22</button><button class="cell lr"><span class="lbl-inline">0-1</span>15.46</button>
+          <button class="cell lr"><span class="lbl-inline">2-0</span>13.79</button><button class="cell lr"><span class="lbl-inline">1-2</span>17.22</button>
+          <button class="cell lr"><span class="lbl-inline">3-1</span>23.04</button><button class="cell lr"><span class="lbl-inline">0-0</span>17.45</button>
+          <button class="cell lr"><span class="lbl-inline">3-0</span>26.01</button><button class="cell lr"><span class="lbl-inline">2-2</span>21.65</button>
+          <button class="cell lr"><span class="lbl-inline">3-2</span>40.83</button><button class="cell lr"><span class="lbl-inline">0-2</span>27.39</button>
+        </div>
+      </div>
+    </div>
+    <div class="market collapsed" data-market="htft">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg></button>
+          <span class="title">Half Time / Full Time</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="otbl cols-3w">
+          <div class="h">HT/FT</div><div class="h">HT/FT</div><div class="h">HT/FT</div>
+          <button class="cell lr"><span class="lbl-inline">1/1</span>4.58</button><button class="cell lr"><span class="lbl-inline">1/X</span>12.42</button><button class="cell lr"><span class="lbl-inline">1/2</span>36.63</button>
+          <button class="cell lr"><span class="lbl-inline">X/1</span>3.99</button><button class="cell lr"><span class="lbl-inline">X/X</span>4.63</button><button class="cell lr"><span class="lbl-inline">X/2</span>7.25</button>
+          <button class="cell lr"><span class="lbl-inline">2/1</span>22.17</button><button class="cell lr"><span class="lbl-inline">2/X</span>17.92</button><button class="cell lr"><span class="lbl-inline">2/2</span>8.99</button>
+        </div>
+      </div>
+    </div>
+    <div class="market collapsed" data-market="result-btts">
+      <div class="title-row">
+        <div class="left">
+          <button class="pin" aria-label="pin" onclick="event.stopPropagation()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 2h8v6l-4 4-4-4z"/></svg></button>
+          <span class="title">Result &amp; Both Teams To Score</span>
+        </div>
+        <button class="chev"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 10l4-4 4 4"/></svg></button>
+      </div>
+      <div class="body">
+        <div class="opts" style="flex-wrap:wrap;gap:6px">
+          <button class="opt col" style="flex:1;min-width:100px"><span class="l">1 & Yes</span><span class="o">4.88</span></button>
+          <button class="opt col" style="flex:1;min-width:100px"><span class="l">X & Yes</span><span class="o">7.32</span></button>
+          <button class="opt col" style="flex:1;min-width:100px"><span class="l">2 & Yes</span><span class="o">6.87</span></button>
+          <button class="opt col" style="flex:1;min-width:100px"><span class="l">1 & No</span><span class="o">5.42</span></button>
+          <button class="opt col" style="flex:1;min-width:100px"><span class="l">X & No</span><span class="o">8.12</span></button>
+          <button class="opt col" style="flex:1;min-width:100px"><span class="l">2 & No</span><span class="o">7.63</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      var root = document.getElementById('markets');
+      if (!root) return;
+      root.addEventListener('click', function(e){
+        var row = e.target.closest('.title-row');
+        if (!row || e.target.closest('.pin')) return;
+        row.closest('.market').classList.toggle('collapsed');
+      });
+    })();
+  </script>
+
+</div><!-- /.app -->
+
+<div id="app-nav" data-page="prematch"></div>
+<script src="betslip-store.js"></script>
+<script src="balance.js"></script>
+<script src="back-button.js"></script>
+<script src="nav.js"></script>
+<script src="betslip-popup.js"></script>
+</div>
+
+</body>
+</html>

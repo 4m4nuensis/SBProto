@@ -62,6 +62,39 @@ MATCHES = [
         "o_1": 1.85, "o_x": 3.50, "o_2": 4.10,
         "seed": 80204,
     },
+    # ── FA Cup fixtures (linked from prematch-games-facup.html) ──────────────
+    {
+        "id": "80301",
+        "home": "Newcastle",  "home_full": "Newcastle United F. C.", "home_logo": "team-newcastle.svg",
+        "away": "Fulham",     "away_full": "Fulham F. C.",           "away_logo": "sew-fulham.png",
+        "date": "29 MAY 2026","time": "16:00",
+        "o_1": 1.95, "o_x": 3.40, "o_2": 3.80,
+        "seed": 80301,
+    },
+    {
+        "id": "80302",
+        "home": "Liverpool", "home_full": "Liverpool F. C.", "home_logo": "team-liverpool.svg",
+        "away": "Arsenal",   "away_full": "Arsenal F. C.",   "away_logo": "team-arsenal.svg",
+        "date": "29 MAY 2026","time": "19:45",
+        "o_1": 2.20, "o_x": 3.30, "o_2": 3.10,
+        "seed": 80302,
+    },
+    {
+        "id": "80303",
+        "home": "Chelsea",  "home_full": "Chelsea F. C.",         "home_logo": "team-chelsea.svg",
+        "away": "Man City", "away_full": "Manchester City F. C.", "away_logo": "team-mancity.svg",
+        "date": "30 MAY 2026","time": "15:00",
+        "o_1": 4.20, "o_x": 3.70, "o_2": 1.80,
+        "seed": 80303,
+    },
+    {
+        "id": "80304",
+        "home": "Man United",  "home_full": "Manchester United F. C.", "home_logo": "team-manunited.svg",
+        "away": "Aston Villa", "away_full": "Aston Villa F. C.",        "away_logo": "sew-aston-villa.png",
+        "date": "30 MAY 2026", "time": "17:30",
+        "o_1": 2.45, "o_x": 3.35, "o_2": 2.80,
+        "seed": 80304,
+    },
 ]
 
 

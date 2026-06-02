@@ -443,6 +443,78 @@ body.bsp-open .sln-group{
     placingTimer = setTimeout(close, 1100);
   });
 
+  /* ──────────────── pre-built multi cards ("Add to Betslip") ──────────────── */
+  // Multiple-of-the-Day and Bet Builder offer cards each describe a ready-made
+  // accumulator. Their button queues every leg as a draft (so it shows up in
+  // the Multiple tab) and flies a chip to the ticket — same feel as tapping odds.
+  function legText(el, sel) {
+    const n = el.querySelector(sel);
+    return n ? n.textContent.trim() : '';
+  }
+  function stripColon(s) { return s.replace(/[:\s]+$/, '').trim(); }
+  function dateTime(scope, sel) {
+    const spans = scope.querySelectorAll(sel + ' span');
+    return {
+      date: spans[0] ? spans[0].textContent.trim() : '',
+      time: spans.length > 1 ? spans[spans.length - 1].textContent.trim() : '',
+    };
+  }
+
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.motd-betslip-btn');
+    if (!btn) return;
+    e.preventDefault();
+    if (!window.BetslipStore) return;
+
+    const card = btn.closest('.motd-card, .bb-card');
+    if (!card) return;
+
+    const totalEl = card.querySelector('.motd-total-value');
+    const total = totalEl ? parseFloat(totalEl.textContent) : 0;
+    const legs = [];
+
+    const motdRows = card.querySelectorAll('.motd-row');
+    if (motdRows.length) {
+      // Multiple-of-the-Day — each row carries its own odds.
+      motdRows.forEach(row => {
+        const dt = dateTime(row, '.motd-date');
+        legs.push({
+          teams:     legText(row, '.motd-teams'),
+          market:    stripColon(legText(row, '.motd-market')),
+          selection: legText(row, '.motd-selection'),
+          odds:      parseFloat(legText(row, '.motd-odds')) || 0,
+          date: dt.date, time: dt.time,
+        });
+      });
+    } else {
+      // Bet Builder — shared event, no per-leg odds shown. Spread the total
+      // across legs (geometric) so the Multiple tab's product lands near it.
+      const event = legText(card, '.bb-event-name');
+      const dt = dateTime(card, '.bb-date');
+      const rows = card.querySelectorAll('.bb-sel-row');
+      const n = rows.length || 1;
+      const perOdds = total > 1 ? Math.round(Math.pow(total, 1 / n) * 100) / 100 : 1.0;
+      rows.forEach(row => {
+        legs.push({
+          teams:     event,
+          market:    stripColon(legText(row, '.bb-mkt-lbl')),
+          selection: legText(row, '.bb-mkt-val'),
+          odds:      perOdds,
+          date: dt.date, time: dt.time,
+        });
+      });
+    }
+
+    if (!legs.length) return;
+    legs.forEach(l => window.BetslipStore.addDraft(l));
+    flyToTicket(btn, total ? total.toFixed(2) : '+' + legs.length);
+
+    const orig = btn.textContent;
+    btn.textContent = 'Added ✓';
+    btn.disabled = true;
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 1200);
+  }, true);
+
   // ESC for keyboard
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && host.classList.contains('open')) close();
