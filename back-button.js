@@ -1,5 +1,5 @@
 /*
- * Shared <.back-btn> styling.
+ * Shared <.back-btn> styling + behaviour.
  *
  * Drop this script on any page that uses a back button — markup is just:
  *
@@ -10,6 +10,11 @@
  *
  * Visual: 32×32 circle, w-8 background, w-16 top hairline border, 16px
  * chevron in w-90. Matches the icon-btn family used in other page chrome.
+ *
+ * Behaviour: a tap returns to the *actual* previous page via the browser
+ * history (so a match opened from the home page goes back to home, not to
+ * a hardcoded parent). The href is kept as a fallback for direct loads /
+ * fresh tabs where there is no in-app history to step back through.
  */
 (function () {
   if (window.__BACK_BUTTON_INSTALLED__) return;
@@ -30,4 +35,23 @@
 .back-btn svg{width:16px;height:16px;display:block}
 `;
   document.head.appendChild(style);
+
+  /* Prefer real browser-history back over the static href. We only step
+   * back when the previous entry is same-origin (document.referrer) so we
+   * never bounce the user off the site; otherwise the href fallback runs. */
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.back-btn');
+    if (!btn) return;
+    let sameOriginReferrer = false;
+    try {
+      sameOriginReferrer =
+        !!document.referrer &&
+        new URL(document.referrer).origin === window.location.origin;
+    } catch (_) { /* malformed referrer — treat as none */ }
+    if (window.history.length > 1 && sameOriginReferrer) {
+      e.preventDefault();
+      window.history.back();
+    }
+    // else: let the <a href> navigate to the static parent page
+  });
 })();
