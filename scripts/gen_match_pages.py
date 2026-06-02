@@ -499,11 +499,19 @@ def build_page(template: str, match: dict) -> str:
         "<title>VBet — Live · Manchester City vs Chelsea</title>",
         f'<title>VBet — Live · {match["home_full"]} vs {match["away_full"]}</title>',
     )
-    # 2) Logos & names in event card header
-    out = out.replace('src="assets/team-mancity.svg"', f'src="assets/{match["home_logo"]}"')
-    out = out.replace('src="assets/team-chelsea.svg"', f'src="assets/{match["away_logo"]}"')
-    out = out.replace('<p class="name">Manchester City</p>', f'<p class="name">{match["home_full"]}</p>')
-    out = out.replace('<p class="name">Chelsea F. C.</p>', f'<p class="name">{match["away_full"]}</p>')
+    # 2) Logos & names in event card header.
+    # Replace via unique sentinels first so a substituted value (e.g. the new
+    # home logo) doesn't get re-substituted by the away replacement.
+    out = (out
+        .replace('src="assets/team-mancity.svg"', 'src="assets/__HOME_LOGO__"')
+        .replace('src="assets/team-chelsea.svg"', 'src="assets/__AWAY_LOGO__"')
+        .replace('<p class="name">Manchester City</p>', '<p class="name">__HOME_NAME__</p>')
+        .replace('<p class="name">Chelsea F. C.</p>',   '<p class="name">__AWAY_NAME__</p>')
+        .replace('__HOME_LOGO__', match["home_logo"])
+        .replace('__AWAY_LOGO__', match["away_logo"])
+        .replace('__HOME_NAME__', match["home_full"])
+        .replace('__AWAY_NAME__', match["away_full"])
+    )
     # 3) Period & score
     out = out.replace("2nd Half | 68'", match["period_text"])
     out = out.replace("<span class=\"score\">2 : 1</span>", f'<span class="score">{match["score_h"]} : {match["score_a"]}</span>')
