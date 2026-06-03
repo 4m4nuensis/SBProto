@@ -111,13 +111,13 @@
 
     // Deposit / balance check is triggered only once the user taps a bet.
     { id: 'deposit',  page: 'match', marks: [
-      { id: 'welcome', fullscreen: true, trigger: 'cta',
+      // a large rich tooltip pointing at the "+" button (was a full-screen splash)
+      { id: 'welcome', target: '.bal-plus-btn', place: 'below', trigger: 'deposit',
+        allowTargetClick: true, rich: true, ctaClick: '.bal-plus-btn',
         art: '💰', badge: '+$' + FREEBET + ' FREEBET',
         title: "Let's top up your balance to place your bet",
         copy: 'Your first bet is on us! Deposit $' + FREEBET + ' and get $' + FREEBET + ' in freebets.',
         cta: 'Top up now' },
-      { id: 'plus', target: '.bal-plus-btn', copy: 'Press the green + to top up your balance.',
-        place: 'below', trigger: 'deposit', allowTargetClick: true },
       { id: 'balPill', target: '.bal-pill', copy: 'Tap to see your balance.',
         place: 'below', trigger: 'balancesOpen', allowTargetClick: true },
       { id: 'balCash', target: '[data-bal-cash]', copy: 'This is your cash balance.',
@@ -198,6 +198,32 @@
 .ob-tip[data-place="below"] .ob-arrow{ top:-7px; border-bottom:7px solid #2a0b3e; }
 .ob-tip[data-place="above"] .ob-arrow{ bottom:-7px; border-top:7px solid #010c23; }
 
+/* large "rich" tooltip (deposit prompt) — same content as the old splash */
+.ob-tip.ob-rich-mode{ max-width:320px; padding:16px 16px 12px; text-align:center; }
+.ob-rich{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+.ob-rich-art{
+  width:72px; height:72px; border-radius:50%;
+  background:radial-gradient(circle at 50% 38%, rgba(216,13,131,.5), rgba(216,13,131,.05) 70%);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 0 30px rgba(216,13,131,.4);
+}
+.ob-rich-art .em{ font-size:40px; line-height:1; }
+.ob-rich-badge{
+  padding:5px 14px; border-radius:999px; background:var(--main,#d80d83);
+  color:#fff; font-weight:700; font-size:12px; letter-spacing:.5px;
+  box-shadow:0 6px 16px rgba(216,13,131,.45);
+}
+.ob-rich-ttl{ font-size:17px; line-height:22px; font-weight:700; color:#fff; }
+.ob-rich-copy{ font-size:13px; line-height:18px; color:rgba(255,255,255,.82); }
+.ob-rich-cta{
+  width:100%; height:44px; border-radius:999px; margin-top:4px;
+  background:var(--main,#d80d83); border:0; border-top:1px solid rgba(255,255,255,.24);
+  color:#fff; font:inherit; font-weight:600; font-size:14px; cursor:pointer;
+  box-shadow:0 8px 20px rgba(216,13,131,.4);
+}
+.ob-rich-cta:active{ transform:translateY(1px); }
+.ob-tip.ob-rich-mode .ob-row{ justify-content:center; margin-top:8px; }
+
 /* full-screen pop-up (welcome / top-up) + missions screen share a base look */
 .ob-screen, .ob-missions{
   position:fixed; inset:0; z-index:9100; pointer-events:auto;
@@ -260,6 +286,7 @@
 
   /* ──────────────── overlay DOM ──────────────── */
   let root, spot, tip, tipCopy, tipArrow, skipBtn, nextBtn;
+  let richWrap, richArt, richBadge, richTtl, richCopy, richCta;
   let tickTimer = null;
   let current = null;     // { step, markIdx, mark, baseCash, baseBets }
   let mountToken = 0;     // invalidates async waits across (re)mounts
@@ -280,6 +307,13 @@
     tip.className = 'ob-tip ob-hidden';
     tip.innerHTML =
       '<div class="ob-arrow"></div>' +
+      '<div class="ob-rich" style="display:none">' +
+        '<div class="ob-rich-art"><span class="em"></span></div>' +
+        '<div class="ob-rich-badge"></div>' +
+        '<div class="ob-rich-ttl"></div>' +
+        '<div class="ob-rich-copy"></div>' +
+        '<button class="ob-rich-cta" type="button"></button>' +
+      '</div>' +
       '<div class="ob-copy"></div>' +
       '<div class="ob-row">' +
         '<button class="ob-skip" type="button">Skip tour</button>' +
@@ -289,6 +323,12 @@
     tipArrow = tip.querySelector('.ob-arrow');
     skipBtn  = tip.querySelector('.ob-skip');
     nextBtn  = tip.querySelector('.ob-next');
+    richWrap = tip.querySelector('.ob-rich');
+    richArt  = tip.querySelector('.ob-rich-art .em');
+    richBadge= tip.querySelector('.ob-rich-badge');
+    richTtl  = tip.querySelector('.ob-rich-ttl');
+    richCopy = tip.querySelector('.ob-rich-copy');
+    richCta  = tip.querySelector('.ob-rich-cta');
 
     root.appendChild(spot);
     root.appendChild(tip);
@@ -300,6 +340,11 @@
     tip.addEventListener('click', e => e.stopPropagation());
     skipBtn.addEventListener('click', endTour);
     nextBtn.addEventListener('click', () => advance());
+    richCta.addEventListener('click', () => {
+      const sel = current && current.mark && current.mark.ctaClick;
+      const el = sel && document.querySelector(sel);
+      if (el) el.click();
+    });
     window.addEventListener('resize', reposition, { passive: true });
     window.addEventListener('scroll', reposition, { passive: true, capture: true });
   }
@@ -504,14 +549,30 @@
     // returning to the betslip — close the balances dropdown we opened earlier
     if (mark.requiresOpen === 'betslip') closeBalances();
 
-    // Next button visibility + label
-    if (mark.trigger === 'next') {
-      nextBtn.classList.remove('ob-hidden');
-      nextBtn.textContent = mark.nextLabel || 'Next';
-    } else {
+    if (mark.rich) {
+      // a large tooltip with art / badge / title / copy / CTA (deposit prompt)
+      tip.classList.add('ob-rich-mode');
+      richWrap.style.display = '';
+      richArt.textContent = mark.art || '💰';
+      richBadge.textContent = mark.badge || '';
+      richBadge.style.display = mark.badge ? '' : 'none';
+      richTtl.textContent = mark.title || '';
+      richCopy.textContent = fillCopy(mark.copy);
+      richCta.textContent = mark.cta || 'Continue';
+      tipCopy.style.display = 'none';
       nextBtn.classList.add('ob-hidden');
+    } else {
+      tip.classList.remove('ob-rich-mode');
+      richWrap.style.display = 'none';
+      tipCopy.style.display = '';
+      tipCopy.textContent = fillCopy(mark.copy);
+      if (mark.trigger === 'next') {
+        nextBtn.classList.remove('ob-hidden');
+        nextBtn.textContent = mark.nextLabel || 'Next';
+      } else {
+        nextBtn.classList.add('ob-hidden');
+      }
     }
-    tipCopy.textContent = fillCopy(mark.copy);
 
     if (mark.requiresOpen === 'balances') ensureBalancesOpen();
 
