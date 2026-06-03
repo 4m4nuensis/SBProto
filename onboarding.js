@@ -119,7 +119,7 @@
         art: '💰', badge: '+$' + FREEBET + ' FREEBET',
         title: "Let's top up your balance to place your bet",
         copy: 'Your first bet is on us! Deposit $' + FREEBET + ' and get $' + FREEBET + ' in freebets.' },
-      { id: 'betslip', target: '.bsp-card', copy: 'Input your stake here, then press Place Bet to place your bet.',
+      { id: 'betslip', target: '.bsp-card', copy: 'Indicate your bet size here, then press Place Bet.',
         place: 'above', trigger: 'placedBet', requiresOpen: 'betslip', allowTargetClick: true },
     ] },
 
