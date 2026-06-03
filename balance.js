@@ -446,6 +446,7 @@ body.bal-dep-open{ overflow:hidden; }
   function doDeposit() {
     const v = parseAmount(amtInput.value);
     if (v <= 0) return;
+    amtInput.blur();          // dismiss the on-screen keyboard as soon as we deposit
     writeCash(readCash() + v);
     syncDisplays();
     depositBtn.textContent = 'Deposited ✓';
@@ -477,12 +478,27 @@ body.bal-dep-open{ overflow:hidden; }
     depHost.classList.add('open');
     depScrim.classList.add('open');
     document.body.classList.add('bal-dep-open');
+    fitToViewport();
     setTimeout(() => amtInput && amtInput.focus({preventScroll:true}), 280);
   }
   function closeDeposit() {
     depHost.classList.remove('open');
     depScrim.classList.remove('open');
     document.body.classList.remove('bal-dep-open');
+    resetViewport();
+  }
+
+  /* Keep the sheet (and its pinned Deposit button) within the *visible* area so
+   * the footer stays above the on-screen keyboard instead of behind it. */
+  function fitToViewport() {
+    const vv = window.visualViewport;
+    if (!vv || !depHost.classList.contains('open')) return;
+    depHost.style.height = vv.height + 'px';
+    depHost.style.transform = 'translateX(-50%) translateY(' + vv.offsetTop + 'px)';
+  }
+  function resetViewport() {
+    depHost.style.height = '';
+    depHost.style.transform = '';
   }
 
   function syncDisplays() {
@@ -537,6 +553,12 @@ body.bal-dep-open{ overflow:hidden; }
       if (e.key === KEY_CASH || e.key === KEY_BONUS) syncDisplays();
     });
     window.addEventListener(EVT, syncDisplays);
+
+    // Reflow the deposit sheet when the keyboard shows/hides (mobile).
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', fitToViewport);
+      window.visualViewport.addEventListener('scroll', fitToViewport);
+    }
   }
 
   if (document.readyState === 'loading') {
