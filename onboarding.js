@@ -97,7 +97,7 @@
     { id: 'event',    page: 'match', onBetslipGoTo: 'deposit', marks: [
       { id: 'intro', target: '.event-card', copy: "This is your match screen — here you'll find the teams playing, kick-off time and key events that you can bet on.",
         place: 'below', trigger: 'next' },
-      { id: 'market', target: '.market[data-market="match-result"] .title', copy: 'This is the Match Result market — pick who you think will win.',
+      { id: 'market', target: '.market[data-market="match-result"] .title', copy: "Let's try placing a bet on a match outcome — choose the team that you think will win.",
         place: 'below', trigger: 'next' },
       { id: 'out1', target: '.market[data-market="match-result"] .opts .opt:nth-child(1)', copy: 'Tap here if you believe {home} wins.',
         place: 'below', trigger: 'next', allowTargetClick: true },
