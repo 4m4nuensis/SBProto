@@ -105,7 +105,7 @@
         place: 'below', trigger: 'next', allowTargetClick: true },
       { id: 'out2', target: '.market[data-market="match-result"] .opts .opt:nth-child(3)', copy: 'Tap here if you believe {away} wins.',
         place: 'below', trigger: 'next', allowTargetClick: true },
-      { id: 'oddsSummary', target: '.market[data-market="match-result"] .opts', copy: 'Those are your three options — {home} to win, the draw, or {away} to win. Tap the one you fancy to place your first bet.',
+      { id: 'oddsSummary', target: '.market[data-market="match-result"] .opts', copy: 'Tap on the outcome you want to bet on.',
         place: 'below', trigger: 'tapOutcome', allowTargetClick: true },
     ] },
 
