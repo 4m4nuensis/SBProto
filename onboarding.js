@@ -95,7 +95,7 @@
 
     // The match page is walked through FIRST — no deposit before this.
     { id: 'event',    page: 'match', onBetslipGoTo: 'deposit', marks: [
-      { id: 'intro', target: '.event-card', copy: "This is your match screen — here you'll find the teams, kick-off time and key stats.",
+      { id: 'intro', target: '.event-card', copy: "This is your match screen — here you'll find the teams playing, kick-off time and key events that you can bet on.",
         place: 'below', trigger: 'next' },
       { id: 'market', target: '.market[data-market="match-result"] .title', copy: 'This is the Match Result market — pick who you think will win.',
         place: 'below', trigger: 'next' },
