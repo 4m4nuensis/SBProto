@@ -109,7 +109,8 @@
         place: 'below', trigger: 'tapOutcome', allowTargetClick: true },
     ] },
 
-    // Deposit / balance check is triggered only once the user taps a bet.
+    // Top-up is triggered only once the user taps a bet; afterwards they go
+    // straight to placing the bet. (Balance education moved to the very end.)
     { id: 'deposit',  page: 'match', marks: [
       // a large rich tooltip pointing at the "+" button (dims the rest of the
       // screen). No CTA — the user taps the spotlighted "+".
@@ -118,12 +119,6 @@
         art: '💰', badge: '+$' + FREEBET + ' FREEBET',
         title: "Let's top up your balance to place your bet",
         copy: 'Your first bet is on us! Deposit $' + FREEBET + ' and get $' + FREEBET + ' in freebets.' },
-      { id: 'balPill', target: '.bal-pill', copy: 'Tap to see your balance.',
-        place: 'below', trigger: 'balancesOpen', allowTargetClick: true },
-      { id: 'balCash', target: '[data-bal-cash]', copy: 'This is your cash balance.',
-        place: 'below', trigger: 'next', requiresOpen: 'balances' },
-      { id: 'balTotal', target: '.bal-bottom-row', copy: 'Here you can see your bonuses and your total balance including bonus.',
-        place: 'below', trigger: 'next', requiresOpen: 'balances', nextLabel: 'Place my bet →' },
       { id: 'betslip', target: '.bsp-card', copy: 'Input your stake here, then press Place Bet to place your bet.',
         place: 'above', trigger: 'placedBet', requiresOpen: 'betslip', allowTargetClick: true },
     ] },
@@ -137,7 +132,20 @@
       { id: 'openBet', target: '.bo-card', copy: 'Here are your open bets. Come back here when the match is over to see your result.',
         place: 'below', trigger: 'next' },
       { id: 'cashout', target: '.bo-cashout', copy: 'If you want to edit your bet you can cash out before the match starts and place a new bet.',
-        place: 'above', trigger: 'next', nextLabel: 'Finish' },
+        place: 'above', trigger: 'next' },
+      { id: 'back', target: '.back-btn', copy: 'Tap here to head back and check your balance.',
+        place: 'below', trigger: 'next', allowTargetClick: true, nextLabel: 'Go back →' },
+    ] },
+
+    // Back on the match screen — the balance education now lives at the very
+    // end, just before the success screen.
+    { id: 'balanceCheck', page: 'match', marks: [
+      { id: 'balPill', target: '.bal-pill', copy: 'Tap to see your balance.',
+        place: 'below', trigger: 'balancesOpen', allowTargetClick: true },
+      { id: 'balCash', target: '[data-bal-cash]', copy: 'This is your cash balance.',
+        place: 'below', trigger: 'next', requiresOpen: 'balances' },
+      { id: 'balTotal', target: '.bal-bottom-row', copy: 'Here you can see your bonuses and your total balance including bonus.',
+        place: 'below', trigger: 'next', requiresOpen: 'balances', nextLabel: 'Finish' },
     ], finale: true },
 
     // Only entered via the missions screen's "At a later time" button.
@@ -741,9 +749,14 @@
 
     // If the user reached the open-bets page by tapping the clock icon (rather
     // than the tooltip's button), the step is still 'openbets1' — bump it so the
-    // tour continues to the missions screen right here.
+    // tour continues right here.
     if (PAGE === 'openbets' && state.step === stepIndexById('openbets1')) {
       state = writeState({ step: stepIndexById('openbets2') });
+    }
+    // "Go back" from the open-bets screen lands the user back on the match page;
+    // continue with the balance check there.
+    if (PAGE === 'match' && onPickedMatch(state) && state.step === stepIndexById('openbets2')) {
+      state = writeState({ step: stepIndexById('balanceCheck') });
     }
 
     const step = STEPS[state.step];
@@ -787,4 +800,9 @@
   } else {
     resume();
   }
+  // history-back can restore a page from the bfcache without re-firing
+  // DOMContentLoaded — re-evaluate the tour so it picks up where it should.
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) { teardownVisuals(); resume(); }
+  });
 })();
