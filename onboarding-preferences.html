@@ -65,9 +65,11 @@ img,svg{display:block;max-width:100%}
 
 .ob-q{font-size:22px;font-weight:600;line-height:28px;margin-top:4px}
 .ob-hint{font-size:13px;color:var(--w-56);margin-bottom:18px}
+/* once the framing header is present (screens 2+), the question steps down */
+.app.q-sub .ob-q{font-size:16px;line-height:21px;font-weight:600;color:var(--w-72);margin-top:2px}
 
 /* framing header (below the progress counter, from screen 2 onward) */
-.ob-intro{margin:0;font-size:19px;line-height:25px;font-weight:700;color:var(--w-100);padding:0 0 16px;flex-shrink:0}
+.ob-intro{margin:0;font-size:23px;line-height:29px;font-weight:700;color:var(--w-100);padding:0 0 14px;flex-shrink:0}
 .ob-section-label{font-size:13px;font-weight:600;color:var(--w-72);margin:16px 0 8px}
 .ob-section-label.first{margin-top:2px}
 
@@ -383,8 +385,10 @@ img,svg{display:block;max-width:100%}
     slides.forEach(s => s.classList.toggle('on', +s.dataset.slide === i));
     dots.forEach((d, di) => d.classList.toggle('on', di <= i));
     cta.textContent = i === 2 ? 'See my matches' : 'Continue';
-    // The framing line appears from the second screen onward, not on Q1.
+    // The framing line appears from the second screen onward, not on Q1; when
+    // it's present the per-question heading steps down (q-sub).
     if (intro) intro.style.display = i === 0 ? 'none' : '';
+    document.querySelector('.app').classList.toggle('q-sub', i > 0);
     if (i === 2) renderQ3();
   }
   cta.addEventListener('click', () => {
