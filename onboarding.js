@@ -111,13 +111,13 @@
 
     // Deposit / balance check is triggered only once the user taps a bet.
     { id: 'deposit',  page: 'match', marks: [
-      // a large rich tooltip pointing at the "+" button (was a full-screen splash)
+      // a large rich tooltip pointing at the "+" button (dims the rest of the
+      // screen). No CTA — the user taps the spotlighted "+".
       { id: 'welcome', target: '.bal-plus-btn', place: 'below', trigger: 'deposit',
-        allowTargetClick: true, rich: true, ctaClick: '.bal-plus-btn',
+        allowTargetClick: true, rich: true, dim: true,
         art: '💰', badge: '+$' + FREEBET + ' FREEBET',
         title: "Let's top up your balance to place your bet",
-        copy: 'Your first bet is on us! Deposit $' + FREEBET + ' and get $' + FREEBET + ' in freebets.',
-        cta: 'Top up now' },
+        copy: 'Your first bet is on us! Deposit $' + FREEBET + ' and get $' + FREEBET + ' in freebets.' },
       { id: 'balPill', target: '.bal-pill', copy: 'Tap to see your balance.',
         place: 'below', trigger: 'balancesOpen', allowTargetClick: true },
       { id: 'balCash', target: '[data-bal-cash]', copy: 'This is your cash balance.',
@@ -160,6 +160,10 @@
   border-radius:12px; pointer-events:none;
   box-shadow:0 0 0 2px rgba(216,13,131,.95), 0 0 22px 5px rgba(216,13,131,.55);
 }
+/* dim variant — darkens the rest of the screen around the target */
+.ob-spot.ob-dim{
+  box-shadow:0 0 0 9999px rgba(1,12,35,.8), 0 0 0 2px rgba(216,13,131,.95), 0 0 22px 5px rgba(216,13,131,.55);
+}
 .ob-spot.ob-hidden{ opacity:0; }
 
 .ob-tip{
@@ -198,31 +202,26 @@
 .ob-tip[data-place="below"] .ob-arrow{ top:-7px; border-bottom:7px solid #2a0b3e; }
 .ob-tip[data-place="above"] .ob-arrow{ bottom:-7px; border-top:7px solid #010c23; }
 
-/* large "rich" tooltip (deposit prompt) — same content as the old splash */
-.ob-tip.ob-rich-mode{ max-width:320px; padding:16px 16px 12px; text-align:center; }
-.ob-rich{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+/* large "rich" tooltip (deposit prompt): title header, then copy + art on right */
+.ob-tip.ob-rich-mode{ max-width:330px; padding:14px 16px 10px; }
+.ob-rich{ display:flex; flex-direction:column; gap:10px; }
+.ob-rich-ttl{ font-size:16px; line-height:21px; font-weight:700; color:#fff; }
+.ob-rich-body{ display:flex; align-items:center; gap:12px; }
+.ob-rich-copy{ flex:1; font-size:13px; line-height:18px; color:rgba(255,255,255,.82); }
+.ob-rich-art-wrap{ flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:6px; }
 .ob-rich-art{
-  width:72px; height:72px; border-radius:50%;
+  width:54px; height:54px; border-radius:50%;
   background:radial-gradient(circle at 50% 38%, rgba(216,13,131,.5), rgba(216,13,131,.05) 70%);
   display:flex; align-items:center; justify-content:center;
-  box-shadow:0 0 30px rgba(216,13,131,.4);
+  box-shadow:0 0 22px rgba(216,13,131,.4);
 }
-.ob-rich-art .em{ font-size:40px; line-height:1; }
+.ob-rich-art .em{ font-size:28px; line-height:1; }
 .ob-rich-badge{
-  padding:5px 14px; border-radius:999px; background:var(--main,#d80d83);
-  color:#fff; font-weight:700; font-size:12px; letter-spacing:.5px;
-  box-shadow:0 6px 16px rgba(216,13,131,.45);
+  padding:4px 10px; border-radius:999px; background:var(--main,#d80d83);
+  color:#fff; font-weight:700; font-size:11px; letter-spacing:.3px; white-space:nowrap;
+  box-shadow:0 6px 14px rgba(216,13,131,.45);
 }
-.ob-rich-ttl{ font-size:17px; line-height:22px; font-weight:700; color:#fff; }
-.ob-rich-copy{ font-size:13px; line-height:18px; color:rgba(255,255,255,.82); }
-.ob-rich-cta{
-  width:100%; height:44px; border-radius:999px; margin-top:4px;
-  background:var(--main,#d80d83); border:0; border-top:1px solid rgba(255,255,255,.24);
-  color:#fff; font:inherit; font-weight:600; font-size:14px; cursor:pointer;
-  box-shadow:0 8px 20px rgba(216,13,131,.4);
-}
-.ob-rich-cta:active{ transform:translateY(1px); }
-.ob-tip.ob-rich-mode .ob-row{ justify-content:center; margin-top:8px; }
+.ob-tip.ob-rich-mode .ob-row{ justify-content:flex-start; margin-top:10px; }
 
 /* full-screen pop-up (welcome / top-up) + missions screen share a base look */
 .ob-screen, .ob-missions{
@@ -286,7 +285,7 @@
 
   /* ──────────────── overlay DOM ──────────────── */
   let root, spot, tip, tipCopy, tipArrow, skipBtn, nextBtn;
-  let richWrap, richArt, richBadge, richTtl, richCopy, richCta;
+  let richWrap, richArt, richBadge, richTtl, richCopy;
   let tickTimer = null;
   let current = null;     // { step, markIdx, mark, baseCash, baseBets }
   let mountToken = 0;     // invalidates async waits across (re)mounts
@@ -308,11 +307,14 @@
     tip.innerHTML =
       '<div class="ob-arrow"></div>' +
       '<div class="ob-rich" style="display:none">' +
-        '<div class="ob-rich-art"><span class="em"></span></div>' +
-        '<div class="ob-rich-badge"></div>' +
         '<div class="ob-rich-ttl"></div>' +
-        '<div class="ob-rich-copy"></div>' +
-        '<button class="ob-rich-cta" type="button"></button>' +
+        '<div class="ob-rich-body">' +
+          '<div class="ob-rich-copy"></div>' +
+          '<div class="ob-rich-art-wrap">' +
+            '<div class="ob-rich-art"><span class="em"></span></div>' +
+            '<div class="ob-rich-badge"></div>' +
+          '</div>' +
+        '</div>' +
       '</div>' +
       '<div class="ob-copy"></div>' +
       '<div class="ob-row">' +
@@ -328,7 +330,6 @@
     richBadge= tip.querySelector('.ob-rich-badge');
     richTtl  = tip.querySelector('.ob-rich-ttl');
     richCopy = tip.querySelector('.ob-rich-copy');
-    richCta  = tip.querySelector('.ob-rich-cta');
 
     root.appendChild(spot);
     root.appendChild(tip);
@@ -340,11 +341,6 @@
     tip.addEventListener('click', e => e.stopPropagation());
     skipBtn.addEventListener('click', endTour);
     nextBtn.addEventListener('click', () => advance());
-    richCta.addEventListener('click', () => {
-      const sel = current && current.mark && current.mark.ctaClick;
-      const el = sel && document.querySelector(sel);
-      if (el) el.click();
-    });
     window.addEventListener('resize', reposition, { passive: true });
     window.addEventListener('scroll', reposition, { passive: true, capture: true });
   }
@@ -550,7 +546,7 @@
     if (mark.requiresOpen === 'betslip') closeBalances();
 
     if (mark.rich) {
-      // a large tooltip with art / badge / title / copy / CTA (deposit prompt)
+      // a large tooltip: title header, then copy (left) + art/badge (right)
       tip.classList.add('ob-rich-mode');
       richWrap.style.display = '';
       richArt.textContent = mark.art || '💰';
@@ -558,7 +554,6 @@
       richBadge.style.display = mark.badge ? '' : 'none';
       richTtl.textContent = mark.title || '';
       richCopy.textContent = fillCopy(mark.copy);
-      richCta.textContent = mark.cta || 'Continue';
       tipCopy.style.display = 'none';
       nextBtn.classList.add('ob-hidden');
     } else {
@@ -573,6 +568,8 @@
         nextBtn.classList.add('ob-hidden');
       }
     }
+    // dim the rest of the screen only for marks that ask for it
+    spot.classList.toggle('ob-dim', !!mark.dim);
 
     if (mark.requiresOpen === 'balances') ensureBalancesOpen();
 
