@@ -63,6 +63,11 @@ img,svg{display:block;max-width:100%}
 .ob-q{font-size:22px;font-weight:600;line-height:28px;margin-top:4px}
 .ob-hint{font-size:13px;color:var(--w-56);margin-bottom:18px}
 
+/* persistent welcome line + Q3 section labels */
+.ob-intro{font-size:17px;line-height:23px;font-weight:600;color:var(--w-100);padding:2px 0 16px;flex-shrink:0}
+.ob-section-label{font-size:13px;font-weight:600;color:var(--w-72);margin:16px 0 8px}
+.ob-section-label.first{margin-top:2px}
+
 /* Q1 interest cards */
 .ob-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .ob-card{
@@ -170,6 +175,8 @@ img,svg{display:block;max-width:100%}
     <button class="ob-skip-top" id="skipTop">Skip</button>
   </div>
 
+  <div class="ob-intro">Hi! Let's find you some interesting matches and place your first bet.</div>
+
   <div class="ob-dots" id="dots">
     <div class="d on"></div><div class="d"></div><div class="d"></div>
   </div>
@@ -204,10 +211,14 @@ img,svg{display:block;max-width:100%}
 
     <!-- Q3 -->
     <div class="ob-slide" data-slide="2">
-      <div class="ob-q">Favourite teams or players?</div>
+      <div class="ob-q">Your favourites</div>
       <div class="ob-hint">Based on the sports you picked.</div>
-      <div class="ob-bubbles" id="q3"></div>
-      <div class="ob-q3-empty" id="q3empty" hidden>Pick a sport on the previous step to see teams here — or skip this one.</div>
+      <div class="ob-section-label first">Major competitions &amp; national leagues</div>
+      <div class="ob-bubbles" id="q3comps"></div>
+      <div class="ob-section-label">Teams</div>
+      <div class="ob-bubbles" id="q3teams"></div>
+      <div class="ob-bubbles" id="q3other" style="margin-top:16px"></div>
+      <div class="ob-q3-empty" id="q3empty" hidden>Pick a sport on the previous step to see options here — or just skip.</div>
     </div>
   </div>
 
@@ -260,6 +271,18 @@ img,svg{display:block;max-width:100%}
     boxing:     ['Canelo','Fury','Joshua'],
     tabletennis:['Ma Long','Fan Zhendong'],
   };
+  // Section A — major competitions & national leagues (incl. world championships).
+  // "Premier League" / "FA Cup" match the catalog leagues, so they sharpen ranking.
+  const COMPS_BY_SPORT = {
+    football:   ['Champions League','Premier League','La Liga','Bundesliga','Serie A','FA Cup','FIFA World Cup','UEFA Euro'],
+    basketball: ['NBA','EuroLeague','FIBA World Cup'],
+    tennis:     ['Grand Slams','ATP Tour','WTA Tour'],
+    baseball:   ['MLB','World Series'],
+    amfootball: ['NFL','Super Bowl'],
+    hockey:     ['NHL','IIHF Worlds'],
+    boxing:     ['World Championship'],
+    tabletennis:['ITTF World Tour'],
+  };
   // Each suggestion maps to a real prematch detail page.
   const MATCH_CATALOG = [
     { id:'80203', href:'prematch-match-80203.html', home:'Arsenal',     away:'Man United', teams:['Arsenal','Manchester United'],     league:'Premier League', when:'26 May · 21:00', o:[2.10,3.40,3.20] },
@@ -271,7 +294,7 @@ img,svg{display:block;max-width:100%}
 
   const Tour = window.OnboardingTour;
   const state = (Tour && Tour.start()) || {};
-  const prefs = Object.assign({ interests:[], sports:[], teams:[] }, state.prefs || {});
+  const prefs = Object.assign({ interests:[], sports:[], comps:[], teams:[], other:false }, state.prefs || {});
 
   /* ── elements ── */
   const dots    = [].slice.call(document.querySelectorAll('#dots .d'));
@@ -311,25 +334,42 @@ img,svg{display:block;max-width:100%}
     save();
   });
 
-  /* ── Q3 (derived from Q2) ── */
+  /* ── Q3 — two sections (competitions / teams) + Other, derived from Q2 ── */
+  function uniqFor(map, sports) {
+    const seen = {}; const out = [];
+    sports.forEach(sp => (map[sp] || []).forEach(v => { if (!seen[v]) { seen[v] = 1; out.push(v); } }));
+    return out;
+  }
+  function bubbleHTML(arr, picked) {
+    return arr.map(v =>
+      `<button class="ob-bubble${picked.indexOf(v) !== -1 ? ' sel' : ''}" data-val="${v}" type="button">${v}</button>`).join('');
+  }
   function renderQ3() {
-    const q3 = document.getElementById('q3');
     const empty = document.getElementById('q3empty');
     const sports = prefs.sports.length ? prefs.sports : ['football'];
-    const seen = {}; const teams = [];
-    sports.forEach(sp => (TEAMS_BY_SPORT[sp] || []).forEach(t => { if (!seen[t]) { seen[t] = 1; teams.push(t); } }));
-    // drop any previously-picked teams that are no longer offered
+    const comps = uniqFor(COMPS_BY_SPORT, sports);
+    const teams = uniqFor(TEAMS_BY_SPORT, sports);
+    // drop previously-picked items no longer offered
+    prefs.comps = prefs.comps.filter(c => comps.indexOf(c) !== -1);
     prefs.teams = prefs.teams.filter(t => teams.indexOf(t) !== -1);
-    if (!teams.length) { q3.innerHTML = ''; empty.hidden = false; return; }
-    empty.hidden = true;
-    q3.innerHTML = teams.map(t =>
-      `<button class="ob-bubble${prefs.teams.indexOf(t)!==-1?' sel':''}" data-val="${t}" type="button">${t}</button>`).join('');
+    document.getElementById('q3comps').innerHTML = bubbleHTML(comps, prefs.comps);
+    document.getElementById('q3teams').innerHTML = bubbleHTML(teams, prefs.teams);
+    document.getElementById('q3other').innerHTML =
+      `<button class="ob-bubble${prefs.other ? ' sel' : ''}" data-other type="button">Other</button>`;
+    empty.hidden = !!(comps.length || teams.length);
   }
-  document.getElementById('q3').addEventListener('click', e => {
+  document.querySelector('.ob-slide[data-slide="2"]').addEventListener('click', e => {
     const b = e.target.closest('.ob-bubble');
     if (!b) return;
+    if (b.hasAttribute('data-other')) {
+      prefs.other = !prefs.other;
+      b.classList.toggle('sel', prefs.other);
+      save();
+      return;
+    }
+    const inComps = b.parentElement.id === 'q3comps';
     b.classList.toggle('sel');
-    toggle(prefs.teams, b.dataset.val);
+    toggle(inComps ? prefs.comps : prefs.teams, b.dataset.val);
     save();
   });
 
@@ -351,9 +391,14 @@ img,svg{display:block;max-width:100%}
 
   /* ── Step 2: match suggestion popup ── */
   function rankMatches() {
-    const picks = prefs.teams || [];
+    const teamPicks = prefs.teams || [];
+    const compPicks = prefs.comps || [];
     return MATCH_CATALOG
-      .map(m => ({ m, score: m.teams.reduce((n, t) => n + (picks.indexOf(t) !== -1 ? 1 : 0), 0) }))
+      .map(m => {
+        let score = m.teams.reduce((n, t) => n + (teamPicks.indexOf(t) !== -1 ? 1 : 0), 0);
+        if (compPicks.indexOf(m.league) !== -1) score += 1;
+        return { m, score };
+      })
       .sort((a, b) => b.score - a.score)
       .map(x => x.m)
       .slice(0, 5);

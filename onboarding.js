@@ -10,13 +10,13 @@
  * step and, if that step's screen is the current page, mounts the relevant
  * coachmark(s); advancing a step may navigate to another page.
  *
- * Steps:
- *   prefs / suggest  → onboarding-preferences.html  (owned by that page's UI)
- *   deposit          → index.html   full-screen welcome pop-up + "+" spotlight
- *   balance          → index.html   three tooltips on the balance pill / dropdown
- *   event            → picked match  match intro → 1X2 market → betslip → place
+ * Flow (revised 2026-06-03 — see onboarding-flow.md):
+ *   prefs / suggest  → onboarding-preferences.html  (preference gallery + pop-up)
+ *   event            → picked match  walkthrough FIRST (intro → 1X2 → odds summary)
+ *   deposit          → picked match  tap-a-bet → top-up pop-up + balance tips → place
  *   openbets1        → picked match  tooltip on the open-bets clock
- *   openbets2        → open-bets.html  tooltip on the open bet → success screen
+ *   openbets2        → open-bets.html  open-bet + cashout tooltips → missions screen
+ *   missionsLater    → index.html   "At a later time" → profile-icon tooltip
  *
  * Launch: visit onboarding-preferences.html (or any page with ?onboarding=start).
  * Replay/reset: ?onboarding=reset, or OnboardingTour.reset() in the console.
@@ -31,6 +31,9 @@
   const KEY = 'vbet:onboarding';
   const EVT = 'vbet:onboarding-changed';
   const FALLBACK_MATCH = { id: '80201', href: 'prematch-match-80201.html', label: 'Man City vs Chelsea' };
+  // TODO: confirm with the team — the welcome offer is now $10 deposit → $10 freebet
+  // (was $5/$5). This is the credited bonus value, not just copy.
+  const FREEBET = 10;
 
   /* ──────────────── state ──────────────── */
   function readState() {
@@ -83,43 +86,44 @@
   //   'cta'         — a full-screen pop-up's primary button
   //   'deposit'     — cash balance increased (a deposit completed)
   //   'balancesOpen'— the balances dropdown opened
-  //   'betslipOpen' — the floating betslip popup opened
   //   'placedBet'   — a bet was placed (BetslipStore count grew)
+  //   (anything else / 'tapOutcome') — no Next; advances via a step-level rule
   // Copy may contain {home}/{away}, filled with the picked match's team names.
   const STEPS = [
     { id: 'prefs',    page: 'prefs',    screen: true },
     { id: 'suggest',  page: 'prefs',    screen: true },
 
-    { id: 'deposit',  page: 'home', marks: [
-      { id: 'welcome', fullscreen: true, trigger: 'cta',
-        art: '🎁', badge: '+$5 FREEBET',
-        title: 'Welcome bonus!',
-        copy: "You've been awarded a welcome bonus. Deposit $5 and we'll match it with $5 in freebets to play with.",
-        cta: 'Top up now' },
-      { id: 'plus', target: '.bal-plus-btn', copy: 'Press the green + to top up your balance.',
-        place: 'below', trigger: 'deposit', allowTargetClick: true },
-    ] },
-
-    { id: 'balance',  page: 'home', marks: [
-      { target: '.bal-pill', copy: 'Tap to see your balance.',
-        place: 'below', trigger: 'balancesOpen', allowTargetClick: true },
-      { target: '[data-bal-cash]', copy: 'This is your cash balance.',
-        place: 'below', trigger: 'next', requiresOpen: 'balances' },
-      { target: '.bal-bottom-row', copy: 'Here you can see your bonuses and your total balance including bonus.',
-        place: 'below', trigger: 'next', requiresOpen: 'balances', nextLabel: "Let's place a bet →" },
-    ] },
-
-    { id: 'event',    page: 'match', marks: [
+    // The match page is walked through FIRST — no deposit before this.
+    { id: 'event',    page: 'match', onBetslipGoTo: 'deposit', marks: [
       { id: 'intro', target: '.event-card', copy: "This is your match screen — here you'll find the teams, kick-off time and key stats.",
         place: 'below', trigger: 'next' },
       { id: 'market', target: '.market[data-market="match-result"] .title', copy: 'This is the Match Result market — pick who you think will win.',
         place: 'below', trigger: 'next' },
       { id: 'out1', target: '.market[data-market="match-result"] .opts .opt:nth-child(1)', copy: 'Tap here if you believe {home} wins.',
-        place: 'below', trigger: 'next', allowTargetClick: true, jumpOnBetslip: true },
+        place: 'below', trigger: 'next', allowTargetClick: true },
       { id: 'outX', target: '.market[data-market="match-result"] .opts .opt:nth-child(2)', copy: "Tap here if you think it'll be a draw.",
-        place: 'below', trigger: 'next', allowTargetClick: true, jumpOnBetslip: true },
-      { id: 'out2', target: '.market[data-market="match-result"] .opts .opt:nth-child(3)', copy: 'Tap here if you believe {away} wins — your first bet is on us!',
-        place: 'below', trigger: 'betslipOpen', allowTargetClick: true },
+        place: 'below', trigger: 'next', allowTargetClick: true },
+      { id: 'out2', target: '.market[data-market="match-result"] .opts .opt:nth-child(3)', copy: 'Tap here if you believe {away} wins.',
+        place: 'below', trigger: 'next', allowTargetClick: true },
+      { id: 'oddsSummary', target: '.market[data-market="match-result"] .opts', copy: 'Those are your three options — {home} to win, the draw, or {away} to win. Tap the one you fancy to place your first bet.',
+        place: 'below', trigger: 'tapOutcome', allowTargetClick: true },
+    ] },
+
+    // Deposit / balance check is triggered only once the user taps a bet.
+    { id: 'deposit',  page: 'match', marks: [
+      { id: 'welcome', fullscreen: true, trigger: 'cta',
+        art: '💰', badge: '+$' + FREEBET + ' FREEBET',
+        title: "Let's top up your balance to place your bet",
+        copy: 'Your first bet is on us! Deposit $' + FREEBET + ' and get $' + FREEBET + ' in freebets.',
+        cta: 'Top up now' },
+      { id: 'plus', target: '.bal-plus-btn', copy: 'Press the green + to top up your balance.',
+        place: 'below', trigger: 'deposit', allowTargetClick: true },
+      { id: 'balPill', target: '.bal-pill', copy: 'Tap to see your balance.',
+        place: 'below', trigger: 'balancesOpen', allowTargetClick: true },
+      { id: 'balCash', target: '[data-bal-cash]', copy: 'This is your cash balance.',
+        place: 'below', trigger: 'next', requiresOpen: 'balances' },
+      { id: 'balTotal', target: '.bal-bottom-row', copy: 'Here you can see your bonuses and your total balance including bonus.',
+        place: 'below', trigger: 'next', requiresOpen: 'balances', nextLabel: 'Place my bet →' },
       { id: 'betslip', target: '.bsp-card', copy: 'Input your stake here, then press Place Bet to place your bet.',
         place: 'above', trigger: 'placedBet', requiresOpen: 'betslip', allowTargetClick: true },
     ] },
@@ -130,13 +134,23 @@
     ] },
 
     { id: 'openbets2', page: 'openbets', marks: [
-      { target: '.bo-card', copy: 'Here are your open bets — you can track them or cash out any time.',
-        place: 'below', trigger: 'next', nextLabel: 'Finish' },
+      { id: 'openBet', target: '.bo-card', copy: 'Here are your open bets. Come back here when the match is over to see your result.',
+        place: 'below', trigger: 'next' },
+      { id: 'cashout', target: '.bo-cashout', copy: 'If you want to edit your bet you can cash out before the match starts and place a new bet.',
+        place: 'above', trigger: 'next', nextLabel: 'Finish' },
     ], finale: true },
+
+    // Only entered via the missions screen's "At a later time" button.
+    { id: 'missionsLater', page: 'home', marks: [
+      { target: '.header-bar .icon-btn-ghost', copy: 'You can access it there.',
+        place: 'below', trigger: 'next', nextLabel: 'Got it' },
+    ] },
   ];
   const stepIndexById = id => STEPS.findIndex(s => s.id === id);
 
   /* ──────────────── styles ──────────────── */
+  // NOTE: tooltips no longer dim the screen — the spotlight is just a glowing
+  // ring around the target (no scrim), so the rest of the UI stays visible.
   const css = `
 #ob-root{ position:fixed; inset:0; z-index:9000; pointer-events:none; }
 #ob-root.ob-suppressed{ opacity:0 !important; pointer-events:none !important; }
@@ -144,8 +158,7 @@
 .ob-spot{
   position:fixed; left:0; top:0; width:0; height:0; z-index:1;
   border-radius:12px; pointer-events:none;
-  box-shadow:0 0 0 9999px rgba(1,12,35,.74), 0 0 0 2px rgba(216,13,131,.9),
-             0 0 18px 4px rgba(216,13,131,.45);
+  box-shadow:0 0 0 2px rgba(216,13,131,.95), 0 0 22px 5px rgba(216,13,131,.55);
 }
 .ob-spot.ob-hidden{ opacity:0; }
 
@@ -182,22 +195,22 @@
   position:absolute; width:0; height:0; left:24px;
   border-left:7px solid transparent; border-right:7px solid transparent;
 }
-.ob-tip[data-place="below"] .ob-arrow{ top:-7px; border-bottom:7px solid #0a1633; }
+.ob-tip[data-place="below"] .ob-arrow{ top:-7px; border-bottom:7px solid #2a0b3e; }
 .ob-tip[data-place="above"] .ob-arrow{ bottom:-7px; border-top:7px solid #010c23; }
 
-/* full-screen pop-up (welcome bonus) + finale share a base look */
-.ob-screen, .ob-finale{
+/* full-screen pop-up (welcome / top-up) + missions screen share a base look */
+.ob-screen, .ob-missions{
   position:fixed; inset:0; z-index:9100; pointer-events:auto;
   background:radial-gradient(130% 90% at 50% 0%, #2a0b3e 0%, #010c23 58%);
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   text-align:center; padding:32px 28px;
   font-family:'Rubik',system-ui,sans-serif; color:#fff;
-  opacity:0; transition:opacity .3s ease;
+  opacity:0; transition:opacity .3s ease; overflow-y:auto;
 }
-.ob-screen.ob-show, .ob-finale.ob-show{ opacity:1; }
+.ob-screen.ob-show, .ob-missions.ob-show{ opacity:1; }
 
 .ob-screen-art{
-  width:148px; height:148px; border-radius:50%; margin-bottom:6px;
+  width:148px; height:148px; border-radius:50%; margin-bottom:6px; flex-shrink:0;
   background:radial-gradient(circle at 50% 38%, rgba(216,13,131,.55), rgba(216,13,131,.06) 70%);
   display:flex; align-items:center; justify-content:center;
   box-shadow:0 0 70px rgba(216,13,131,.5);
@@ -210,30 +223,39 @@
   background:var(--main,#d80d83); color:#fff; font-weight:700; font-size:13px; letter-spacing:.6px;
   box-shadow:0 8px 22px rgba(216,13,131,.5);
 }
-.ob-screen-ttl{ font-size:30px; line-height:36px; font-weight:700; margin:12px 0 8px; }
-.ob-screen-copy{ font-size:15px; line-height:22px; color:rgba(255,255,255,.78); max-width:300px; margin:0 0 28px; }
-.ob-screen-cta, .ob-finale .ob-fin-cta{
+.ob-screen-ttl{ font-size:26px; line-height:32px; font-weight:700; margin:12px 0 8px; max-width:320px; }
+.ob-screen-copy{ font-size:15px; line-height:22px; color:rgba(255,255,255,.82); max-width:300px; margin:0 0 28px; }
+.ob-cta-lg, .ob-screen-cta{
   width:100%; max-width:320px; height:52px; border-radius:999px;
   background:var(--main,#d80d83); border:0; border-top:1px solid rgba(255,255,255,.24);
   color:#fff; font:inherit; font-weight:600; font-size:16px; cursor:pointer;
   box-shadow:0 12px 30px rgba(216,13,131,.45);
 }
-.ob-screen-cta:active{ transform:translateY(1px); }
-.ob-screen-skip, .ob-finale .ob-fin-later{
+.ob-cta-lg:active, .ob-screen-cta:active{ transform:translateY(1px); }
+.ob-link-lg, .ob-screen-skip{
   margin-top:14px; background:none; border:0; color:rgba(255,255,255,.5);
   font:inherit; font-size:13px; cursor:pointer;
 }
-.ob-screen-skip:hover, .ob-finale .ob-fin-later:hover{ color:rgba(255,255,255,.85); }
+.ob-link-lg:hover, .ob-screen-skip:hover{ color:rgba(255,255,255,.85); }
 
-.ob-finale .ob-burst{ font-size:56px; line-height:1; margin-bottom:8px; }
-.ob-finale h2{ font-size:24px; font-weight:700; margin:0 0 8px; }
-.ob-finale p{ font-size:14px; line-height:20px; color:rgba(255,255,255,.72); margin:0 0 6px; max-width:300px; }
-.ob-finale .ob-prize{
-  margin:18px 0 24px; padding:14px 18px; border-radius:14px;
-  background:rgba(255,255,255,.06); border-top:1px solid rgba(255,255,255,.16);
-  display:flex; align-items:center; gap:10px; font-size:14px;
+/* missions screen */
+.ob-missions{ justify-content:flex-start; padding-top:48px; }
+.ob-ring{ width:128px; height:128px; flex-shrink:0; margin-bottom:14px; }
+.ob-ring .ob-ring-label{ font:700 22px/1 'Rubik',sans-serif; fill:#fff; }
+.ob-ring .ob-ring-sub{ font:500 11px/1 'Rubik',sans-serif; fill:rgba(255,255,255,.5); }
+.ob-missions h2{ font-size:24px; font-weight:700; margin:0 0 6px; }
+.ob-missions .ob-sub{ font-size:14px; line-height:20px; color:rgba(255,255,255,.72); margin:0 0 4px; max-width:320px; }
+.ob-missions .ob-carrot{ font-size:13px; color:#ffad29; font-weight:600; margin:6px 0 18px; }
+.ob-mission-list{ width:100%; max-width:340px; display:flex; flex-direction:column; gap:8px; margin-bottom:22px; }
+.ob-mission{
+  display:flex; align-items:center; gap:12px; text-align:left;
+  padding:12px 14px; border-radius:12px;
+  background:rgba(255,255,255,.06); border-top:1px solid rgba(255,255,255,.12);
 }
-.ob-finale .ob-prize b{ color:#ffad29; }
+.ob-mission .mi{ font-size:22px; line-height:1; flex-shrink:0; }
+.ob-mission .mt{ flex:1; }
+.ob-mission .mt b{ display:block; font-size:14px; font-weight:600; }
+.ob-mission .mt span{ font-size:12px; color:rgba(255,255,255,.56); }
 `;
 
   /* ──────────────── overlay DOM ──────────────── */
@@ -328,6 +350,11 @@
     const pill = document.querySelector('.bal-pill');
     if (pill) pill.click();
   }
+  function closeBalances() {
+    if (!balancesOpen()) return;
+    const pill = document.querySelector('.bal-pill');
+    if (pill) pill.click();
+  }
 
   /* ──────────────── render / position ──────────────── */
   function reposition() {
@@ -371,21 +398,19 @@
 
   function checkAutoAdvance() {
     if (!current || !current.mark) return;
+    const step = STEPS[current.step];
     const mark = current.mark;
-    // A real outcome tap during the explanatory market tooltips opens the
-    // betslip — jump straight to the betslip/stake tooltip.
-    if (mark.jumpOnBetslip && betslipOpen()) {
-      const step = STEPS[current.step];
-      const i = step.marks.findIndex(m => m.id === 'betslip');
-      if (i >= 0) { mountMark(current.step, i); return; }
+    // In the event walkthrough, tapping any outcome (the betslip opens) means
+    // the user is ready to bet → jump to the top-up / deposit step.
+    if (step.onBetslipGoTo && betslipOpen()) {
+      goToStep(stepIndexById(step.onBetslipGoTo));
+      return;
     }
     const t = mark.trigger;
     if (t === 'deposit' && num('vbet:balance') > current.baseCash) {
       creditFreebet();
       advance();
     } else if (t === 'balancesOpen' && balancesOpen()) {
-      advance();
-    } else if (t === 'betslipOpen' && betslipOpen()) {
       advance();
     } else if (t === 'placedBet' && betsCount() > current.baseBets) {
       writeState({ firstBetIsFreebet: false });
@@ -420,11 +445,11 @@
     return (window.BetslipStore && window.BetslipStore.getCount()) || 0;
   }
 
-  // Reflect the "$5 in freebets" in the balances dropdown the user inspects next.
+  // Reflect the freebet in the balances dropdown the user inspects next.
   function creditFreebet() {
     try {
-      if (num('vbet:bonus') < 5) {
-        localStorage.setItem('vbet:bonus', '5');
+      if (num('vbet:bonus') < FREEBET) {
+        localStorage.setItem('vbet:bonus', String(FREEBET));
         // balance.js listens for this and repaints the bonus / total rows.
         window.dispatchEvent(new CustomEvent('vbet:balance-changed'));
       }
@@ -456,7 +481,7 @@
     const mark = current && current.mark;
     removeScreen();
     advance();
-    // The welcome pop-up's CTA also opens the deposit flow straight away.
+    // The top-up pop-up's CTA also opens the deposit sheet straight away.
     if (mark && mark.id === 'welcome') {
       const plus = document.querySelector('.bal-plus-btn');
       if (plus) plus.click();
@@ -475,6 +500,9 @@
     };
 
     if (mark.fullscreen) { renderScreen(mark); return; }
+
+    // returning to the betslip — close the balances dropdown we opened earlier
+    if (mark.requiresOpen === 'betslip') closeBalances();
 
     // Next button visibility + label
     if (mark.trigger === 'next') {
@@ -502,7 +530,7 @@
       return;
     }
     // step complete
-    if (step.finale) { showFinale(); return; }
+    if (step.finale) { showMissions(); return; }
     goToStep(stepIdx + 1);
   }
 
@@ -554,28 +582,65 @@
   function endTour() {
     teardownVisuals();
     writeState({ active: false });
-    const fin = document.querySelector('.ob-finale');
-    if (fin) fin.remove();
+    const m = document.querySelector('.ob-missions');
+    if (m) m.remove();
   }
 
-  /* ──────────────── finale ──────────────── */
-  function showFinale() {
+  /* ──────────────── missions / congrats screen ──────────────── */
+  // Replaces the old video finale. 6-segment progress ring, 1 filled.
+  function ringSVG() {
+    // r=52, C≈326.73; 6 segments with 8u gaps → each segment ≈ 46.45u.
+    const seg = 46.45, gap = 8, C = 326.73;
+    return '<svg class="ob-ring" viewBox="0 0 128 128">' +
+      '<circle cx="64" cy="64" r="52" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="8" ' +
+        'stroke-dasharray="' + seg + ' ' + gap + '" transform="rotate(-90 64 64)"/>' +
+      '<circle cx="64" cy="64" r="52" fill="none" stroke="#d80d83" stroke-width="8" ' +
+        'stroke-dasharray="' + seg + ' ' + (C - seg) + '" transform="rotate(-90 64 64)" ' +
+        'style="filter:drop-shadow(0 0 6px rgba(216,13,131,.7))"/>' +
+      '<text class="ob-ring-label" x="64" y="62" text-anchor="middle">1/6</text>' +
+      '<text class="ob-ring-sub" x="64" y="80" text-anchor="middle">steps</text>' +
+    '</svg>';
+  }
+  function showMissions() {
     teardownVisuals();
-    if (document.querySelector('.ob-finale')) return;
+    if (document.querySelector('.ob-missions')) return;
+    // Missions: 4 named below. The ring has 6 segments = 1 (first bet, filled)
+    // + 5 missions, but only 4 are named here.
+    // TODO: confirm the 5th mission (design doc suggests "Bet Builder") or
+    // reduce the ring to 5 segments. Do not guess.
+    const MISSIONS = [
+      { i: '🧭', t: 'Navigation', s: 'Find your way around the app' },
+      { i: '🎯', t: 'Markets', s: 'Read and choose betting markets' },
+      { i: '🔴', t: 'Live vs. pre-match', s: 'Bet before or during the match' },
+      { i: '🎲', t: 'Explore different types of bets', s: 'Singles, combos and more' },
+    ];
     const el = document.createElement('div');
-    el.className = 'ob-finale';
+    el.className = 'ob-missions';
     el.innerHTML =
-      '<div class="ob-burst">🎉</div>' +
+      ringSVG() +
       '<h2>Congratulations!</h2>' +
-      '<p>Your first bet is placed on a freebet. You\'re all set.</p>' +
-      '<div class="ob-prize">📺 Watch a quick video on navigating matches &amp; markets to earn another <b>$5 freebet</b>.</div>' +
-      '<button class="ob-fin-cta" type="button">Watch the video</button>' +
-      '<button class="ob-fin-later" type="button">Maybe later</button>';
+      '<p class="ob-sub">Your first bet is placed on a freebet. That\'s step 1 done — keep going to learn the ropes.</p>' +
+      '<div class="ob-carrot">Complete all missions to earn an extra $' + FREEBET + ' bonus</div>' +
+      '<div class="ob-mission-list">' +
+        MISSIONS.map(m => '<div class="ob-mission"><span class="mi">' + m.i + '</span>' +
+          '<span class="mt"><b>' + m.t + '</b><span>' + m.s + '</span></span></div>').join('') +
+      '</div>' +
+      '<button class="ob-cta-lg" type="button">Take me there</button>' +
+      '<button class="ob-link-lg" type="button">At a later time</button>';
     document.body.appendChild(el);
     setTimeout(() => el.classList.add('ob-show'), 20);
-    const finish = () => { writeState({ active: false, done: true }); el.remove(); };
-    el.querySelector('.ob-fin-cta').addEventListener('click', finish);
-    el.querySelector('.ob-fin-later').addEventListener('click', finish);
+    // "Take me there" — missions aren't built; end the tour and drop into the app.
+    el.querySelector('.ob-cta-lg').addEventListener('click', () => {
+      writeState({ active: false, done: true });
+      el.remove();
+      location.href = 'index.html';
+    });
+    // "At a later time" — go home and point at the profile icon.
+    el.querySelector('.ob-link-lg').addEventListener('click', () => {
+      writeState({ step: stepIndexById('missionsLater') });
+      el.remove();
+      location.href = 'index.html';
+    });
   }
 
   /* ──────────────── boot ──────────────── */
@@ -618,7 +683,7 @@
 
     // If the user reached the open-bets page by tapping the clock icon (rather
     // than the tooltip's button), the step is still 'openbets1' — bump it so the
-    // tour continues to the success screen right here.
+    // tour continues to the missions screen right here.
     if (PAGE === 'openbets' && state.step === stepIndexById('openbets1')) {
       state = writeState({ step: stepIndexById('openbets2') });
     }
@@ -642,10 +707,12 @@
     },
     getState: readState,
     update: writeState,
-    // Called by the suggestion popup: lock the picked match and jump to deposit.
+    // Called by the suggestion popup: lock the picked match and go to the match
+    // page (the walkthrough now runs there first — no deposit beforehand).
     beginWalkthrough(pickedMatch) {
-      writeState({ step: stepIndexById('deposit'), pickedMatch: pickedMatch || FALLBACK_MATCH });
-      location.href = 'index.html';
+      const pm = pickedMatch || FALLBACK_MATCH;
+      writeState({ step: stepIndexById('event'), pickedMatch: pm });
+      location.href = pm.href;
     },
     setStep(id) { writeState({ step: stepIndexById(id) }); },
     skip: endTour,
