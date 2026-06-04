@@ -119,7 +119,7 @@
       // a large rich tooltip pointing at the "+" button (dims the rest of the
       // screen). No CTA — the user taps the spotlighted "+".
       { id: 'welcome', target: '.bal-plus-btn', place: 'below', trigger: 'deposit',
-        allowTargetClick: true, rich: true, dim: true,
+        allowTargetClick: true, rich: true, dim: true, scrollTop: true,
         art: '💰', badge: '+$' + FREEBET + ' FREEBET',
         title: "Let's top up your balance to place your bet",
         copy: 'Your first bet is on us! Deposit $' + FREEBET + ' and get $' + FREEBET + ' in freebets.' },
@@ -145,7 +145,7 @@
     // end, just before the success screen.
     { id: 'balanceCheck', page: 'match', marks: [
       { id: 'balPill', target: '.bal-pill', copy: 'Tap to see your balance.',
-        place: 'below', trigger: 'balancesOpen', allowTargetClick: true },
+        place: 'below', trigger: 'balancesOpen', allowTargetClick: true, scrollTop: true },
       { id: 'balCash', target: '[data-bal-cash]', copy: 'This is your cash balance.',
         place: 'below', trigger: 'next', requiresOpen: 'balances' },
       { id: 'balTotal', target: '.bal-bottom-row', copy: 'Here you can see your bonuses and your total balance including bonus.',
@@ -483,6 +483,7 @@
     } else if (t === 'balancesOpen' && balancesOpen()) {
       advance();
     } else if (t === 'placedBet' && betsCount() > current.baseBets) {
+      consumeFreebet();
       writeState({ firstBetIsFreebet: false });
       advance();
     }
@@ -524,6 +525,16 @@
         window.dispatchEvent(new CustomEvent('vbet:balance-changed'));
       }
     } catch (_) {}
+  }
+  // The first bet is placed on the freebet — spend it so the balance actually
+  // moves during onboarding (bonus first; chargeStake is otherwise a no-op
+  // mid-tour). Only the freebet token is consumed, leaving deposited cash.
+  function consumeFreebet() {
+    const s = readState();
+    if (!s || !s.firstBetIsFreebet) return;
+    if (window.Balance && typeof window.Balance.withdraw === 'function') {
+      window.Balance.withdraw(FREEBET);
+    }
   }
 
   /* ──────────────── full-screen pop-up marks ──────────────── */
@@ -573,6 +584,10 @@
 
     // Skip marks whose target doesn't exist (e.g. draw button on 2-way markets).
     if (mark.skipIfMissing && !resolveTarget(mark)) { advance(); return; }
+
+    // The target lives in the (non-sticky) header — jump to the top so the
+    // tooltip isn't stranded off-screen if the user had scrolled down.
+    if (mark.scrollTop) window.scrollTo(0, 0);
 
     // returning to the betslip — close the balances dropdown we opened earlier
     if (mark.requiresOpen === 'betslip') closeBalances();
