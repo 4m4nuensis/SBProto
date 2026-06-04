@@ -228,7 +228,8 @@
 .ob-rich-ttl{ font-size:16px; line-height:21px; font-weight:700; color:#fff; }
 .ob-rich-body{ display:flex; align-items:center; gap:12px; }
 .ob-rich-copy{ flex:1; font-size:13px; line-height:18px; color:rgba(255,255,255,.82); }
-.ob-rich-art-wrap{ flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:6px; }
+.ob-rich-art-wrap{ flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; }
+.ob-rich-art-wrap:active{ transform:scale(.96); }
 .ob-rich-art{
   width:54px; height:54px; border-radius:50%;
   background:radial-gradient(circle at 50% 38%, rgba(216,13,131,.5), rgba(216,13,131,.05) 70%);
@@ -359,6 +360,14 @@
     // dropdown's own click-outside handler (balance.js) would close it the
     // moment the user presses Next.
     tip.addEventListener('click', e => e.stopPropagation());
+    // The rich tooltip's art + badge double as a CTA: on a deposit mark, tapping
+    // them opens the top-up screen (same as tapping the spotlit "+" button).
+    tip.querySelector('.ob-rich-art-wrap').addEventListener('click', () => {
+      const m = current && current.mark;
+      if (!m || (m.trigger !== 'deposit' && m.id !== 'welcome')) return;
+      const plus = document.querySelector('.bal-plus-btn');
+      if (plus) plus.click();
+    });
     skipBtn.addEventListener('click', endTour);
     nextBtn.addEventListener('click', () => advance());
     window.addEventListener('resize', reposition, { passive: true });
