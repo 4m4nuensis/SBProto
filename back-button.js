@@ -33,8 +33,24 @@
 .back-btn:hover{background:var(--w-12)}
 .back-btn:active{background:var(--w-16)}
 .back-btn svg{width:16px;height:16px;display:block}
+/* When the page has a "My Zone" row, the back button is hoisted into it at the
+   far left (before the search button); let the My Zone pill shrink to fit. */
+.subnav:has(> .back-btn) .my-zone{flex:1 1 auto;width:auto;min-width:0}
 `;
   document.head.appendChild(style);
+
+  /* Hoist the back button up to the top, immediately left of the search
+   * button in the "My Zone" subnav, on any page that has that row. Pages
+   * without a subnav (e.g. open-bets) keep the back button where it is. */
+  function relocate() {
+    var subnav = document.querySelector('.subnav');
+    if (!subnav) return;
+    var back = document.querySelector('.back-btn');
+    if (!back || subnav.contains(back)) return;
+    subnav.insertBefore(back, subnav.firstChild);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', relocate);
+  else relocate();
 
   /* Prefer real browser-history back over the static href. We only step
    * back when the previous entry is same-origin (document.referrer) so we

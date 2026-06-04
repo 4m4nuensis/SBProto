@@ -246,55 +246,73 @@ img,svg{display:block;max-width:100%}
 
 </div>
 
+<script>
+/* Demo: starting onboarding resets the wallet — $0 balance, no bonus, empty
+ * betslip and no open bets — so the guided first bet always begins from scratch.
+ * (The onboarding tour state itself is managed by onboarding.js, not cleared here.) */
+(function () {
+  try { ['vbet:balance', 'vbet:bonus', 'vbet:bets', 'vbet:drafts'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
+})();
+</script>
+<script src="data/catalog.js"></script>
 <script src="logo.js"></script>
 <script src="betslip-store.js"></script>
 <script src="onboarding.js"></script>
 <script>
 (function () {
-  /* ── data ── */
-  const SPORTS = [
-    { key:'football',    emoji:'⚽', name:'Football' },
-    { key:'basketball',  emoji:'🏀', name:'Basketball' },
-    { key:'tennis',      emoji:'🎾', name:'Tennis' },
-    { key:'baseball',    emoji:'⚾', name:'Baseball' },
-    { key:'amfootball',  emoji:'🏈', name:'Am. Football' },
-    { key:'hockey',      emoji:'🏒', name:'Hockey' },
-    { key:'boxing',      emoji:'🥊', name:'Boxing' },
-    { key:'tabletennis', emoji:'🏓', name:'Table Tennis' },
-  ];
-  // Football teams are the real names used by the match detail pages, so the
-  // suggestion step can map a chosen team to a real event. Other sports are
-  // cosmetic (no detail pages exist for them in this prototype).
-  const TEAMS_BY_SPORT = {
-    football:   ['Arsenal','Chelsea','Liverpool','Manchester City','Manchester United','Aston Villa','Newcastle United','Fulham','Real Madrid','Barcelona'],
-    basketball: ['Lakers','Celtics','Warriors','Bulls','Heat'],
-    tennis:     ['Djokovic','Alcaraz','Sinner','Swiatek'],
-    baseball:   ['Yankees','Dodgers','Red Sox'],
-    amfootball: ['Chiefs','49ers','Cowboys','Eagles'],
-    hockey:     ['Maple Leafs','Rangers','Bruins'],
-    boxing:     ['Canelo','Fury','Joshua'],
-    tabletennis:['Ma Long','Fan Zhendong'],
+  /* ── data — derived entirely from the shared catalog (data/catalog.js) so the
+     offered sports, leagues, teams and the suggested matches always match the
+     "backend table". No more hardcoded stock football list. ── */
+  const D = window.VBET_DATA;
+  const SPORT_EMOJI = {
+    football:'⚽', basketball:'🏀', tennis:'🎾', hockey:'🏒',
+    baseball:'⚾', boxing:'🥊', amfootball:'🏈',
   };
-  // Section A — major competitions & national leagues (incl. world championships).
-  // "Premier League" / "FA Cup" match the catalog leagues, so they sharpen ranking.
-  const COMPS_BY_SPORT = {
-    football:   ['Champions League','Premier League','La Liga','Bundesliga','Serie A','FA Cup','FIFA World Cup','UEFA Euro'],
-    basketball: ['NBA','EuroLeague','FIBA World Cup'],
-    tennis:     ['Grand Slams','ATP Tour','WTA Tour'],
-    baseball:   ['MLB','World Series'],
-    amfootball: ['NFL','Super Bowl'],
-    hockey:     ['NHL','IIHF Worlds'],
-    boxing:     ['World Championship'],
-    tabletennis:['ITTF World Tour'],
-  };
-  // Each suggestion maps to a real prematch detail page.
-  const MATCH_CATALOG = [
-    { id:'80203', href:'prematch-match-80203.html', home:'Arsenal',     away:'Man United', teams:['Arsenal','Manchester United'],     league:'Premier League', when:'26 May · 21:00', o:[2.10,3.40,3.20] },
-    { id:'80201', href:'prematch-match-80201.html', home:'Man City',    away:'Chelsea',    teams:['Manchester City','Chelsea'],       league:'Premier League', when:'25 May · 15:00', o:[1.25,3.64,8.40] },
-    { id:'80202', href:'prematch-match-80202.html', home:'Aston Villa', away:'Liverpool',  teams:['Aston Villa','Liverpool'],         league:'Premier League', when:'26 May · 18:30', o:[3.60,3.30,2.05] },
-    { id:'80204', href:'prematch-match-80204.html', home:'Fulham',      away:'Newcastle',  teams:['Fulham','Newcastle United'],       league:'Premier League', when:'27 May · 17:30', o:[1.85,3.50,4.10] },
-    { id:'80302', href:'prematch-match-80302.html', home:'Liverpool',   away:'Arsenal',    teams:['Liverpool','Arsenal'],             league:'FA Cup',         when:'29 May · 19:45', o:[2.20,3.30,3.10] },
-  ];
+  // Sports the catalog actually carries, in declaration order.
+  const SPORTS = Object.keys(D.sports).map(key => ({
+    key, emoji: SPORT_EMOJI[key] || '•', name: D.sports[key].name,
+  }));
+  // Competitions & teams per sport, read straight from the catalog. Team and
+  // league names are the exact strings used by match.html, so a picked
+  // team/league maps directly to a real event when we rank suggestions.
+  const COMPS_BY_SPORT = {};
+  const TEAMS_BY_SPORT = {};
+  SPORTS.forEach(s => {
+    COMPS_BY_SPORT[s.key] = D.leaguesForSport(s.key).map(l => l.name);
+    const seen = {}, teams = [];
+    D.bySport(s.key).forEach(m => {
+      [m.home.short, m.away.short].forEach(nm => {
+        if (!seen[nm]) { seen[nm] = 1; teams.push(nm); }
+      });
+    });
+    TEAMS_BY_SPORT[s.key] = teams.slice(0, 20);   // keep the bubble grid manageable
+  });
+
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function whenText(m) {
+    if (m.status === 'live') return 'Live now';
+    const [date, time] = m.start.split('T');
+    const d = date.split('-');
+    return (+d[2]) + ' ' + MONTHS[(+d[1]) - 1] + ' · ' + (time || '').slice(0, 5);
+  }
+  function matchOdds(m) {
+    const a = m.anchor;
+    return a.x != null
+      ? [['1', a['1']], ['X', a['x']], ['2', a['2']]]
+      : [['1', a['1']], ['2', a['2']]];
+  }
+  // Every catalog match is a potential suggestion — across every sport, not just
+  // football. Ranking (rankMatches) decides which surface to the top.
+  const MATCH_CATALOG = D.matches.map(m => {
+    const lg = D.getLeague(m.league) || {};
+    return {
+      id: m.id, href: 'match.html?id=' + m.id,
+      home: m.home.short, away: m.away.short,
+      teams: [m.home.short, m.away.short],
+      league: lg.name || '', sport: m.sport, status: m.status,
+      when: whenText(m), odds: matchOdds(m),
+    };
+  });
 
   const Tour = window.OnboardingTour;
   const state = (Tour && Tour.start()) || {};
@@ -391,6 +409,18 @@ img,svg{display:block;max-width:100%}
     if (i === 2) renderQ3();
   }
   cta.addEventListener('click', () => {
+    // On the very first screen, a user who picks Casino (and not Sportsbook)
+    // isn't here for a first bet — drop them straight into the casino home and
+    // stop the onboarding tour.
+    if (slide === 0) {
+      const wantsCasino = prefs.interests.indexOf('casino') !== -1;
+      const wantsSports = prefs.interests.indexOf('sportsbook') !== -1;
+      if (wantsCasino && !wantsSports) {
+        if (Tour) Tour.skip();
+        location.href = 'home.html';
+        return;
+      }
+    }
     if (slide < 2) show(slide + 1);
     else openSuggestions();
   });
@@ -399,13 +429,20 @@ img,svg{display:block;max-width:100%}
   skipTop.addEventListener('click', skipGallery);
 
   /* ── Step 2: match suggestion popup ── */
+  // Score each catalog match against what the user actually picked: a chosen
+  // team is the strongest signal, then league, then just the sport. Prematch
+  // games edge out live ones on ties for a cleaner first-bet experience.
   function rankMatches() {
-    const teamPicks = prefs.teams || [];
-    const compPicks = prefs.comps || [];
+    const teamPicks  = prefs.teams  || [];
+    const compPicks  = prefs.comps  || [];
+    const sportPicks = prefs.sports || [];
     return MATCH_CATALOG
       .map(m => {
-        let score = m.teams.reduce((n, t) => n + (teamPicks.indexOf(t) !== -1 ? 1 : 0), 0);
-        if (compPicks.indexOf(m.league) !== -1) score += 1;
+        let score = 0;
+        m.teams.forEach(t => { if (teamPicks.indexOf(t) !== -1) score += 4; });
+        if (compPicks.indexOf(m.league) !== -1) score += 2;
+        if (sportPicks.indexOf(m.sport) !== -1) score += 1;
+        if (m.status === 'prematch') score += 0.5;
         return { m, score };
       })
       .sort((a, b) => b.score - a.score)
@@ -422,9 +459,7 @@ img,svg{display:block;max-width:100%}
          <div class="m-top"><span class="m-league">${m.league}</span><span class="m-when">${m.when}</span></div>
          <div class="m-teams">${m.home}<span class="vs">vs</span>${m.away}</div>
          <div class="m-odds">
-           <span class="o"><span class="l">1</span><span class="v">${m.o[0].toFixed(2)}</span></span>
-           <span class="o"><span class="l">X</span><span class="v">${m.o[1].toFixed(2)}</span></span>
-           <span class="o"><span class="l">2</span><span class="v">${m.o[2].toFixed(2)}</span></span>
+           ${m.odds.map(o => `<span class="o"><span class="l">${o[0]}</span><span class="v">${o[1].toFixed(2)}</span></span>`).join('')}
          </div>
        </div>`).join('');
     // Pre-select the top suggestion so Continue is always actionable — the user
@@ -449,8 +484,8 @@ img,svg{display:block;max-width:100%}
     if (Tour) Tour.beginWalkthrough(entry);
     else location.href = m.href;
   }
-  document.getElementById('popCta').addEventListener('click', () => go(picked || MATCH_CATALOG[0]));
-  document.getElementById('popSkip').addEventListener('click', () => go(MATCH_CATALOG[0]));
+  document.getElementById('popCta').addEventListener('click', () => go(picked || rankMatches()[0]));
+  document.getElementById('popSkip').addEventListener('click', () => go(picked || rankMatches()[0]));
 
   /* ── init ── */
   show(0);

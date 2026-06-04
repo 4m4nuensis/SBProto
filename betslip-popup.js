@@ -201,11 +201,11 @@ body.bsp-open .sln-group{
   let placingTimer = null;
 
   /* ──────────────── helpers ──────────────── */
-  const ODD_SELECTOR = '.bet-opt, .gw-bet-opt, .to-bet-opt, .opt';
+  const ODD_SELECTOR = '.bet-opt, .gw-bet-opt, .to-bet-opt, .opt, .cell';
   const CONTEXT_SELECTOR =
     '.event-card, .match-card, .gw-match-box, .gw-live-card, ' +
     '.banner-card, .to-card, .ev-body, .match-row, ' +
-    '.sg-info, .game-info, .pg-event, .pg-card';
+    '.sg-info, .game-info, .pg-event, .pg-card, .market';
 
   function parseOdds(str) {
     if (!str) return 0;
@@ -284,10 +284,11 @@ body.bsp-open .sln-group{
     else if (/^x$/i.test(label)) selection = 'Draw';
     else selection = label || 'Selection';
 
+    const marketTitle = oddBtn.closest('.market')?.querySelector('.title')?.textContent?.trim() || 'Match Result';
     return {
       selection,
       odds,
-      market: 'Match Result',
+      market: marketTitle,
       teams: `${home} - ${away}`,
     };
   }

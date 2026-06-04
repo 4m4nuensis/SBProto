@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>VBet — Match</title>
+<!-- dynamic match detail page; data from data/catalog.js -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#010c23;
+  --bg-60:rgba(1,12,35,.6);
+  --bg-64:rgba(1,12,35,.64);
+  --main:#d80d83;
+  --main-40:rgba(216,13,131,.4);
+  --odds:#ffad29;
+  --green:#249f58;
+  --red:#b4132b;
+  --yellow-card:#ffad29;
+  --w-100:#fff;
+  --w-90:rgba(255,255,255,.9);
+  --w-80:rgba(255,255,255,.8);
+  --w-72:rgba(255,255,255,.72);
+  --w-64:rgba(255,255,255,.64);
+  --w-56:rgba(255,255,255,.56);
+  --w-48:rgba(255,255,255,.48);
+  --w-32:rgba(255,255,255,.32);
+  --w-24:rgba(255,255,255,.24);
+  --w-16:rgba(255,255,255,.16);
+  --w-12:rgba(255,255,255,.12);
+  --w-8:rgba(255,255,255,.08);
+  --w-6:rgba(255,255,255,.06);
+  --w-4:rgba(255,255,255,.04);
+  --w-2:rgba(255,255,255,.02);
+  --d-16:rgba(0,2,5,.16);
+  --d-24:rgba(0,2,5,.24);
+  --d-32:rgba(0,2,5,.32);
+  --d-40:rgba(0,2,5,.4);
+  --d-56:rgba(0,2,5,.56);
+  --d-80:rgba(0,2,5,.8);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:#010c23;font-family:'Rubik',system-ui,-apple-system,sans-serif;color:var(--w-100);font-size:14px;line-height:20px;letter-spacing:0}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+.app{width:100%;max-width:440px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;padding-bottom:114px;overflow-x:hidden}
+
+/* status bar */
+.statusbar{position:relative;height:40px;width:100%;background:var(--bg)}
+
+/* header */
+.header-bar{
+  width:100%;padding:8px 8px 8px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(90deg,var(--w-8) 0%,var(--w-8) 100%),linear-gradient(90deg,var(--bg-60) 0%,var(--bg-60) 100%);
+  backdrop-filter:blur(21px);filter:drop-shadow(0 4px 4px rgba(0,0,0,.4));
+}
+.header-bar .logo-wrap{width:75px;height:32px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.header-bar .vbet{width:56px;height:16px;display:block}
+.header-bar .right{display:flex;align-items:center;gap:4px;position:relative}
+.icon-btn-pink{width:32px;height:32px;border-radius:999px;background:var(--main);display:flex;align-items:center;justify-content:center;border-top:1px solid var(--w-24);overflow:hidden}
+.icon-btn-pink img{width:16px;height:16px}
+.icon-btn-ghost{width:32px;height:32px;border-radius:999px;background:var(--w-8);display:flex;align-items:center;justify-content:center;border-top:1px solid var(--w-16);overflow:hidden}
+.icon-btn-ghost img{width:16px;height:16px}
+.balance{height:32px;border-radius:88px;background:var(--w-8);display:flex;align-items:center;gap:4px;padding:0 8px}
+.balance .plus{width:16px;height:16px}
+.balance .amt{font-size:12px;line-height:16px;color:var(--w-100);white-space:nowrap}
+.balance .cur{width:12px;height:12px}
+.header-bar .notif-dot{position:absolute;left:193px;top:0;width:8px;height:8px}
+
+/* my zone */
+.subnav{width:100%;padding:12px 8px;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--w-4);backdrop-filter:blur(4px)}
+.subnav .my-zone{
+  flex:none;width:279px;height:32px;border:1px solid var(--main-40);border-radius:32px;
+  display:flex;align-items:center;justify-content:space-between;padding:4px 16px;
+  background:radial-gradient(ellipse 150px 8px at center bottom, rgba(216,13,131,0.4), transparent 70%);
+}
+.subnav .my-zone .label{font-size:14px;line-height:20px;color:var(--w-72)}
+.subnav .my-zone .stats{display:flex;align-items:center;gap:8px}
+.subnav .my-zone .stat{display:flex;align-items:center;gap:2px}
+.subnav .my-zone .stat img{width:16px;height:16px;display:block}
+.subnav .my-zone .stat .num{background:var(--d-40);border-radius:8px;width:20px;height:16px;display:flex;align-items:center;justify-content:center;font-size:12px;line-height:16px;color:var(--w-72)}
+.subnav .my-zone .divider{height:16px;width:1px;background:var(--w-16)}
+
+/* breadcrumb */
+.crumb-bar{padding:6px 12px 0;font-size:12px;line-height:16px;color:var(--w-56);letter-spacing:.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ====== LIVE EVENT HEADER CARD ====== */
+.event-wrap{padding:8px}
+.event-card{position:relative;border-radius:8px;overflow:hidden}
+.event-top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px;background:var(--w-4);
+  border-radius:8px 8px 0 0;
+}
+.event-top .back-btn{width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--w-80)}
+.event-top .back-btn svg{width:20px;height:20px}
+.seg{
+  background:var(--bg);padding:4px;border-radius:999px;
+  display:flex;align-items:center;gap:4px;
+}
+.seg-item{
+  height:28px;padding:4px 10px;border-radius:32px;
+  font-size:12px;line-height:16px;letter-spacing:.4px;color:var(--w-48);
+  display:flex;align-items:center;justify-content:center;white-space:nowrap;
+}
+.seg-item.active{background:var(--w-4);border:1px solid var(--w-4);color:var(--w-90)}
+.event-top .icons{display:flex;align-items:center;gap:4px}
+.event-top .icbtn{width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--w-72)}
+.event-top .icbtn svg{width:12px;height:12px}
+
+.event-main{
+  position:relative;min-height:140px;padding:16px 12px 8px;
+  display:flex;flex-direction:column;gap:8px;
+  background:url('assets/sew-bg.png') center/cover no-repeat;
+}
+.event-main::before{
+  content:"";position:absolute;inset:0;
+  backdrop-filter:blur(8px);
+  background:rgba(0,2,5,.32);
+  z-index:0;
+}
+.event-main > *{position:relative;z-index:1}
+
+.teams-row{display:flex;align-items:center;justify-content:center;width:100%}
+.team-block{flex:0 0 120px;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative}
+.team-block .logo{width:56px;height:56px;display:flex;align-items:center;justify-content:center}
+.team-block .logo img{width:100%;height:100%;object-fit:contain}
+.team-block .logo.ph{
+  border-radius:50%;background:var(--w-8);border:1px solid var(--w-16);
+  font-size:16px;font-weight:600;color:var(--w-80);letter-spacing:.5px;
+}
+.team-block .name{
+  font-size:14px;line-height:20px;font-weight:500;color:var(--w-100);text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;
+}
+.team-block .fav{
+  position:absolute;top:0;width:24px;height:24px;border-radius:4px;background:var(--w-8);
+  display:flex;align-items:center;justify-content:center;color:var(--w-80);
+}
+.team-block.left .fav{left:0}
+.team-block.right .fav{right:0}
+.team-block .fav svg{width:12px;height:12px}
+
+.score-pill{flex:0 0 96px;padding-top:8px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-pill .inner{
+  width:auto;padding:8px;border-radius:8px;background:var(--d-16);backdrop-filter:blur(6px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+}
+.score-pill .time{font-size:12px;line-height:16px;letter-spacing:.4px;color:var(--w-72);white-space:nowrap}
+.score-pill .score{font-size:18px;line-height:24px;font-weight:600;color:var(--w-100);white-space:nowrap}
+
+/* stats footer row inside event card */
+.event-stats{display:flex;gap:2px;align-items:stretch;width:100%}
+.event-stats .stats-left,
+.event-stats .stats-right{
+  flex:1;min-width:0;padding:6px 16px 6px 16px;
+  backdrop-filter:blur(6px);background:var(--d-24);
+  display:flex;flex-direction:column;justify-content:center;gap:0;
+}
+.event-stats .stats-left{border-radius:0 0 0 8px;padding-right:8px;padding-left:16px}
+.event-stats .stats-right{border-radius:0 0 8px 0;justify-content:flex-end}
+.stats-line{display:flex;align-items:center;gap:4.5px;height:14px}
+.stat-cell{display:flex;align-items:center;gap:2px}
+.stat-cell .ico{width:13px;height:13px;display:flex;align-items:center;justify-content:center}
+.card{height:10.8px;width:7.5px;border-radius:1.75px}
+.card.yellow{background:var(--yellow-card)}
+.card.red{background:var(--red)}
+.card.outline{width:9.7px;height:9.7px;border-radius:50%;border:1.2px solid var(--w-72);background:transparent}
+.stat-cell .num{font-size:10px;line-height:13.3px;letter-spacing:.4px;color:var(--w-72)}
+.event-stats .shirts{
+  flex:none;padding:8px;backdrop-filter:blur(6px);background:var(--d-32);
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;width:32px;
+}
+.event-stats .shirts .shirt{width:12px;height:12px;color:var(--w-72)}
+.event-stats .shirts .shirt svg{width:100%;height:100%}
+.event-stats .scores-cells{display:flex;align-items:center;gap:12px}
+.scores-cells .col{display:flex;flex-direction:column;gap:2px;font-size:10px;line-height:14px;color:var(--w-56);text-align:center}
+.scores-cells .col.active{
+  background:var(--w-8);border:1px solid var(--w-8);
+  font-weight:600;color:var(--w-100);padding:0 4px;height:30px;border-radius:4px;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+}
+
+/* ====== BET INSIGHTS ROW ====== */
+.section-pad{padding:8px}
+.bet-insights{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 8px 8px 12px;background:var(--w-4);
+  border:1px solid var(--w-8);border-radius:4px;
+}
+.bet-insights .label{font-size:14px;line-height:20px;color:var(--w-80)}
+.bet-insights .plus-btn{width:24px;height:24px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--w-80)}
+.bet-insights .plus-btn svg{width:16px;height:16px}
+
+/* ====== MARKETS TABS ====== */
+.tabs-row{display:flex;align-items:center;gap:4px;padding:8px 8px 4px;overflow-x:auto;scrollbar-width:none}
+.tabs-row::-webkit-scrollbar{display:none}
+.market-tab{flex:none;height:32px;padding:8px 12px;border-radius:999px;font-size:12px;line-height:16px;color:var(--w-56);white-space:nowrap}
+.market-tab.active{background:var(--w-8);color:var(--w-100)}
+
+/* ====== MARKETS LIST ====== */
+.markets{padding:0 8px;display:flex;flex-direction:column;gap:4px}
+.market{
+  background:var(--w-4);border:1px solid var(--w-8);border-radius:4px;
+  padding:8px;display:flex;flex-direction:column;gap:12px;
+}
+.market .title-row{display:flex;align-items:center;justify-content:space-between;width:100%;cursor:pointer;user-select:none}
+.market .title-row .left{display:flex;align-items:center;gap:4px;flex:1;min-width:0}
+.market .pin{width:24px;height:24px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--w-72)}
+.market .pin svg{width:16px;height:16px}
+.market .title{font-size:14px;line-height:20px;color:var(--w-90);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.market .badge{font-size:10px;line-height:14px;letter-spacing:.4px;font-weight:500;background:var(--main);color:#fff;padding:1px 6px;border-radius:999px;flex:none}
+.market .chev{width:24px;height:24px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--w-72);transition:transform .18s ease}
+.market .chev svg{width:16px;height:16px}
+.market.collapsed .chev{transform:rotate(180deg)}
+.market.collapsed{gap:0;padding:10px 8px 10px 12px}
+.market.collapsed .body{display:none}
+.market .body{display:flex;flex-direction:column;gap:6px}
+
+/* 1×N option row */
+.market .opts{display:flex;gap:6px;width:100%}
+.market .opt{
+  flex:1;min-width:0;background:var(--w-4);border:1px solid var(--w-4);
+  border-radius:4px;padding:8px 12px;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.market .opt.col{flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px 8px}
+.market .opt .l{font-size:12px;line-height:16px;color:var(--w-48)}
+.market .opt .o{font-size:14px;line-height:20px;color:var(--odds);font-weight:500}
+.market .opt.selected{background:var(--main);border-color:var(--main)}
+.market .opt.selected .l,
+.market .opt.selected .o{color:#fff}
+
+/* Table style */
+.market .otbl{display:grid;width:100%;gap:4px;font-size:13px;line-height:16px}
+.market .otbl.cols-2{grid-template-columns:1fr 1fr}
+.market .otbl.cols-3{grid-template-columns:48px 1fr 1fr}
+.market .otbl.cols-3w{grid-template-columns:1fr 1fr 1fr}
+.market .otbl.cols-4{grid-template-columns:48px 1fr 1fr 1fr}
+.market .otbl .h{padding:8px 4px;text-align:center;color:var(--w-56);background:var(--w-4);border-radius:4px}
+.market .otbl .lbl{padding:10px 4px;text-align:center;color:var(--w-56);background:var(--w-4);border-radius:4px;display:flex;align-items:center;justify-content:center}
+.market .otbl .cell{
+  padding:10px 12px;background:var(--w-4);border:1px solid var(--w-4);border-radius:4px;
+  display:flex;align-items:center;justify-content:flex-end;
+  color:var(--odds);font-weight:500;font-size:14px;cursor:pointer;
+}
+.market .otbl .cell.center{justify-content:center}
+.market .otbl .cell.lr{justify-content:space-between}
+.market .otbl .cell.lr .lbl-inline{color:var(--w-56);font-size:12px;font-weight:400}
+.market .otbl .cell.selected{background:var(--main);border-color:var(--main);color:#fff}
+
+/* ====== PLACEHOLDER ====== */
+.placeholder-section{margin:24px 8px;padding:16px;border-radius:12px;background:var(--w-4);border:1px dashed var(--w-12);color:var(--w-48);font-size:12px;text-align:center}
+
+/* nav styles live in nav.js */
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Status Bar -->  <!-- Header -->
+  <div class="header-bar">
+    <div class="logo-wrap"><span data-app-logo></span></div>
+    <div class="right">
+      <button class="icon-btn-pink"><img src="assets/cd2ab15627e314b76cd18186ac8debb1e046753b.svg" alt=""></button>
+      <div class="balance">
+        <img class="plus" src="assets/fba9a203cde61becd3d03a28733eed924695e9e6.svg" alt="">
+        <span class="amt">2 000 000.50</span>
+        <img class="cur" src="assets/dcbe03fff8b7bff8da30b22defa876253b4ed716.svg" alt="">
+      </div>
+      <button class="icon-btn-ghost"><img src="assets/c51db1de3442902710310b7f412f5e50bf258747.svg" alt=""></button>
+      <img class="notif-dot" src="assets/3bfbd9ba21a63ae47aae5835471dcaa057683d29.svg" alt="">
+    </div>
+  </div>
+
+  <!-- My Zone -->
+  <div class="subnav">
+    <button class="icon-btn-ghost"><img src="assets/a60c35b6330c349df1b28504b4e27f90d97d172a.svg" alt=""></button>
+    <div class="my-zone">
+      <span class="label">My Zone</span>
+      <div class="stats">
+        <div class="stat"><img src="assets/8870c8992c4849c49f96ffb9b4eb1a7d18919ada.svg" alt=""><div class="num">3</div></div>
+        <div class="divider"></div>
+        <div class="stat"><img src="assets/acd11b20fb2060636db862fa9127aba4208a4c74.svg" alt=""><div class="num">2</div></div>
+        <div class="divider"></div>
+        <div class="stat"><img src="assets/80e95aa265f716d0508b727c0f4d19dede41ec35.svg" alt=""><div class="num">2</div></div>
+      </div>
+    </div>
+    <button class="icon-btn-ghost"><img src="assets/f37caf38309d5f5ce34bd17d34b049ca71fb945f.svg" alt=""></button>
+  </div>
+
+  <!-- Breadcrumb (sport · region · league) -->
+  <div class="crumb-bar"><span id="event-crumb"></span></div>
+
+  <!-- Live Event Header Card -->
+  <div class="event-wrap">
+    <div class="event-card">
+      <div class="event-top">
+        <a class="back-btn" href="live.html" aria-label="back">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5l-5 5 5 5"/></svg>
+        </a>
+        <div class="seg">
+          <button class="seg-item active">Event</button>
+          <button class="seg-item">Live</button>
+          <button class="seg-item">Live View</button>
+          <button class="seg-item">Stats</button>
+        </div>
+        <div class="icons">
+          <button class="icbtn" aria-label="bell"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M6 1.5a3 3 0 0 0-3 3v1.5L2 7.5h8L9 6V4.5a3 3 0 0 0-3-3zM4.5 9a1.5 1.5 0 0 0 3 0"/></svg></button>
+          <button class="icbtn" aria-label="favorite"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M6 1.5l1.4 3 3.3.4-2.5 2.3.7 3.2L6 8.7 3.1 10.4l.7-3.2L1.3 4.9l3.3-.4z"/></svg></button>
+        </div>
+      </div>
+      <!-- filled by match-render.js -->
+      <div class="event-main" id="event-main"></div>
+    </div>
+  </div>
+
+  <!-- Bet Insights -->
+  <div class="section-pad">
+    <div class="bet-insights">
+      <span class="label">Bet-Insights</span>
+      <button class="plus-btn" aria-label="expand">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M3 8h10"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Markets Tabs (filled by match-render.js) -->
+  <div class="tabs-row" id="market-tabs"></div>
+
+  <!-- Markets List (filled by match-render.js) -->
+  <div class="markets" id="markets"></div>
+
+  <div class="placeholder-section">Footer — payments, regulations, partners, app stores, Hoory AI<br>(approximated — reuses home page footer)</div>
+
+</div><!-- /.app -->
+
+<div id="app-nav" data-page="live"></div>
+<script src="data/catalog.js"></script>
+<script src="match-render.js"></script>
+<script src="betslip-store.js"></script>
+<script src="balance.js"></script>
+<script src="logo.js"></script>
+<script src="nav.js"></script>
+<script src="back-button.js"></script>
+<script src="betslip-popup.js"></script>
+<script src="onboarding.js"></script>
+
+</body>
+</html>

@@ -189,6 +189,28 @@ ${page !== 'casino' ? `<div class="sln-group">
   <div class="home-indicator"></div>
 </div>`;
 
+  /* ─── clock / ticket act as toggles ─────────────────────────────────────
+   * Tapping opens the screen; tapping again while already on it closes it
+   * (steps back to where you came from, falling back to the sport home). */
+  (function () {
+    function currentFile() { return (location.pathname.split('/').pop() || 'index.html'); }
+    function closeScreen(e) {
+      e.preventDefault();
+      if (history.length > 1) history.back();
+      else location.href = 'index.html';
+    }
+    var OPEN_BETS = ['open-bets.html'];
+    var BETSLIP = ['betslip.html', 'betslip-multiple.html', 'betslip-open-bets.html'];
+    var clock = document.querySelector('.sln-clock[data-bs-clock]');
+    if (clock) clock.addEventListener('click', function (e) {
+      if (OPEN_BETS.indexOf(currentFile()) !== -1) closeScreen(e);
+    });
+    var ticket = document.querySelector('.sln-ticket[data-bs-ticket]');
+    if (ticket) ticket.addEventListener('click', function (e) {
+      if (BETSLIP.indexOf(currentFile()) !== -1) closeScreen(e);
+    });
+  })();
+
   /* ─── live update badge when DRAFTS change ──────────────────────────────── */
   if (window.BetslipStore) {
     let lastDraftCount = window.BetslipStore.getDraftCount();

@@ -663,6 +663,14 @@ a{color:inherit;text-decoration:none}
 </div><!-- /.app -->
 
 <div id="app-nav" data-page="casino"></div>
+<script>
+/* Demo: every fresh launch of the casino home starts clean — $0 balance,
+ * no bonus, empty betslip and no open bets. (Runs before balance.js /
+ * betslip-store.js; onboarding tour state is left untouched.) */
+(function () {
+  try { ['vbet:balance', 'vbet:bonus', 'vbet:bets', 'vbet:drafts'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
+})();
+</script>
 <script src="betslip-store.js"></script>
 <script src="balance.js"></script>
 <script src="logo.js"></script>

@@ -30,7 +30,7 @@
 
   const KEY = 'vbet:onboarding';
   const EVT = 'vbet:onboarding-changed';
-  const FALLBACK_MATCH = { id: '80201', href: 'prematch-match-80201.html', label: 'Man City vs Chelsea' };
+  const FALLBACK_MATCH = { id: '80201', href: 'match.html?id=80201', label: 'Man City vs Chelsea' };
   // TODO: confirm with the team — the welcome offer is now $10 deposit → $10 freebet
   // (was $5/$5). This is the credited bonus value, not just copy.
   const FREEBET = 10;
@@ -63,7 +63,8 @@
     if (file.indexOf('onboarding-preferences') === 0) return 'prefs';
     // both the 1-tab (open-bets.html) and 2-tab (betslip-open-bets.html) screens
     if (file.indexOf('open-bets') === 0 || file.indexOf('betslip-open-bets') === 0) return 'openbets';
-    if (/-match-\d+\.html$/.test(file)) return 'match';
+    // the dynamic match detail page (match.html?id=…); plus the old per-match files
+    if (file.indexOf('match.html') === 0 || /-match-\d+\.html$/.test(file)) return 'match';
     if (file === '' || file === 'index.html') return 'home';
     const nav = document.getElementById('app-nav');
     if (nav && nav.dataset.page === 'home') return 'home';
@@ -94,18 +95,15 @@
     { id: 'suggest',  page: 'prefs',    screen: true },
 
     // The match page is walked through FIRST — no deposit before this.
+    // Targets the first market generically (it's the result/money-line market
+    // for every sport) so the walkthrough works whether it's a 3-way (1/X/2)
+    // football game or a 2-way basketball/tennis match.
     { id: 'event',    page: 'match', onBetslipGoTo: 'deposit', marks: [
       { id: 'intro', target: '.event-card', copy: "This is your match screen — here you'll find the teams playing, kick-off time and key events that you can bet on.",
         place: 'below', trigger: 'next' },
-      { id: 'market', target: '.market[data-market="match-result"] .title', copy: "Let's try placing a bet on a match outcome — choose the team that you think will win.",
+      { id: 'market', target: '#markets .market:first-child .title', copy: "Let's try placing a bet — this is the main market. Pick the outcome you think will happen.",
         place: 'below', trigger: 'next' },
-      { id: 'out1', target: '.market[data-market="match-result"] .opts .opt:nth-child(1)', copy: 'Tap here if you believe {home} wins.',
-        place: 'below', trigger: 'next', allowTargetClick: true },
-      { id: 'outX', target: '.market[data-market="match-result"] .opts .opt:nth-child(2)', copy: "Tap here if you think it'll be a draw.",
-        place: 'below', trigger: 'next', allowTargetClick: true },
-      { id: 'out2', target: '.market[data-market="match-result"] .opts .opt:nth-child(3)', copy: 'Tap here if you believe {away} wins.',
-        place: 'below', trigger: 'next', allowTargetClick: true },
-      { id: 'oddsSummary', target: '.market[data-market="match-result"] .opts', copy: 'Tap on the outcome you want to bet on.',
+      { id: 'oddsSummary', target: '#markets .market:first-child .opts', copy: 'Tap on the outcome you want to bet on.',
         place: 'below', trigger: 'tapOutcome', allowTargetClick: true },
     ] },
 
@@ -616,6 +614,10 @@
 
   function onPickedMatch(state) {
     const picked = (state && state.pickedMatch) || FALLBACK_MATCH;
+    // The dynamic page identifies the match by ?id=… , not by filename.
+    const here = new URLSearchParams(location.search || '').get('id');
+    if (here && picked.id) return String(here) === String(picked.id);
+    // Legacy per-match file fallback.
     const path = (location.pathname || '').toLowerCase();
     return path.indexOf(picked.href.toLowerCase()) !== -1;
   }
