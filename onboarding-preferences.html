@@ -58,7 +58,10 @@ img,svg{display:block;max-width:100%}
 /* ── slides ── */
 /* the questions area scrolls so tall content (Q3) never pushes the footer
    off-screen on small phones */
-.ob-slides{flex:1;min-height:0;display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch}
+/* centre the active slide in the available space so tall screens (e.g. Pixel
+   Pro XL) don't leave a giant void below the cards; `safe` keeps tall content
+   (Q3) scrollable from the top instead of clipping it */
+.ob-slides{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:safe center;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .ob-slide{display:none;flex-direction:column;gap:6px;padding-bottom:8px;animation:obIn .28s ease}
 .ob-slide.on{display:flex}
 @keyframes obIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
