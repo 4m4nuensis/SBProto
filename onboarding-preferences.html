@@ -45,6 +45,15 @@ img,svg{display:block;max-width:100%}
   display:flex;align-items:center;justify-content:space-between;
   padding:18px 0 10px;flex-shrink:0;
 }
+.ob-top-left{display:flex;align-items:center;gap:10px}
+.ob-back{
+  width:36px;height:36px;border-radius:999px;flex-shrink:0;
+  background:var(--w-8);border:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;color:var(--w-72);
+  transition:background .12s ease;
+}
+.ob-back:hover{background:var(--w-12);color:var(--w-100)}
+.ob-back svg{width:18px;height:18px}
 .ob-logo{font-weight:600;font-size:18px;letter-spacing:.3px}
 .ob-logo b{color:var(--main)}
 .ob-skip-top{font-size:13px;color:var(--w-48);padding:6px 4px}
@@ -179,7 +188,12 @@ img,svg{display:block;max-width:100%}
 <div class="app">
 
   <div class="ob-top">
-    <div class="ob-logo"><span data-app-logo="lg"></span></div>
+    <div class="ob-top-left">
+      <button class="ob-back" id="backBtn" type="button" aria-label="Back">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3l-5 5 5 5"/></svg>
+      </button>
+      <div class="ob-logo"><span data-app-logo="lg"></span></div>
+    </div>
     <button class="ob-skip-top" id="skipTop">Skip</button>
   </div>
 
@@ -327,6 +341,7 @@ img,svg{display:block;max-width:100%}
   const cta     = document.getElementById('cta');
   const skipLink= document.getElementById('skipLink');
   const skipTop = document.getElementById('skipTop');
+  const backBtn = document.getElementById('backBtn');
   let slide = 0;
 
   function save() { if (Tour) Tour.update({ prefs }); }
@@ -430,6 +445,14 @@ img,svg{display:block;max-width:100%}
   function skipGallery() { save(); openSuggestions(); }
   skipLink.addEventListener('click', skipGallery);
   skipTop.addEventListener('click', skipGallery);
+
+  // Back: step to the previous question; from the first screen leave the
+  // gallery (browser history, falling back to the home page).
+  backBtn.addEventListener('click', () => {
+    if (slide > 0) show(slide - 1);
+    else if (history.length > 1) history.back();
+    else location.href = 'index.html';
+  });
 
   /* ── Step 2: match suggestion popup ── */
   // Score each catalog match against what the user actually picked: a chosen
