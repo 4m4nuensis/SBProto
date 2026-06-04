@@ -31,6 +31,28 @@
     const v = parseFloat(localStorage.getItem(KEY_BONUS));
     return isFinite(v) ? v : 0;
   }
+  function round2(x) { return Math.round((Number(x) || 0) * 100) / 100; }
+
+  /* Public balance API. Placing a bet withdraws the stake — bonus (freebet)
+   * funds are spent first, then cash. Amounts are clamped at zero so the
+   * balance never goes negative in the prototype. */
+  window.Balance = {
+    cash: readCash,
+    bonus: readBonus,
+    total: function () { return round2(readCash() + readBonus()); },
+    withdraw: function (amount) {
+      const amt = Number(amount);
+      if (!isFinite(amt) || amt <= 0) return { fromBonus: 0, fromCash: 0 };
+      const bonus = readBonus();
+      const fromBonus = Math.min(bonus, amt);
+      const fromCash = Math.min(readCash(), amt - fromBonus);
+      if (fromBonus > 0) localStorage.setItem(KEY_BONUS, String(round2(bonus - fromBonus)));
+      // writeCash persists cash AND dispatches the change event → all displays
+      // (pill, balances drop-down, deposit sheet) refresh, bonus included.
+      writeCash(round2(readCash() - fromCash));
+      return { fromBonus: round2(fromBonus), fromCash: round2(fromCash) };
+    },
+  };
 
   function fmtUSD(n) {
     if (!isFinite(n)) n = 0;

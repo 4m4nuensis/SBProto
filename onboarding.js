@@ -643,6 +643,16 @@
     return path.indexOf(picked.href.toLowerCase()) !== -1;
   }
 
+  // Build a pickedMatch entry from a catalog id (used by "Let me explore" mode,
+  // where the user picks the match themselves on the prematch pages).
+  function matchEntryFromId(id) {
+    if (!id) return null;
+    const D = window.VBET_DATA;
+    const m = (D && typeof D.getMatch === 'function') ? D.getMatch(String(id)) : null;
+    if (!m) return null;
+    return { id: String(id), href: 'match.html?id=' + id, label: m.home.short + ' vs ' + m.away.short };
+  }
+
   function beginStepOnThisPage(stepIdx) {
     const step = STEPS[stepIdx];
     if (!step || step.screen) return;           // screen steps own their own UI
@@ -772,6 +782,13 @@
     if (!state || !state.active) return;        // self-gate: dormant
     if (PAGE === 'prefs') return;               // the prefs page drives steps 0–1
 
+    // "Let me explore" mode: the user is browsing prematch on their own. The
+    // moment they open any match, adopt it and kick off the walkthrough here.
+    if (state.exploring && PAGE === 'match') {
+      const pm = matchEntryFromId(new URLSearchParams(location.search || '').get('id'));
+      if (pm) state = writeState({ exploring: false, pickedMatch: pm, step: stepIndexById('event') });
+    }
+
     // If the user reached the open-bets page by tapping the clock icon (rather
     // than the tooltip's button), the step is still 'openbets1' — bump it so the
     // tour continues right here.
@@ -807,8 +824,14 @@
     // page (the walkthrough now runs there first — no deposit beforehand).
     beginWalkthrough(pickedMatch) {
       const pm = pickedMatch || FALLBACK_MATCH;
-      writeState({ step: stepIndexById('event'), pickedMatch: pm });
+      writeState({ step: stepIndexById('event'), pickedMatch: pm, exploring: false });
       location.href = pm.href;
+    },
+    // "Let me explore": send the user to the prematch pages to browse freely;
+    // the walkthrough auto-starts on whichever match they open next.
+    explore() {
+      writeState({ step: stepIndexById('event'), exploring: true, pickedMatch: null });
+      location.href = 'prematch-menu.html';
     },
     setStep(id) { writeState({ step: stepIndexById(id) }); },
     skip: endTour,

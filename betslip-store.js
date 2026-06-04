@@ -48,6 +48,24 @@
     return 'b_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
   }
 
+  // Onboarding tour is mid-flow (used to restrict multiples during the tour).
+  function onboardingActive() {
+    try {
+      const s = JSON.parse(localStorage.getItem('vbet:onboarding') || 'null');
+      return !!(s && s.active && !s.done);
+    } catch (_) { return false; }
+  }
+
+  // Placing a bet outside onboarding withdraws the stake from the balance
+  // (bonus/freebet first, then cash). The onboarding "freebet" bet is exempt.
+  function chargeStake(stake) {
+    if (onboardingActive()) return;
+    const amt = Number(stake) || 0;
+    if (amt > 0 && window.Balance && typeof window.Balance.withdraw === 'function') {
+      window.Balance.withdraw(amt);
+    }
+  }
+
   const BetslipStore = {
     getBets() {
       // newest first
@@ -74,6 +92,7 @@
       const bets = read();
       bets.push(entry);
       write(bets);
+      chargeStake(entry.stake);
       return entry;
     },
 
@@ -100,6 +119,7 @@
       const bets = read();
       bets.push(entry);
       write(bets);
+      chargeStake(entry.stake);
       return entry;
     },
 
@@ -150,6 +170,16 @@
         queuedAt:  Date.now(),
       };
       const drafts = readDrafts();
+      // Opposite-side restriction: outcomes of the same market for the same
+      // event are mutually exclusive (1/X/2). A new pick in that market
+      // replaces the existing one rather than stacking a contradictory leg.
+      if (entry.teams) {
+        const i = drafts.findIndex(d => d.teams === entry.teams && d.market === entry.market);
+        if (i !== -1) { drafts[i] = entry; writeDrafts(drafts); return entry; }
+      }
+      // During the onboarding tour, keep the betslip to a single selection —
+      // no building multiples until the tour is finished or skipped.
+      if (onboardingActive() && drafts.length >= 1) return null;
       drafts.push(entry);
       writeDrafts(drafts);
       return entry;

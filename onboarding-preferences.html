@@ -240,7 +240,7 @@ img,svg{display:block;max-width:100%}
     <div class="ob-matches" id="matches"></div>
     <div class="ob-foot">
       <button class="ob-cta" id="popCta" type="button" disabled>Continue</button>
-      <button class="ob-skip-link" id="popSkip" type="button">Skip — surprise me</button>
+      <button class="ob-skip-link" id="popSkip" type="button">Let me explore</button>
     </div>
   </div>
 
@@ -485,7 +485,12 @@ img,svg{display:block;max-width:100%}
     else location.href = m.href;
   }
   document.getElementById('popCta').addEventListener('click', () => go(picked || rankMatches()[0]));
-  document.getElementById('popSkip').addEventListener('click', () => go(picked || rankMatches()[0]));
+  // "Let me explore" — drop the user into the prematch pages to find a match
+  // themselves; the walkthrough resumes the moment they open one.
+  document.getElementById('popSkip').addEventListener('click', () => {
+    if (Tour && Tour.explore) Tour.explore();
+    else location.href = 'prematch-menu.html';
+  });
 
   /* ── init ── */
   show(0);
