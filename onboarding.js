@@ -101,9 +101,15 @@
     { id: 'event',    page: 'match', onBetslipGoTo: 'deposit', marks: [
       { id: 'intro', target: '.event-card', copy: "This is your match screen — here you'll find the teams playing, kick-off time and key events that you can bet on.",
         place: 'below', trigger: 'next' },
-      { id: 'market', target: '#markets .market:first-child .title', copy: "Let's try placing a bet — this is the main market. Pick the outcome you think will happen.",
+      { id: 'market', target: '.market[data-market="match-result"] .title', copy: 'This is the Match Result market — pick who you think will win.',
         place: 'below', trigger: 'next' },
-      { id: 'oddsSummary', target: '#markets .market:first-child .opts', copy: 'Tap on the outcome you want to bet on.',
+      { id: 'out1', target: '.market[data-market="match-result"] .opts .opt:nth-child(1)', copy: 'Tap here if you believe {home} wins.',
+        place: 'below', trigger: 'next', allowTargetClick: true },
+      { id: 'outX', target: '.market[data-market="match-result"] .opts .opt:nth-child(2)', copy: "Tap here if you think it'll be a draw.",
+        place: 'below', trigger: 'next', allowTargetClick: true, skipIfMissing: true },
+      { id: 'out2', target: '.market[data-market="match-result"] .opts .opt:nth-child(3)', copy: 'Tap here if you believe {away} wins.',
+        place: 'below', trigger: 'next', allowTargetClick: true, skipIfMissing: true },
+      { id: 'oddsSummary', target: '.market[data-market="match-result"] .opts', copy: "Those are your options — {home} to win, {away} to win, or a draw if available. Tap the one you fancy to place your first bet.",
         place: 'below', trigger: 'tapOutcome', allowTargetClick: true },
     ] },
 
@@ -547,6 +553,9 @@
     };
 
     if (mark.fullscreen) { renderScreen(mark); return; }
+
+    // Skip marks whose target doesn't exist (e.g. draw button on 2-way markets).
+    if (mark.skipIfMissing && !resolveTarget(mark)) { advance(); return; }
 
     // returning to the betslip — close the balances dropdown we opened earlier
     if (mark.requiresOpen === 'betslip') closeBalances();
