@@ -105,7 +105,7 @@
         place: 'below', trigger: 'next' },
       { id: 'out1', target: '.market[data-market="match-result"] .opts .opt:nth-child(1)', copy: 'Tap here if you believe {home} wins.',
         place: 'below', trigger: 'next', allowTargetClick: true },
-      { id: 'outX', target: '.market[data-market="match-result"] .opts .opt:nth-child(2)', copy: "Tap here if you think it'll be a draw.",
+      { id: 'outX', target: '.market[data-market="match-result"] .opts .opt:nth-child(2):not(:last-child)', copy: "Tap here if you think it'll be a draw.",
         place: 'below', trigger: 'next', allowTargetClick: true, skipIfMissing: true },
       { id: 'out2', target: '.market[data-market="match-result"] .opts .opt:nth-child(3)', copy: 'Tap here if you believe {away} wins.',
         place: 'below', trigger: 'next', allowTargetClick: true, skipIfMissing: true },
