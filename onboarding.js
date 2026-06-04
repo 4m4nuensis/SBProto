@@ -109,7 +109,7 @@
         place: 'below', trigger: 'next', allowTargetClick: true, skipIfMissing: true },
       { id: 'out2', target: '.market[data-market="match-result"] .opts .opt:nth-child(3)', copy: 'Tap here if you believe {away} wins.',
         place: 'below', trigger: 'next', allowTargetClick: true, skipIfMissing: true },
-      { id: 'oddsSummary', target: '.market[data-market="match-result"] .opts', copy: "Those are your options — {home} to win, {away} to win, or a draw if available. Tap the one you fancy to place your first bet.",
+      { id: 'oddsSummary', target: '.market[data-market="match-result"] .opts', copy: 'Select the match result you want to bet on.',
         place: 'below', trigger: 'tapOutcome', allowTargetClick: true },
     ] },
 
@@ -166,6 +166,14 @@
   const css = `
 #ob-root{ position:fixed; inset:0; z-index:9000; pointer-events:none; }
 #ob-root.ob-suppressed{ opacity:0 !important; pointer-events:none !important; }
+
+/* Pulse ring on the deposit + button when the tooltip points at it */
+@keyframes ob-pulse{
+  0%   { box-shadow:0 0 0 0 rgba(36,159,88,.7); }
+  60%  { box-shadow:0 0 0 10px rgba(36,159,88,0); }
+  100% { box-shadow:0 0 0 0 rgba(36,159,88,0); }
+}
+.ob-pulse-target{ animation:ob-pulse 1.2s ease-out infinite !important; }
 
 .ob-spot{
   position:fixed; left:0; top:0; width:0; height:0; z-index:1;
@@ -588,6 +596,10 @@
 
     if (mark.requiresOpen === 'balances') ensureBalancesOpen();
 
+    // pulse the deposit + button while the welcome / deposit tooltip is pointing at it
+    const plusBtn = document.querySelector('.bal-plus-btn');
+    if (plusBtn) plusBtn.classList.toggle('ob-pulse-target', mark.id === 'welcome');
+
     spot.classList.add('ob-hidden');
     tip.classList.add('ob-hidden');
     startTicking();
@@ -653,6 +665,8 @@
     if (tickTimer != null) { clearInterval(tickTimer); tickTimer = null; }
     if (spot) spot.classList.add('ob-hidden');
     if (tip) tip.classList.add('ob-hidden');
+    const plusBtn = document.querySelector('.bal-plus-btn');
+    if (plusBtn) plusBtn.classList.remove('ob-pulse-target');
     removeScreen();
   }
 
