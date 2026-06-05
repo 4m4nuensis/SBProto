@@ -128,7 +128,7 @@
     ] },
 
     { id: 'openbets1', page: 'match', waitPopupClosed: true, marks: [
-      { target: '.sln-clock[data-bs-clock]', copy: 'You can find your open bets here.',
+      { id: 'clock', target: '.sln-clock[data-bs-clock]', copy: 'You can find your open bets here.',
         place: 'above', trigger: 'next', allowTargetClick: true, nextLabel: 'Show me →' },
     ] },
 
@@ -816,6 +816,42 @@
       try { localStorage.removeItem(k); } catch (_) {}
     });
   }
+  // ── Demo entry points (for usability testing) ──
+  // Drop straight into a single onboarding moment with made-up data, each at its
+  // own URL so Useberry treats it as a distinct screen. Canonical URLs:
+  //   match.html?id=80201&onboarding=openbets → dummy open bet + "find your open bets" clock tooltip
+  //   match.html?id=80201&onboarding=balance  → dummy balance + balance-check tooltips
+  // (The param also works on any page — it redirects to the picked match.)
+  function seedDummyBet() {
+    if (!window.BetslipStore) return;
+    window.BetslipStore.clearAll();                       // idempotent: exactly one dummy bet
+    window.BetslipStore.addBet({
+      selection: FALLBACK_MATCH.label.split(' vs ')[0],   // "Man City"
+      market: 'Match Result',
+      teams: FALLBACK_MATCH.label.replace(' vs ', ' - '), // "Man City - Chelsea"
+      odds: 1.85, stake: FREEBET, date: 'Today', time: '20:45',
+    });
+  }
+  function seedDummyBalance() {
+    try {
+      localStorage.setItem('vbet:balance', '2000');
+      localStorage.setItem('vbet:bonus', String(FREEBET));
+      window.dispatchEvent(new CustomEvent('vbet:balance-changed'));
+    } catch (_) {}
+  }
+  function onPickedMatchPage() {
+    const here = new URLSearchParams(location.search || '').get('id');
+    return PAGE === 'match' && here && String(here) === String(FALLBACK_MATCH.id);
+  }
+  function gotoMatch(param) {
+    redirecting = true;
+    setTimeout(function () { location.href = FALLBACK_MATCH.href + '&onboarding=' + param; }, 0);
+  }
+  function enterStep(stepId) {
+    writeState({ active: true, done: false, firstBetIsFreebet: false,
+      pickedMatch: FALLBACK_MATCH, step: stepIndexById(stepId) });
+  }
+
   function handleDemoControls() {
     const q = (location.search || '');
     if (/[?&]onboarding=reset/.test(q)) {
@@ -825,6 +861,15 @@
       if (PAGE !== 'prefs') gotoPrefs();
     } else if (/[?&]onboarding=start/.test(q) && PAGE !== 'prefs') {
       gotoPrefs();
+    } else if (/[?&]onboarding=openbets/.test(q)) {
+      enterStep('openbets1');           // active before seeding so the stake isn't charged
+      seedDummyBet();
+      if (!onPickedMatchPage()) gotoMatch('openbets');
+    } else if (/[?&]onboarding=balance/.test(q)) {
+      enterStep('balanceCheck');
+      seedDummyBet();                   // so the open-bets they 'came from' isn't empty
+      seedDummyBalance();
+      if (!onPickedMatchPage()) gotoMatch('balance');
     }
   }
   handleDemoControls();
