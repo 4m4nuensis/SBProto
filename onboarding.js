@@ -569,6 +569,31 @@
     }
   }
 
+  /* ──────────────── Useberry screen tracking ──────────────── */
+  // Reflect the current onboarding screen/tooltip into the URL as ?ub=<id> so
+  // Useberry registers it as a distinct screen (for click maps + drop-off funnels).
+  // Uses replaceState (no history entry, so back-button behaviour is unchanged),
+  // then appends a throwaway node — Useberry's MutationObserver only re-reads
+  // location.href from inside addedNodes, so a node insertion is what triggers it.
+  function reflectScreen(id) {
+    if (typeof window.ubScreen === 'function') { window.ubScreen(id); return; }
+    // Fallback if useberry.js isn't loaded on this page (keeps onboarding self-contained).
+    try {
+      var u = new URL(location.href);
+      if (id) u.searchParams.set('ub', id); else u.searchParams.delete('ub');
+      var next = u.pathname + u.search + u.hash;
+      if (next !== location.pathname + location.search + location.hash) {
+        history.replaceState(history.state, '', next);
+      }
+      var n = document.createElement('span');
+      n.setAttribute('data-ub-nudge', 'true');
+      n.setAttribute('aria-hidden', 'true');
+      n.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;pointer-events:none';
+      document.body.appendChild(n);
+      setTimeout(function () { if (n.parentNode) n.parentNode.removeChild(n); }, 0);
+    } catch (e) {}
+  }
+
   /* ──────────────── mount / advance ──────────────── */
   function mountMark(stepIdx, markIdx) {
     const step = STEPS[stepIdx];
@@ -580,10 +605,13 @@
       baseBets: betsCount(),
     };
 
-    if (mark.fullscreen) { renderScreen(mark); return; }
-
     // Skip marks whose target doesn't exist (e.g. draw button on 2-way markets).
     if (mark.skipIfMissing && !resolveTarget(mark)) { advance(); return; }
+
+    // Record this screen for Useberry before showing it; skipped marks (above) record nothing.
+    reflectScreen(step.id + '-' + mark.id);
+
+    if (mark.fullscreen) { renderScreen(mark); return; }
 
     // The target lives in the (non-sticky) header — jump to the top so the
     // tooltip isn't stranded off-screen if the user had scrolled down.
@@ -729,6 +757,7 @@
   function showMissions() {
     teardownVisuals();
     if (document.querySelector('.ob-missions')) return;
+    reflectScreen('missions-complete');
     // Missions: 4 named below. The ring has 6 segments = 1 (first bet, filled)
     // + 5 missions, but only 4 are named here.
     // TODO: confirm the 5th mission (design doc suggests "Bet Builder") or
@@ -858,6 +887,10 @@
       location.href = 'prematch-menu.html';
     },
     setStep(id) { writeState({ step: stepIndexById(id) }); },
+    // Reflect a screen id into the URL (?ub=…) for Useberry. Used by the
+    // preferences gallery, which owns its own screens (the tooltip engine
+    // records its own via mountMark).
+    screen(id) { reflectScreen(id); },
     skip: endTour,
     reset() {
       clearState();

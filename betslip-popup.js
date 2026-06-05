@@ -198,9 +198,23 @@ body.bsp-open .sln-group{
 
   let currentOdds = 0;
   let currentOddBtn = null;
+  let currentCtx = null;
   let placingTimer = null;
 
   /* ──────────────── helpers ──────────────── */
+  // Two selections clash when they're outcomes of the same market for the same
+  // event (1/X/2) — you can't back both sides.
+  function conflicts(a, b) {
+    return !!(a && b && a.teams && a.teams === b.teams && a.market === b.market);
+  }
+  // Onboarding tour mid-flow → keep the betslip to a single bet (no multiples).
+  function onboardingActive() {
+    try {
+      const s = JSON.parse(localStorage.getItem('vbet:onboarding') || 'null');
+      return !!(s && s.active && !s.done);
+    } catch (_) { return false; }
+  }
+
   const ODD_SELECTOR = '.bet-opt, .gw-bet-opt, .to-bet-opt, .opt, .cell';
   const CONTEXT_SELECTOR =
     '.event-card, .match-card, .gw-match-box, .gw-live-card, ' +
@@ -298,6 +312,7 @@ body.bsp-open .sln-group{
       currentOddBtn.classList.remove('bsp-active-odd');
     }
     currentOddBtn = oddBtn;
+    currentCtx = ctx;
     oddBtn.classList.add('bsp-active-odd');
 
     nameEl.textContent  = ctx.selection;
@@ -310,12 +325,14 @@ body.bsp-open .sln-group{
 
     host.classList.add('open');
     document.body.classList.add('bsp-open');
+    if (window.ubOverlay) window.ubOverlay('betslip-popup');
   }
 
   function close() {
     host.classList.remove('open');
     host.classList.remove('placing');
     document.body.classList.remove('bsp-open');
+    if (window.ubOverlay) window.ubOverlay(null);
     if (currentOddBtn) currentOddBtn.classList.remove('bsp-active-odd');
     currentOddBtn = null;
     if (placingTimer) { clearTimeout(placingTimer); placingTimer = null; }
@@ -397,15 +414,22 @@ body.bsp-open .sln-group{
     // 1. Tapping the same odd again toggles the popup off (single-bet mode only).
     if (popupOpen && currentOddBtn === oddBtn) { close(); return; }
 
+    // During onboarding the betslip stays single-bet — tapping any other odd
+    // just switches the current selection instead of starting a multiple.
+    if (onboardingActive()) { open(ctx, oddBtn); return; }
+
     // 2. Already in multi-bet mode (drafts exist) → just queue directly.
+    //    (addDraft swaps same-market/same-event picks rather than stacking them.)
     if (draftCount > 0 && !popupOpen) {
       addDraftWithFly(ctxToBet(ctx), oddBtn);
       return;
     }
 
-    // 3. Popup open with bet #1, user tapped a different odd → enter multi-bet.
-    //    Queue the popup's current bet and the new one, close popup.
+    // 3. Popup open with bet #1, user tapped a different odd.
     if (popupOpen && currentOddBtn !== oddBtn) {
+      // Mutually-exclusive outcome of the same event → just switch the
+      // single selection (can't back both sides), don't start a multiple.
+      if (conflicts(currentCtx, ctx)) { open(ctx, oddBtn); return; }
       const firstBet  = popupBetSnapshot();
       const firstFrom = currentOddBtn || oddBtn;
       close();

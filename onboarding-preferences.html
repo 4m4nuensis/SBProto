@@ -425,6 +425,8 @@ img,svg{display:block;max-width:100%}
     if (intro) intro.style.display = i === 0 ? 'none' : '';
     document.querySelector('.app').classList.toggle('q-sub', i > 0);
     if (i === 2) renderQ3();
+    // Useberry: give each gallery question its own URL (?ub=…) for the funnel.
+    if (Tour && Tour.screen) Tour.screen(['prefs-interests', 'prefs-sports', 'prefs-teams'][i]);
   }
   cta.addEventListener('click', () => {
     // On the very first screen, a user who picks Casino (and not Sportsbook)
@@ -478,6 +480,7 @@ img,svg{display:block;max-width:100%}
   let picked = null;
   function openSuggestions() {
     if (Tour) Tour.setStep('suggest');
+    if (Tour && Tour.screen) Tour.screen('prefs-suggestions');
     const list = rankMatches();
     const wrap = document.getElementById('matches');
     wrap.innerHTML = list.map(m =>
@@ -522,5 +525,8 @@ img,svg{display:block;max-width:100%}
   show(0);
 })();
 </script>
+<script src="useberry.js"></script>
+<!-- Useberry usability-testing tracker -->
+<script type="text/javascript" src="https://api.useberry.com/integrations/liveUrl/scripts/useberryScript.js"></script>
 </body>
 </html>

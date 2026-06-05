@@ -487,11 +487,13 @@ body.bal-dep-open{ overflow:hidden; }
     popupHost.classList.add('open');
     popBackdrop.classList.add('open');
     document.querySelectorAll('.bal-pill').forEach(el => el.classList.add('open'));
+    if (window.ubOverlay) window.ubOverlay('balances');
   }
   function closeBalances() {
     popupHost.classList.remove('open');
     popBackdrop.classList.remove('open');
     document.querySelectorAll('.bal-pill').forEach(el => el.classList.remove('open'));
+    if (window.ubOverlay) window.ubOverlay(null);
   }
 
   function openDeposit() {
@@ -502,12 +504,14 @@ body.bal-dep-open{ overflow:hidden; }
     document.body.classList.add('bal-dep-open');
     fitToViewport();
     setTimeout(() => amtInput && amtInput.focus({preventScroll:true}), 280);
+    if (window.ubOverlay) window.ubOverlay('top-up');
   }
   function closeDeposit() {
     depHost.classList.remove('open');
     depScrim.classList.remove('open');
     document.body.classList.remove('bal-dep-open');
     resetViewport();
+    if (window.ubOverlay) window.ubOverlay(null);
   }
 
   /* Keep the sheet (and its pinned Deposit button) within the *visible* area so
