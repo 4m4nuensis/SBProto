@@ -35,21 +35,21 @@
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{background:#000;font-family:'Rubik',system-ui,-apple-system,sans-serif;color:var(--w-100);font-size:14px;line-height:20px;letter-spacing:0}
+html,body{background:#010c23;font-family:'Rubik',system-ui,-apple-system,sans-serif;color:var(--w-100);font-size:14px;line-height:20px;letter-spacing:0}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 input{font:inherit;color:inherit;background:none;border:0;outline:none;width:100%}
 img,svg{display:block;max-width:100%}
 a{color:inherit;text-decoration:none}
 
 .app{
-  width:375px;margin:0 auto;min-height:100vh;
+  width:100%;max-width:440px;margin:0 auto;min-height:100vh;
   background:var(--bg);position:relative;
   overflow-x:hidden;padding-bottom:180px;
 }
 
 /* ========== STATUS BAR ========== */
 .statusbar{
-  position:relative;height:40px;width:375px;
+  position:relative;height:40px;width:100%;
   background:linear-gradient(90deg,var(--w-4) 0%,var(--w-4) 100%),linear-gradient(90deg,var(--bg) 0%,var(--bg) 100%);
 }
 .statusbar .time{
@@ -63,7 +63,7 @@ a{color:inherit;text-decoration:none}
 
 /* ========== BETSLIP CONTAINER ========== */
 .betslip{
-  width:375px;
+  width:100%;
   padding:0 8px 8px;
   border-top:1px solid var(--w-16);
   border-radius:8px;
@@ -131,6 +131,22 @@ a{color:inherit;text-decoration:none}
 .bs-tickets{
   display:flex;flex-direction:column;gap:4px;align-items:flex-start;width:100%;
 }
+.bs-empty{
+  width:100%;padding:32px 16px;border-radius:8px;
+  background:var(--w-4);border:1px dashed var(--w-12);
+  display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;
+}
+.bs-empty .ttl{font-size:14px;line-height:20px;color:var(--w-72);font-weight:500}
+.bs-empty .sub{font-size:12px;line-height:16px;color:var(--w-48)}
+/* Hide draft-mode controls when there are no drafts; show them when drafts exist */
+.bs-main.is-empty .bs-total-odds,
+.bs-main.is-empty .bs-counter-offer,
+.bs-main.is-empty .bs-presets,
+.bs-main.is-empty .bs-stake-field,
+.bs-main.is-empty .bs-info-row,
+.bs-main.is-empty .bs-boost,
+.bs-main.is-empty .bs-odds-select,
+.bs-main.is-empty .bs-actions{display:none}
 .bs-ticket{
   width:100%;
   background:var(--w-8);
@@ -352,128 +368,26 @@ a{color:inherit;text-decoration:none}
 <body>
 <div class="app">
 
-  <!-- ===== Status Bar ===== -->
-  <div class="statusbar">
-    <p class="time">9:41</p>
-    <img class="cellular" src="assets/9a9814626f1691496dee37fbaec4dc36714c9fc3.svg" alt="">
-    <img class="wifi" src="assets/8a2078f592bc8059bdee9a1b67c5850384630832.svg" alt="">
-    <img class="battery" src="assets/f555df63f6a65f0f822624125f6922109416d804.svg" alt="">
-  </div>
-
-  <!-- ===== Betslip ===== -->
+  <!-- ===== Status Bar ===== -->  <!-- ===== Betslip ===== -->
   <div class="betslip">
 
-    <!-- Top tabs -->
-    <div class="bs-top-tabs">
-      <div class="bs-top-tab active">
-        <p class="label">Betslip</p>
-        <span class="bs-count">4</span>
-      </div>
-      <div class="bs-top-tab">
-        <img class="curve-bg" src="assets/bs-curve-bg.svg" alt="">
-        <p class="label">Open Bets</p>
-        <span class="bs-count">4</span>
-      </div>
-    </div>
+    <!-- Top tabs (component) -->
+    <div data-bs-tabs="betslip"></div>
+    <script src="bs-tabs.js"></script>
 
     <!-- Main -->
-    <div class="bs-main">
+    <div class="bs-main is-empty" id="bs-main">
 
       <!-- Type tabs -->
       <div class="bs-type-tabs">
         <a class="bs-type-tab" href="betslip.html"><span class="lbl">Single</span></a>
         <div class="bs-type-tab active"><span class="lbl">Multiple</span></div>
         <div class="bs-type-tab"><span class="lbl">System</span></div>
-        <button class="bs-trash" aria-label="clear all"><img src="assets/bs-trash.svg" alt=""></button>
+        <button class="bs-trash" id="bs-trash" aria-label="clear all"><img src="assets/bs-trash.svg" alt=""></button>
       </div>
 
-      <!-- Bet tickets -->
-      <div class="bs-tickets">
-
-        <!-- Ticket 1: Fulham -->
-        <div class="bs-ticket">
-          <div class="bs-ticket-title">
-            <div class="bs-ticket-date">
-              <span class="txt">03.04.2026</span>
-              <span class="dot"><img src="assets/bs-dots-h.svg" alt=""></span>
-              <span class="txt">19:00</span>
-            </div>
-            <button class="bs-ticket-close" aria-label="remove"><img src="assets/bs-x-close.svg" alt=""></button>
-          </div>
-          <div class="bs-ticket-selection">
-            <p class="name">Fulham</p>
-            <p class="odds">2.50</p>
-          </div>
-          <div class="bs-ticket-market">
-            <p class="mkt">Match Result (Early Payout)</p>
-            <p class="teams">Fulham - Aston Villa</p>
-          </div>
-        </div>
-
-        <!-- Ticket 2: Atletico Madrid -->
-        <div class="bs-ticket">
-          <div class="bs-ticket-title">
-            <div class="bs-ticket-date">
-              <span class="txt">03.04.2026</span>
-              <span class="dot"><img src="assets/bs-dots-h.svg" alt=""></span>
-              <span class="txt">19:00</span>
-            </div>
-            <button class="bs-ticket-close" aria-label="remove"><img src="assets/bs-x-close.svg" alt=""></button>
-          </div>
-          <div class="bs-ticket-selection">
-            <p class="name">Atletico Madrid</p>
-            <p class="odds">3.29</p>
-          </div>
-          <div class="bs-ticket-market">
-            <p class="mkt">Match Result</p>
-            <p class="teams">Atletico Madrid - Arsenal</p>
-          </div>
-        </div>
-
-        <!-- Ticket 3: Aston Villa (odds change) -->
-        <div class="bs-ticket">
-          <div class="bs-ticket-title">
-            <div class="bs-ticket-date">
-              <span class="txt">03.04.2026</span>
-              <span class="dot"><img src="assets/bs-dots-h.svg" alt=""></span>
-              <span class="txt">19:00</span>
-            </div>
-            <button class="bs-ticket-close" aria-label="remove"><img src="assets/bs-x-close.svg" alt=""></button>
-          </div>
-          <div class="bs-ticket-selection">
-            <p class="name">Aston Villa</p>
-            <div class="odds-group">
-              <span class="odds-old">2.00</span>
-              <span class="odds">3.28</span>
-            </div>
-          </div>
-          <div class="bs-ticket-market">
-            <p class="mkt">Match Result (Early Payout)</p>
-            <p class="teams">Fulham - Aston Villa</p>
-          </div>
-        </div>
-
-        <!-- Ticket 4: Fulham -->
-        <div class="bs-ticket">
-          <div class="bs-ticket-title">
-            <div class="bs-ticket-date">
-              <span class="txt">03.04.2026</span>
-              <span class="dot"><img src="assets/bs-dots-h.svg" alt=""></span>
-              <span class="txt">19:00</span>
-            </div>
-            <button class="bs-ticket-close" aria-label="remove"><img src="assets/bs-x-close.svg" alt=""></button>
-          </div>
-          <div class="bs-ticket-selection">
-            <p class="name">Fulham</p>
-            <p class="odds">2.50</p>
-          </div>
-          <div class="bs-ticket-market">
-            <p class="mkt">Match Result (Early Payout)</p>
-            <p class="teams">Fulham - Aston Villa</p>
-          </div>
-        </div>
-
-      </div><!-- /bs-tickets -->
+      <!-- Bet tickets — populated from BetslipStore.getDrafts() -->
+      <div class="bs-tickets" id="bs-tickets"></div>
 
       <!-- Total Odds -->
       <div class="bs-total-odds">
@@ -554,6 +468,144 @@ a{color:inherit;text-decoration:none}
 
   <div id="app-nav" data-page="betslip"></div>
 </div><!-- /.app -->
+<script src="betslip-store.js"></script>
 <script src="nav.js"></script>
+<script>
+(function () {
+  const main   = document.getElementById('bs-main');
+  const list   = document.getElementById('bs-tickets');
+  const trash  = document.getElementById('bs-trash');
+  const totEl  = document.querySelector('.bs-total-odds .amt');
+  const stakeI = document.querySelector('.bs-stake-field .value');
+  const infoRows = document.querySelectorAll('.bs-info-row .amt');
+  const pwAmt  = infoRows[0]; // Possible Win
+  const placeBtn = document.querySelector('.bs-place-bet');
+  const presets  = document.querySelectorAll('.bs-presets .preset');
+  if (!main || !list) return;
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function fmtMoney(n) {
+    const v = Number(n) || 0;
+    const parts = v.toFixed(2).split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return '$ ' + parts.join('.');
+  }
+  function fmtStakeInput(n) {
+    const v = Math.round(Number(n) || 0);
+    return String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
+  function parseStake(v) {
+    const n = parseFloat(String(v || '').replace(/[^\d.]/g, ''));
+    return isFinite(n) ? n : 0;
+  }
+
+  function ticketHTML(b) {
+    const dateBlock = (b.date || b.time)
+      ? `<span class="txt">${esc(b.date)}</span>
+         <span class="dot"><img src="assets/bs-dots-h.svg" alt=""></span>
+         <span class="txt">${esc(b.time)}</span>`
+      : `<span class="txt">Queued</span>`;
+    return `
+      <div class="bs-ticket" data-id="${esc(b.id)}">
+        <div class="bs-ticket-title">
+          <div class="bs-ticket-date">${dateBlock}</div>
+          <button class="bs-ticket-close" aria-label="remove" data-remove="${esc(b.id)}">
+            <img src="assets/bs-x-close.svg" alt="">
+          </button>
+        </div>
+        <div class="bs-ticket-selection">
+          <p class="name">${esc(b.selection)}</p>
+          <p class="odds">${(Number(b.odds) || 0).toFixed(2)}</p>
+        </div>
+        <div class="bs-ticket-market">
+          <p class="mkt">${esc(b.market)}</p>
+          <p class="teams">${esc(b.teams)}</p>
+        </div>
+      </div>`;
+  }
+
+  function emptyHTML() {
+    return `
+      <div class="bs-empty">
+        <p class="ttl">No multiple bets yet</p>
+        <p class="sub">Tap two or more odds across the app to start building one.</p>
+      </div>`;
+  }
+
+  function recompute() {
+    const drafts = window.BetslipStore ? window.BetslipStore.getDrafts() : [];
+    const totalOdds = drafts.reduce((acc, d) => acc * (Number(d.odds) || 1), 1);
+    if (totEl) totEl.textContent = totalOdds.toFixed(2);
+    const stake = parseStake(stakeI && stakeI.value);
+    if (pwAmt) pwAmt.textContent = fmtMoney(stake * totalOdds);
+  }
+
+  function render() {
+    const drafts = window.BetslipStore ? window.BetslipStore.getDrafts() : [];
+    if (drafts.length === 0) {
+      list.innerHTML = emptyHTML();
+      main.classList.add('is-empty');
+    } else {
+      list.innerHTML = drafts.map(ticketHTML).join('');
+      main.classList.remove('is-empty');
+    }
+    recompute();
+  }
+
+  // Remove a single draft
+  list.addEventListener('click', function (e) {
+    const btn = e.target.closest('[data-remove]');
+    if (!btn || !window.BetslipStore) return;
+    window.BetslipStore.removeDraft(btn.getAttribute('data-remove'));
+  });
+
+  // Trash → clear all drafts
+  if (trash) {
+    trash.addEventListener('click', function () {
+      if (window.BetslipStore) window.BetslipStore.clearDrafts();
+    });
+  }
+
+  // Stake input → recompute
+  if (stakeI) stakeI.addEventListener('input', recompute);
+
+  // Presets
+  presets.forEach(p => p.addEventListener('click', function () {
+    if (!stakeI) return;
+    stakeI.value = fmtStakeInput(parseStake(p.textContent));
+    recompute();
+  }));
+
+  // Place a Bet → confirm drafts → Open Bets
+  // - 1 draft  → single bet entry (re-uses the single placed-card style)
+  // - 2+ drafts → ONE multi-bet entry (Multiple Bet (N) card per Figma 3582:869)
+  if (placeBtn) {
+    placeBtn.addEventListener('click', function () {
+      if (!window.BetslipStore) return;
+      const drafts = window.BetslipStore.getDrafts();
+      if (!drafts.length) return;
+      const stake = parseStake(stakeI && stakeI.value) || 0;
+      if (drafts.length === 1) {
+        const d = drafts[0];
+        window.BetslipStore.addBet({
+          selection: d.selection, market: d.market, teams: d.teams,
+          odds: d.odds, stake, date: d.date, time: d.time,
+        });
+      } else {
+        window.BetslipStore.addMultiBet({ legs: drafts, stake });
+      }
+      window.BetslipStore.clearDrafts();
+      window.location.href = 'betslip-open-bets.html';
+    });
+  }
+
+  if (window.BetslipStore) window.BetslipStore.subscribeDrafts(render);
+  render();
+})();
+</script>
 </body>
 </html>

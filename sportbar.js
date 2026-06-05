@@ -73,15 +73,21 @@
     { key: 'tennis',       name: 'Tennis',        ball: 'assets/sf-tennis.png' },
   ];
 
+  // Live count per sport from the shared catalog when present; else placeholder.
+  const D = window.VBET_DATA;
+  function countFor(key) {
+    return (D && D.sports && D.sports[key]) ? D.matches.filter(m => m.sport === key).length : 112;
+  }
+
   function chip(s) {
     const isActive = s.key === active;
     const selected = isActive ? ' selected' : '';
     const accent = isActive ? '' : `<span class="accent ${s.key}"></span>`;
     return `
-    <div class="sport-filter">
+    <div class="sport-filter" data-sport="${s.key}">
       <div class="sport-chip${selected}">
         <img class="ball" src="${s.ball}" alt="">
-        <span class="count">112</span>
+        <span class="count">${countFor(s.key)}</span>
         ${accent}
       </div>
       <span class="name">${s.name}</span>

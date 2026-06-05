@@ -199,6 +199,9 @@ a{color:inherit;text-decoration:none}
 .bo-empty .ttl{font-size:14px;line-height:20px;color:var(--w-72);font-weight:500}
 .bo-empty .sub{font-size:12px;line-height:16px;color:var(--w-48)}
 
+
+.ob-head{display:flex;align-items:center;gap:8px;padding:12px 8px 4px;width:100%}
+.ob-title{flex:1;font-size:16px;line-height:24px;font-weight:600;color:var(--w-100);margin:0}
 </style>
 </head>
 <body>
@@ -207,9 +210,13 @@ a{color:inherit;text-decoration:none}
   <!-- ===== Status Bar ===== -->  <!-- ===== Betslip ===== -->
   <div class="betslip">
 
-    <!-- Top tabs (component) -->
-    <div data-bs-tabs="openbets"></div>
-    <script src="bs-tabs.js"></script>
+    <!-- Simple header: back + title (no betslip tab) -->
+    <div class="ob-head">
+      <a class="back-btn" href="index.html" aria-label="back">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 4l-4 4 4 4"/></svg>
+      </a>
+      <h1 class="ob-title">Open Bets</h1>
+    </div>
 
     <!-- Main -->
     <div class="bs-main">
@@ -227,6 +234,7 @@ a{color:inherit;text-decoration:none}
   <div id="app-nav" data-page="history"></div>
 </div><!-- /.app -->
 <script src="betslip-store.js"></script>
+<script src="back-button.js"></script>
 <script src="nav.js"></script>
 <script src="onboarding.js"></script>
 <script>

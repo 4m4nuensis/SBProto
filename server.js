@@ -1,9 +1,11 @@
-const http = require('http');
-const fs   = require('fs');
-const path = require('path');
+// ESM syntax — package.json sets "type":"module" (added by the Lovable build setup).
+import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const PORT = 8000;
-const ROOT = __dirname;
+const ROOT = path.dirname(fileURLToPath(import.meta.url));
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
