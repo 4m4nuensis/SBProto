@@ -117,6 +117,12 @@ img,svg{display:block;max-width:100%}
 .ob-chip .emoji{font-size:22px}
 .ob-chip .nm{font-size:14px;font-weight:500}
 .ob-chip.sel{border-color:var(--main);background:var(--main-16)}
+/* "coming soon" sports — visible under "More sports" but not selectable */
+.ob-chip--soon{cursor:not-allowed}
+.ob-chip--soon:active{transform:none}
+.ob-chip--soon .emoji{filter:grayscale(.5);opacity:.7}
+.ob-chip--soon .nm{color:var(--w-48)}
+.ob-soon{margin-left:auto;font-size:10px;font-weight:600;letter-spacing:.3px;color:var(--w-72);background:var(--w-12);border-radius:999px;padding:3px 8px;white-space:nowrap}
 /* Q2 "More sports" collapsible */
 .ob-more-toggle{
   width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
@@ -391,11 +397,10 @@ img,svg{display:block;max-width:100%}
     });
   });
 
-  /* ── Q2 — top sports + a collapsible "More sports" list (incl. e-sports) ── */
-  // "Top" is everything the catalog carries except American Football; the rest
-  // live under "More sports" (collapsed by default). The extra entries are
-  // demo-only — they have no catalog data, so they contribute nothing to the Q3
-  // league/team step or to suggestion ranking, but still record a preference.
+  /* ── Q2 — top sports + a collapsible "More sports" list (coming soon) ── */
+  // "Top" is everything the catalog carries except American Football. The rest
+  // live under the collapsible "More sports" row, marked "Coming soon" and
+  // disabled — they're not selectable yet, so they never enter prefs.sports.
   const EXTRA_SPORTS = [
     { key:'amfootball',  emoji:'🏈', name:'American Football' },
     { key:'dota',        emoji:'🐉', name:'Dota 2' },
@@ -408,17 +413,28 @@ img,svg{display:block;max-width:100%}
     { key:'darts',       emoji:'🎯', name:'Darts' },
     { key:'tabletennis', emoji:'🏓', name:'Table Tennis' },
   ];
-  const TOP_SPORTS  = SPORTS.filter(s => s.key !== 'amfootball');
+  const TOP_SPORTS = SPORTS.filter(s => s.key !== 'amfootball');
+  // drop any "coming soon" keys a prior session may have stored
+  const SELECTABLE = TOP_SPORTS.map(s => s.key);
+  if (prefs.sports.some(k => SELECTABLE.indexOf(k) === -1)) {
+    prefs.sports = prefs.sports.filter(k => SELECTABLE.indexOf(k) !== -1);
+    save();
+  }
   const sportChip = s =>
     `<button class="ob-chip${prefs.sports.indexOf(s.key)!==-1?' sel':''}" data-val="${s.key}" type="button">
        <span class="emoji">${s.emoji}</span><span class="nm">${s.name}</span>
      </button>`;
+  const soonChip = s =>
+    `<button class="ob-chip ob-chip--soon" data-val="${s.key}" type="button" disabled aria-disabled="true">
+       <span class="emoji">${s.emoji}</span><span class="nm">${s.name}</span>
+       <span class="ob-soon">Soon</span>
+     </button>`;
   document.getElementById('q2top').innerHTML  = TOP_SPORTS.map(sportChip).join('');
-  document.getElementById('q2more').innerHTML = EXTRA_SPORTS.map(sportChip).join('');
-  // chip selection — delegated across both grids
+  document.getElementById('q2more').innerHTML = EXTRA_SPORTS.map(soonChip).join('');
+  // chip selection — "coming soon" chips are disabled and ignored
   document.querySelector('.ob-slide[data-slide="1"]').addEventListener('click', e => {
     const chip = e.target.closest('.ob-chip');
-    if (!chip) return;
+    if (!chip || chip.disabled || chip.classList.contains('ob-chip--soon')) return;
     chip.classList.toggle('sel');
     toggle(prefs.sports, chip.dataset.val);
     save();
