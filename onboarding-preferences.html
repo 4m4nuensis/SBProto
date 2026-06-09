@@ -131,7 +131,7 @@ img,svg{display:block;max-width:100%}
 .ob-soon{flex-shrink:0;font-size:9px;font-weight:600;letter-spacing:.3px;color:var(--w-72);background:var(--w-12);border-radius:999px;padding:3px 7px;white-space:nowrap}
 /* Q2 "More sports" collapsible */
 .ob-more-toggle{
-  width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  width:100%;display:flex;align-items:center;gap:10px;
   margin-top:18px;padding:13px 14px;border-radius:14px;
   background:var(--w-6);border:1.5px solid var(--w-8);
   font-size:14px;font-weight:600;color:var(--w-72);cursor:pointer;
@@ -139,7 +139,7 @@ img,svg{display:block;max-width:100%}
 }
 .ob-more-toggle:active{transform:scale(.99)}
 .ob-more-toggle.open{color:var(--w-100)}
-.ob-more-toggle .chev{width:18px;height:18px;flex-shrink:0;color:var(--w-48);transition:transform .2s}
+.ob-more-toggle .chev{width:18px;height:18px;flex-shrink:0;margin-left:auto;color:var(--w-48);transition:transform .2s}
 .ob-more-toggle.open .chev{transform:rotate(180deg);color:var(--w-72)}
 .ob-grid.ob-more{margin-top:10px}
 /* Q3 sport tabs */
@@ -155,7 +155,9 @@ img,svg{display:block;max-width:100%}
 .ob-tab.on{border-color:var(--main);background:var(--main-16);color:var(--w-100)}
 /* Q3 acts as a real tab interface: top-align the slide so switching sports never
    re-centres it, and pin the tab bar as a fixed header that survives scrolling */
-.app.on-q3 .ob-slides{justify-content:flex-start}
+/* Only the first gallery screen (Q1) is vertically centred; Q2 & Q3 top-align so
+   their content doesn't float/jump as it changes height */
+.app.q-sub .ob-slides{justify-content:flex-start}
 .app.on-q3 .ob-tabs{
   position:sticky;top:0;z-index:3;margin:0;padding:8px 0;
   background:rgba(1,12,35,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
@@ -275,6 +277,7 @@ img,svg{display:block;max-width:100%}
       <div class="ob-grid" id="q2top"></div>
       <button class="ob-more-toggle" id="moreToggle" type="button" aria-expanded="false" aria-controls="q2more">
         <span class="ob-more-lbl">More sports</span>
+        <span class="ob-soon">Coming soon</span>
         <svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"></path></svg>
       </button>
       <div class="ob-grid ob-more" id="q2more" hidden></div>
@@ -417,7 +420,7 @@ img,svg{display:block;max-width:100%}
   const EXTRA_SPORTS = [
     { key:'amfootball',  emoji:'🏈', name:'American Football' },
     { key:'dota',        emoji:'🐉', name:'Dota 2' },
-    { key:'lol',         emoji:'⚔️', name:'LoL' },
+    { key:'lol',         emoji:'⚔️', name:'League of Legends' },
     { key:'cs',          emoji:'🔫', name:'CS2' },
     { key:'volleyball',  emoji:'🏐', name:'Volleyball' },
     { key:'handball',    emoji:'🤾', name:'Handball' },
@@ -437,10 +440,11 @@ img,svg{display:block;max-width:100%}
     `<button class="ob-chip${prefs.sports.indexOf(s.key)!==-1?' sel':''}" data-val="${s.key}" type="button">
        <span class="emoji">${s.emoji}</span><span class="nm">${s.name}</span>
      </button>`;
+  // No per-chip badge — the whole "More sports" section is flagged "Coming soon"
+  // on its header; these chips are just disabled + dimmed.
   const soonChip = s =>
     `<button class="ob-chip ob-chip--soon" data-val="${s.key}" type="button" disabled aria-disabled="true">
        <span class="emoji">${s.emoji}</span><span class="nm">${s.name}</span>
-       <span class="ob-soon">Soon</span>
      </button>`;
   document.getElementById('q2top').innerHTML  = TOP_SPORTS.map(sportChip).join('');
   document.getElementById('q2more').innerHTML = EXTRA_SPORTS.map(soonChip).join('');
