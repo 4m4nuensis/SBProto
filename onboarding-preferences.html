@@ -130,6 +130,17 @@ img,svg{display:block;max-width:100%}
 .ob-more-toggle .chev{width:18px;height:18px;flex-shrink:0;color:var(--w-48);transition:transform .2s}
 .ob-more-toggle.open .chev{transform:rotate(180deg);color:var(--w-72)}
 .ob-grid.ob-more{margin-top:10px}
+/* Q3 sport tabs */
+.ob-tabs{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:2px 0;padding-bottom:4px;scrollbar-width:none}
+.ob-tabs::-webkit-scrollbar{display:none}
+.ob-tab{
+  flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;
+  background:var(--w-6);border:1.5px solid var(--w-8);color:var(--w-72);cursor:pointer;white-space:nowrap;
+  transition:border-color .15s, background .15s, color .15s;
+}
+.ob-tab .emoji{font-size:16px}
+.ob-tab .nm{font-size:13px;font-weight:600}
+.ob-tab.on{border-color:var(--main);background:var(--main-16);color:var(--w-100)}
 
 /* Q3 team bubbles */
 .ob-bubbles{display:flex;flex-wrap:wrap;gap:10px}
@@ -253,9 +264,10 @@ img,svg{display:block;max-width:100%}
     <!-- Q3 -->
     <div class="ob-slide" data-slide="2">
       <div class="ob-q">What leagues, competitions and teams are you interested in?</div>
-      <div class="ob-section-label first">Major competitions &amp; national leagues</div>
+      <div class="ob-tabs" id="q3tabs"></div>
+      <div class="ob-section-label first">Top leagues &amp; championships</div>
       <div class="ob-bubbles" id="q3comps"></div>
-      <div class="ob-section-label">Teams</div>
+      <div class="ob-section-label">Top teams &amp; players</div>
       <div class="ob-bubbles" id="q3teams"></div>
       <div class="ob-bubbles" id="q3other" style="margin-top:16px"></div>
       <div class="ob-q3-empty" id="q3empty" hidden>Pick a sport on the previous step to see options here — or just skip.</div>
@@ -423,31 +435,80 @@ img,svg{display:block;max-width:100%}
     });
   })();
 
-  /* ── Q3 — two sections (competitions / teams) + Other, derived from Q2 ── */
-  function uniqFor(map, sports) {
-    const seen = {}; const out = [];
-    sports.forEach(sp => (map[sp] || []).forEach(v => { if (!seen[v]) { seen[v] = 1; out.push(v); } }));
-    return out;
-  }
+  /* ── Q3 — per-sport tabs, each with top leagues & top teams/players ── */
+  // Catalog sports carry real leagues/teams; the demo-only extras (e-sports etc.)
+  // get a made-up set here so every tab the user can reach has content.
+  const SPORT_META = {};
+  SPORTS.forEach(s => { SPORT_META[s.key] = s; });
+  EXTRA_SPORTS.forEach(s => { if (!SPORT_META[s.key]) SPORT_META[s.key] = s; });
+
+  const DEMO_COMPS = {
+    dota:        ['The International', 'ESL One', 'DreamLeague', 'PGL Major'],
+    lol:         ['Worlds', 'LEC', 'LCK', 'LCS'],
+    cs:          ['BLAST Premier', 'ESL Pro League', 'IEM', 'Majors'],
+    volleyball:  ['CEV Champions League', 'Serie A1', 'PlusLiga'],
+    handball:    ['EHF Champions League', 'Bundesliga', 'Liga ASOBAL'],
+    rugby:       ['Six Nations', 'Premiership', 'Top 14', 'URC'],
+    cricket:     ['IPL', 'The Ashes', 'Big Bash', 'T20 World Cup'],
+    darts:       ['PDC World Championship', 'Premier League Darts'],
+    tabletennis: ['ITTF World Tour', 'Champions League'],
+  };
+  const DEMO_TEAMS = {
+    dota:        ['Team Spirit', 'OG', 'Team Liquid', 'PSG.LGD', 'Tundra'],
+    lol:         ['T1', 'G2 Esports', 'Fnatic', 'Gen.G', 'JDG'],
+    cs:          ['NAVI', 'FaZe Clan', 'Vitality', 'G2', 'MOUZ'],
+    volleyball:  ['Zenit Kazan', 'Trentino', 'Perugia', 'Lube Civitanova'],
+    handball:    ['Barça', 'THW Kiel', 'PSG', 'Magdeburg'],
+    rugby:       ['Leinster', 'Saracens', 'Toulouse', 'Crusaders'],
+    cricket:     ['India', 'Australia', 'England', 'Mumbai Indians', 'Chennai Super Kings'],
+    darts:       ['Luke Humphries', 'Michael van Gerwen', 'Luke Littler', 'Gerwyn Price'],
+    tabletennis: ['Ma Long', 'Fan Zhendong', 'Tomokazu Harimoto', 'Wang Chuqin'],
+  };
+  function leaguesFor(key) { const c = COMPS_BY_SPORT[key]; return (c && c.length) ? c : (DEMO_COMPS[key] || []); }
+  function teamsFor(key)   { const t = TEAMS_BY_SPORT[key]; return (t && t.length) ? t : (DEMO_TEAMS[key] || []); }
+
   function bubbleHTML(arr, picked) {
     return arr.map(v =>
       `<button class="ob-bubble${picked.indexOf(v) !== -1 ? ' sel' : ''}" data-val="${v}" type="button">${v}</button>`).join('');
   }
+  function q3Sports() { return prefs.sports.length ? prefs.sports : ['football']; }
+  let activeSport = null;
+
+  function renderTabs() {
+    document.getElementById('q3tabs').innerHTML = q3Sports().map(k => {
+      const m = SPORT_META[k] || { emoji: '•', name: k };
+      return `<button class="ob-tab${k === activeSport ? ' on' : ''}" data-tab="${k}" type="button">
+          <span class="emoji">${m.emoji}</span><span class="nm">${m.name}</span>
+        </button>`;
+    }).join('');
+  }
+  function renderTabContent() {
+    document.getElementById('q3comps').innerHTML = bubbleHTML(leaguesFor(activeSport), prefs.comps);
+    document.getElementById('q3teams').innerHTML = bubbleHTML(teamsFor(activeSport), prefs.teams);
+  }
   function renderQ3() {
-    const empty = document.getElementById('q3empty');
-    const sports = prefs.sports.length ? prefs.sports : ['football'];
-    const comps = uniqFor(COMPS_BY_SPORT, sports);
-    const teams = uniqFor(TEAMS_BY_SPORT, sports);
-    // drop previously-picked items no longer offered
-    prefs.comps = prefs.comps.filter(c => comps.indexOf(c) !== -1);
-    prefs.teams = prefs.teams.filter(t => teams.indexOf(t) !== -1);
-    document.getElementById('q3comps').innerHTML = bubbleHTML(comps, prefs.comps);
-    document.getElementById('q3teams').innerHTML = bubbleHTML(teams, prefs.teams);
+    const sports = q3Sports();
+    // prune picks no longer offered by any selected sport
+    const allComps = [], allTeams = [];
+    sports.forEach(k => {
+      leaguesFor(k).forEach(v => { if (allComps.indexOf(v) === -1) allComps.push(v); });
+      teamsFor(k).forEach(v => { if (allTeams.indexOf(v) === -1) allTeams.push(v); });
+    });
+    prefs.comps = prefs.comps.filter(c => allComps.indexOf(c) !== -1);
+    prefs.teams = prefs.teams.filter(t => allTeams.indexOf(t) !== -1);
+    if (!activeSport || sports.indexOf(activeSport) === -1) activeSport = sports[0];
+    renderTabs();
+    renderTabContent();
     document.getElementById('q3other').innerHTML =
       `<button class="ob-bubble${prefs.other ? ' sel' : ''}" data-other type="button">Other</button>`;
-    empty.hidden = !!(comps.length || teams.length);
+    document.getElementById('q3empty').hidden = !!(allComps.length || allTeams.length);
   }
   document.querySelector('.ob-slide[data-slide="2"]').addEventListener('click', e => {
+    const tab = e.target.closest('.ob-tab');
+    if (tab) {
+      if (tab.dataset.tab !== activeSport) { activeSport = tab.dataset.tab; renderTabs(); renderTabContent(); }
+      return;
+    }
     const b = e.target.closest('.ob-bubble');
     if (!b) return;
     if (b.hasAttribute('data-other')) {
