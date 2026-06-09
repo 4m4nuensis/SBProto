@@ -120,7 +120,7 @@
       // screen). No CTA — the user taps the spotlighted "+".
       { id: 'welcome', target: '.bal-plus-btn', place: 'below', trigger: 'deposit',
         allowTargetClick: true, rich: true, dim: true, scrollTop: true,
-        art: '💰', badge: '+$' + FREEBET + ' FREEBET',
+        art: '💰', badge: 'Claim your freebet', badgeCta: true,
         title: "Let's top up your balance to place your bet",
         copy: 'Your first bet is on us! Deposit $' + FREEBET + ' and get $' + FREEBET + ' in freebets.' },
       { id: 'betslip', target: '.bsp-card', copy: 'Indicate your bet size here, then press Place Bet.',
@@ -241,6 +241,17 @@
   padding:4px 10px; border-radius:999px; background:var(--main,#d80d83);
   color:#fff; font-weight:700; font-size:11px; letter-spacing:.3px; white-space:nowrap;
   box-shadow:0 6px 14px rgba(216,13,131,.45);
+}
+/* the freebet badge doubles as the primary "Claim your freebet" CTA — it pulses
+   to draw the tap (the deposit "+" button no longer does) */
+.ob-rich-badge.ob-rich-cta{
+  padding:7px 14px; font-size:12px; cursor:pointer; border-top:1px solid rgba(255,255,255,.28);
+  animation:ob-cta-pulse 1.4s ease-out infinite;
+}
+@keyframes ob-cta-pulse{
+  0%   { box-shadow:0 0 0 0 rgba(216,13,131,.6), 0 6px 14px rgba(216,13,131,.45); }
+  60%  { box-shadow:0 0 0 12px rgba(216,13,131,0), 0 6px 14px rgba(216,13,131,.45); }
+  100% { box-shadow:0 0 0 0 rgba(216,13,131,0), 0 6px 14px rgba(216,13,131,.45); }
 }
 .ob-tip.ob-rich-mode .ob-row{ justify-content:flex-start; margin-top:10px; }
 
@@ -483,7 +494,7 @@
     } else if (t === 'balancesOpen' && balancesOpen()) {
       advance();
     } else if (t === 'placedBet' && betsCount() > current.baseBets) {
-      consumeFreebet();
+      chargeFirstBet();
       writeState({ firstBetIsFreebet: false });
       advance();
     }
@@ -526,14 +537,18 @@
       }
     } catch (_) {}
   }
-  // The first bet is placed on the freebet — spend it so the balance actually
-  // moves during onboarding (bonus first; chargeStake is otherwise a no-op
-  // mid-tour). Only the freebet token is consumed, leaving deposited cash.
-  function consumeFreebet() {
+  // Placing the first bet moves real money: deduct its actual stake so the
+  // balance the user inspects next reflects the bet they just placed. Spend the
+  // freebet/bonus first, then cash — Balance.withdraw does exactly that order and
+  // clamps at zero. chargeStake (betslip-store) is a no-op mid-tour, so this is
+  // the sole deduction during onboarding.
+  function chargeFirstBet() {
     const s = readState();
     if (!s || !s.firstBetIsFreebet) return;
-    if (window.Balance && typeof window.Balance.withdraw === 'function') {
-      window.Balance.withdraw(FREEBET);
+    const bets = (window.BetslipStore && window.BetslipStore.getBets()) || [];
+    const stake = bets.length ? (Number(bets[0].stake) || 0) : 0;
+    if (stake > 0 && window.Balance && typeof window.Balance.withdraw === 'function') {
+      window.Balance.withdraw(stake);
     }
   }
 
@@ -627,6 +642,7 @@
       richArt.textContent = mark.art || '💰';
       richBadge.textContent = mark.badge || '';
       richBadge.style.display = mark.badge ? '' : 'none';
+      richBadge.classList.toggle('ob-rich-cta', !!mark.badgeCta);
       richTtl.textContent = mark.title || '';
       richCopy.textContent = fillCopy(mark.copy);
       tipCopy.style.display = 'none';
@@ -649,8 +665,10 @@
     if (mark.requiresOpen === 'balances') ensureBalancesOpen();
 
     // pulse the deposit + button while the welcome / deposit tooltip is pointing at it
+    // The deposit "+" button no longer pulses — the "Claim your freebet" CTA in
+    // the rich tooltip is the pulsing call-to-action instead.
     const plusBtn = document.querySelector('.bal-plus-btn');
-    if (plusBtn) plusBtn.classList.toggle('ob-pulse-target', mark.id === 'welcome');
+    if (plusBtn) plusBtn.classList.remove('ob-pulse-target');
 
     spot.classList.add('ob-hidden');
     tip.classList.add('ob-hidden');
