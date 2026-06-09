@@ -117,6 +117,19 @@ img,svg{display:block;max-width:100%}
 .ob-chip .emoji{font-size:22px}
 .ob-chip .nm{font-size:14px;font-weight:500}
 .ob-chip.sel{border-color:var(--main);background:var(--main-16)}
+/* Q2 "More sports" collapsible */
+.ob-more-toggle{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  margin-top:18px;padding:13px 14px;border-radius:14px;
+  background:var(--w-6);border:1.5px solid var(--w-8);
+  font-size:14px;font-weight:600;color:var(--w-72);cursor:pointer;
+  transition:border-color .15s, background .15s, color .15s;
+}
+.ob-more-toggle:active{transform:scale(.99)}
+.ob-more-toggle.open{color:var(--w-100)}
+.ob-more-toggle .chev{width:18px;height:18px;flex-shrink:0;color:var(--w-48);transition:transform .2s}
+.ob-more-toggle.open .chev{transform:rotate(180deg);color:var(--w-72)}
+.ob-grid.ob-more{margin-top:10px}
 
 /* Q3 team bubbles */
 .ob-bubbles{display:flex;flex-wrap:wrap;gap:10px}
@@ -228,7 +241,13 @@ img,svg{display:block;max-width:100%}
     <div class="ob-slide" data-slide="1">
       <div class="ob-q">Which sports interest you?</div>
       <div class="ob-hint">We'll tailor your home page to these.</div>
-      <div class="ob-grid" id="q2"></div>
+      <div class="ob-section-label first">Top sports in your region</div>
+      <div class="ob-grid" id="q2top"></div>
+      <button class="ob-more-toggle" id="moreToggle" type="button" aria-expanded="false" aria-controls="q2more">
+        <span class="ob-more-lbl">More sports</span>
+        <svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"></path></svg>
+      </button>
+      <div class="ob-grid ob-more" id="q2more" hidden></div>
     </div>
 
     <!-- Q3 -->
@@ -360,19 +379,49 @@ img,svg{display:block;max-width:100%}
     });
   });
 
-  /* ── Q2 ── */
-  const q2 = document.getElementById('q2');
-  q2.innerHTML = SPORTS.map(s =>
+  /* ── Q2 — top sports + a collapsible "More sports" list (incl. e-sports) ── */
+  // "Top" is everything the catalog carries except American Football; the rest
+  // live under "More sports" (collapsed by default). The extra entries are
+  // demo-only — they have no catalog data, so they contribute nothing to the Q3
+  // league/team step or to suggestion ranking, but still record a preference.
+  const EXTRA_SPORTS = [
+    { key:'amfootball',  emoji:'🏈', name:'American Football' },
+    { key:'dota',        emoji:'🐉', name:'Dota 2' },
+    { key:'lol',         emoji:'⚔️', name:'League of Legends' },
+    { key:'cs',          emoji:'🔫', name:'CS2' },
+    { key:'volleyball',  emoji:'🏐', name:'Volleyball' },
+    { key:'handball',    emoji:'🤾', name:'Handball' },
+    { key:'rugby',       emoji:'🏉', name:'Rugby' },
+    { key:'cricket',     emoji:'🏏', name:'Cricket' },
+    { key:'darts',       emoji:'🎯', name:'Darts' },
+    { key:'tabletennis', emoji:'🏓', name:'Table Tennis' },
+  ];
+  const TOP_SPORTS  = SPORTS.filter(s => s.key !== 'amfootball');
+  const sportChip = s =>
     `<button class="ob-chip${prefs.sports.indexOf(s.key)!==-1?' sel':''}" data-val="${s.key}" type="button">
        <span class="emoji">${s.emoji}</span><span class="nm">${s.name}</span>
-     </button>`).join('');
-  q2.addEventListener('click', e => {
+     </button>`;
+  document.getElementById('q2top').innerHTML  = TOP_SPORTS.map(sportChip).join('');
+  document.getElementById('q2more').innerHTML = EXTRA_SPORTS.map(sportChip).join('');
+  // chip selection — delegated across both grids
+  document.querySelector('.ob-slide[data-slide="1"]').addEventListener('click', e => {
     const chip = e.target.closest('.ob-chip');
     if (!chip) return;
     chip.classList.toggle('sel');
     toggle(prefs.sports, chip.dataset.val);
     save();
   });
+  // collapse / expand "More sports"
+  (function () {
+    const tog = document.getElementById('moreToggle');
+    const more = document.getElementById('q2more');
+    tog.addEventListener('click', () => {
+      const willOpen = more.hasAttribute('hidden');
+      more.toggleAttribute('hidden', !willOpen);
+      tog.classList.toggle('open', willOpen);
+      tog.setAttribute('aria-expanded', String(willOpen));
+    });
+  })();
 
   /* ── Q3 — two sections (competitions / teams) + Other, derived from Q2 ── */
   function uniqFor(map, sports) {
