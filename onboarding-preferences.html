@@ -108,21 +108,27 @@ img,svg{display:block;max-width:100%}
 
 /* Q2 sport grid */
 .ob-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* a class selector (.ob-grid) would otherwise beat the UA [hidden] rule and keep
+   the collapsed "More sports" grid visible — pin it shut explicitly */
+.ob-grid[hidden]{display:none}
 .ob-chip{
-  display:flex;align-items:center;gap:10px;padding:14px;border-radius:14px;
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;min-height:58px;
   background:var(--w-6);border:1.5px solid var(--w-8);cursor:pointer;
   transition:border-color .15s, background .15s, transform .1s;
 }
 .ob-chip:active{transform:scale(.98)}
-.ob-chip .emoji{font-size:22px}
-.ob-chip .nm{font-size:14px;font-weight:500}
+.ob-chip .emoji{font-size:21px;flex-shrink:0}
+.ob-chip .nm{
+  font-size:13px;font-weight:500;line-height:1.2;flex:1;min-width:0;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
 .ob-chip.sel{border-color:var(--main);background:var(--main-16)}
 /* "coming soon" sports — visible under "More sports" but not selectable */
 .ob-chip--soon{cursor:not-allowed}
 .ob-chip--soon:active{transform:none}
 .ob-chip--soon .emoji{filter:grayscale(.5);opacity:.7}
 .ob-chip--soon .nm{color:var(--w-48)}
-.ob-soon{margin-left:auto;font-size:10px;font-weight:600;letter-spacing:.3px;color:var(--w-72);background:var(--w-12);border-radius:999px;padding:3px 8px;white-space:nowrap}
+.ob-soon{flex-shrink:0;font-size:9px;font-weight:600;letter-spacing:.3px;color:var(--w-72);background:var(--w-12);border-radius:999px;padding:3px 7px;white-space:nowrap}
 /* Q2 "More sports" collapsible */
 .ob-more-toggle{
   width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
@@ -411,7 +417,7 @@ img,svg{display:block;max-width:100%}
   const EXTRA_SPORTS = [
     { key:'amfootball',  emoji:'🏈', name:'American Football' },
     { key:'dota',        emoji:'🐉', name:'Dota 2' },
-    { key:'lol',         emoji:'⚔️', name:'League of Legends' },
+    { key:'lol',         emoji:'⚔️', name:'LoL' },
     { key:'cs',          emoji:'🔫', name:'CS2' },
     { key:'volleyball',  emoji:'🏐', name:'Volleyball' },
     { key:'handball',    emoji:'🤾', name:'Handball' },
