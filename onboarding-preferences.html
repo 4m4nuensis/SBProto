@@ -143,23 +143,27 @@ img,svg{display:block;max-width:100%}
 .ob-more-toggle.open .chev{transform:rotate(180deg);color:var(--w-72)}
 .ob-grid.ob-more{margin-top:10px}
 /* Q3 sport tabs */
-.ob-tabs{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:2px 0;padding-bottom:4px;scrollbar-width:none}
+/* Underline tabs — text + an active underline on a shared baseline, so they read
+   as tabs (a view switcher) rather than selectable option chips */
+.ob-tabs{display:flex;gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:4px 0 0;scrollbar-width:none;border-bottom:1px solid var(--w-12)}
 .ob-tabs::-webkit-scrollbar{display:none}
 .ob-tab{
-  flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;
-  background:var(--w-6);border:1.5px solid var(--w-8);color:var(--w-72);cursor:pointer;white-space:nowrap;
-  transition:border-color .15s, background .15s, color .15s;
+  flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:9px 12px;
+  border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:none;
+  color:var(--w-48);cursor:pointer;white-space:nowrap;
+  transition:color .15s, border-color .15s;
 }
-.ob-tab .emoji{font-size:16px}
-.ob-tab .nm{font-size:13px;font-weight:600}
-.ob-tab.on{border-color:var(--main);background:var(--main-16);color:var(--w-100)}
+.ob-tab .emoji{font-size:16px;opacity:.6;transition:opacity .15s}
+.ob-tab .nm{font-size:14px;font-weight:600;color:inherit}
+.ob-tab.on{color:var(--w-100);border-bottom-color:var(--main)}
+.ob-tab.on .emoji{opacity:1}
 /* Q3 acts as a real tab interface: top-align the slide so switching sports never
-   re-centres it, and pin the tab bar as a fixed header that survives scrolling */
-/* Only the first gallery screen (Q1) is vertically centred; Q2 & Q3 top-align so
-   their content doesn't float/jump as it changes height */
+   re-centres it, and pin the tab bar as a fixed header that survives scrolling.
+   Only the first gallery screen (Q1) is vertically centred; Q2 & Q3 top-align so
+   their content doesn't float/jump as it changes height. */
 .app.q-sub .ob-slides{justify-content:flex-start}
 .app.on-q3 .ob-tabs{
-  position:sticky;top:0;z-index:3;margin:0;padding:8px 0;
+  position:sticky;top:0;z-index:3;margin:0;padding-top:6px;
   background:rgba(1,12,35,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
 }
 
