@@ -147,6 +147,13 @@ img,svg{display:block;max-width:100%}
 .ob-tab .emoji{font-size:16px}
 .ob-tab .nm{font-size:13px;font-weight:600}
 .ob-tab.on{border-color:var(--main);background:var(--main-16);color:var(--w-100)}
+/* Q3 acts as a real tab interface: top-align the slide so switching sports never
+   re-centres it, and pin the tab bar as a fixed header that survives scrolling */
+.app.on-q3 .ob-slides{justify-content:flex-start}
+.app.on-q3 .ob-tabs{
+  position:sticky;top:0;z-index:3;margin:0;padding:8px 0;
+  background:rgba(1,12,35,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+}
 
 /* Q3 team bubbles */
 .ob-bubbles{display:flex;flex-wrap:wrap;gap:10px}
@@ -550,6 +557,9 @@ img,svg{display:block;max-width:100%}
     // it's present the per-question heading steps down (q-sub).
     if (intro) intro.style.display = i === 0 ? 'none' : '';
     document.querySelector('.app').classList.toggle('q-sub', i > 0);
+    // Q3 is a tab interface: top-align it (so switching sports doesn't re-centre
+    // the slide and shift the tabs) and pin the tab bar as a fixed header.
+    document.querySelector('.app').classList.toggle('on-q3', i === 2);
     if (i === 2) renderQ3();
     // Useberry: give each gallery question its own URL (?ub=…) for the funnel.
     if (Tour && Tour.screen) Tour.screen(['prefs-interests', 'prefs-sports', 'prefs-teams'][i]);
