@@ -41,21 +41,22 @@
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{background:#000;font-family:'Rubik',system-ui,-apple-system,sans-serif;color:var(--w-100);font-size:14px;line-height:20px;letter-spacing:0}
+.balance{visibility:hidden}
+html,body{background:#010c23;font-family:'Rubik',system-ui,-apple-system,sans-serif;color:var(--w-100);font-size:14px;line-height:20px;letter-spacing:0}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 img,svg{display:block;max-width:100%}
 ul{list-style:none}
 a{color:inherit;text-decoration:none}
 
 .app{
-  width:375px;margin:0 auto;min-height:100vh;
+  width:100%;max-width:440px;margin:0 auto;min-height:100vh;
   background:var(--bg);position:relative;padding-bottom:114px;
   overflow-x:hidden;
 }
 
 /* ========== STATUS BAR ========== */
 .statusbar{
-  position:relative;height:40px;width:375px;
+  position:relative;height:40px;width:100%;
   background:linear-gradient(90deg,var(--w-4) 0%,var(--w-4) 100%),linear-gradient(90deg,var(--bg) 0%,var(--bg) 100%);
 }
 .statusbar .time{
@@ -107,7 +108,7 @@ a{color:inherit;text-decoration:none}
   backdrop-filter:blur(4px);
   filter:drop-shadow(0 4px 4px rgba(0,0,0,.1));
 }
-.subnav-row{display:flex;align-items:flex-start;gap:8px;width:100%}
+.subnav-row{display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
 .subnav .my-zone{
   flex:none;width:279px;height:32px;border:1px solid var(--main-40);border-radius:32px;
   display:flex;align-items:center;justify-content:space-between;
@@ -330,7 +331,7 @@ a{color:inherit;text-decoration:none}
   padding:0 8px;
 }
 .tile{
-  aspect-ratio:1/1;border-radius:8px;overflow:hidden;position:relative;
+  aspect-ratio:11/8;border-radius:8px;overflow:hidden;position:relative;
   display:flex;align-items:flex-end;justify-content:center;
   padding:8px;color:#fff;
   text-align:center;
@@ -353,22 +354,28 @@ a{color:inherit;text-decoration:none}
   text-transform:uppercase;
 }
 
-/* Tile gradients to mimic actual game art */
-.t-vbet21{background:linear-gradient(135deg,#ff8a3d 0%,#e6470c 50%,#a02b00 100%)}
-.t-vbet22{background:linear-gradient(135deg,#e64dab 0%,#c2167d 50%,#7a0c4d 100%)}
-.t-hot-seven{background:linear-gradient(135deg,#1a1a3e 0%,#0a0a1f 100%)}
-.t-diamond{background:linear-gradient(135deg,#ffb84d 0%,#e89a1a 50%,#a96b00 100%)}
-.t-shining{background:linear-gradient(135deg,#e02828 0%,#8c0e0e 100%)}
-.t-royal{background:linear-gradient(135deg,#2a4794 0%,#142244 100%)}
-.t-olympus{background:linear-gradient(135deg,#4a8fb8 0%,#1a4870 100%)}
-.t-sugar1000{background:linear-gradient(135deg,#b85cd1 0%,#7a2da3 100%)}
-.t-starlight{background:linear-gradient(135deg,#4aa8d4 0%,#1a6498 100%)}
-.t-bonbon{background:linear-gradient(135deg,#ff5e8a 0%,#e02463 100%)}
-.t-sugar{background:linear-gradient(135deg,#ff85b8 0%,#d44a8a 100%)}
-.t-bonbon2{background:linear-gradient(135deg,#ffa84d 0%,#d96b18 100%)}
-.t-super-scatter{background:linear-gradient(135deg,#5a98c8 0%,#1d558a 100%)}
-.t-olympus1000{background:linear-gradient(135deg,#7ab8d4 0%,#3a78a8 100%)}
-.t-sweet-bonanza{background:linear-gradient(135deg,#4ad6e0 0%,#1a98b8 100%)}
+/* Real game artwork (cropped from reference). The images contain logos,
+ * provider marks and badges, so the placeholder text/badge overlays
+ * inside .tile are hidden when the tile has an image background. */
+.tile[class*="t-"]{ background-position:center; background-size:cover; background-repeat:no-repeat; }
+.tile[class*="t-"] > .name,
+.tile[class*="t-"] > .provider,
+.tile[class*="t-"] > .badge{ display:none; }
+
+.t-vbet21       { background-image:url(assets/game-vbet21.png); }
+.t-vbet22       { background-image:url(assets/game-vbet22.png); }
+.t-hot-seven    { background-image:url(assets/game-hot-seven.png); }
+.t-diamond      { background-image:url(assets/game-diamond.png); }
+.t-shining      { background-image:url(assets/game-shining.png); }
+.t-royal        { background-image:url(assets/game-royal.png); }
+.t-olympus      { background-image:url(assets/game-olympus.png); }
+.t-starlight    { background-image:url(assets/game-starlight.png); }
+.t-bonbon       { background-image:url(assets/game-bonbon-pop.png); }
+.t-sugar        { background-image:url(assets/game-sugar-rush.png); }
+.t-bonbon2      { background-image:url(assets/game-bonbon.png); }
+.t-super-scatter{ background-image:url(assets/game-super-scatter.png); }
+.t-olympus1000  { background-image:url(assets/game-olympus-1000.png); }
+.t-sweet-bonanza{ background-image:url(assets/game-sweet-bonanza.png); }
 
 /* Active/focused tile (Sugar Rush 1000 example) */
 .tile.focused{
@@ -406,18 +413,10 @@ a{color:inherit;text-decoration:none}
 <body>
 <div class="app">
 
-  <!-- ===== Status Bar ===== -->
-  <div class="statusbar">
-    <p class="time">9:41</p>
-    <img class="cellular" src="assets/9a9814626f1691496dee37fbaec4dc36714c9fc3.svg" alt="">
-    <img class="wifi" src="assets/8a2078f592bc8059bdee9a1b67c5850384630832.svg" alt="">
-    <img class="battery" src="assets/f555df63f6a65f0f822624125f6922109416d804.svg" alt="">
-  </div>
-
-  <!-- ===== Header ===== -->
+  <!-- ===== Status Bar ===== -->  <!-- ===== Header ===== -->
   <div class="header-bar">
     <div class="logo-wrap">
-      <img class="vbet" src="assets/c7ee4cb442a696c4b22400e87d4d4564d77ee63d.svg" alt="VBet">
+      <span data-app-logo></span>
     </div>
     <div class="right">
       <button class="icon-btn-pink" aria-label="announcements">
@@ -665,6 +664,17 @@ a{color:inherit;text-decoration:none}
 </div><!-- /.app -->
 
 <div id="app-nav" data-page="casino"></div>
+<script>
+/* Demo: every fresh launch of the casino home starts clean — $0 balance,
+ * no bonus, empty betslip and no open bets. (Runs before balance.js /
+ * betslip-store.js; onboarding tour state is left untouched.) */
+(function () {
+  try { ['vbet:balance', 'vbet:bonus', 'vbet:bets', 'vbet:drafts'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
+})();
+</script>
+<script src="betslip-store.js"></script>
+<script src="balance.js"></script>
+<script src="logo.js"></script>
 <script src="nav.js"></script>
 </body>
 </html>

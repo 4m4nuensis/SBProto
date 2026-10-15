@@ -42,21 +42,22 @@
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{background:#000;font-family:'Rubik',system-ui,-apple-system,sans-serif;color:var(--w-100);font-size:14px;line-height:20px;letter-spacing:0}
+.balance{visibility:hidden}
+html,body{background:#010c23;font-family:'Rubik',system-ui,-apple-system,sans-serif;color:var(--w-100);font-size:14px;line-height:20px;letter-spacing:0}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 img,svg{display:block;max-width:100%}
 ul{list-style:none}
 a{color:inherit;text-decoration:none}
 
 .app{
-  width:375px;margin:0 auto;min-height:100vh;
+  width:100%;max-width:440px;margin:0 auto;min-height:100vh;
   background:var(--bg);position:relative;padding-bottom:114px;
   overflow-x:hidden;
 }
 
 /* ========== STATUS BAR (40px) ========== */
 .statusbar{
-  position:relative;height:40px;width:375px;
+  position:relative;height:40px;width:100%;
   background:linear-gradient(90deg,var(--w-4) 0%,var(--w-4) 100%),linear-gradient(90deg,var(--bg) 0%,var(--bg) 100%);
 }
 .statusbar .time{
@@ -111,7 +112,7 @@ a{color:inherit;text-decoration:none}
   backdrop-filter:blur(4px);
   filter:drop-shadow(0 4px 4px rgba(0,0,0,.1));
 }
-.subnav-row{display:flex;align-items:flex-start;gap:8px;width:100%}
+.subnav-row{display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
 .subnav .my-zone{
   flex:none;width:279px;height:32px;border:1px solid var(--main-40);border-radius:32px;
   display:flex;align-items:center;justify-content:space-between;
@@ -131,7 +132,7 @@ a{color:inherit;text-decoration:none}
 .subnav .my-zone .divider{height:16px;width:1px;background:var(--w-16)}
 
 /* ========== BANNER ========== */
-.banner-wrap{position:relative;padding:0 8px;width:100%}
+.banner-wrap{position:relative;padding:0 16px;width:100%}
 .banner-card{
   position:relative;width:100%;height:192px;border-radius:12px;overflow:hidden;
   border:1.176px solid var(--w-8);
@@ -139,24 +140,29 @@ a{color:inherit;text-decoration:none}
   display:flex;flex-direction:column;justify-content:space-between;
 }
 /* ---- New banner layers ---- */
+/* Portraits/trophy use fixed pixel sizes so they don't scale with the
+ * banner width — the banner card stretches edge-to-edge but the art
+ * stays anchored: Mbappé to the left, Rice to the right, trophy
+ * centered. Designed against the original 359px banner width. */
 .bnr-bg{position:absolute;inset:0;border-radius:12px;pointer-events:none;z-index:0;overflow:hidden}
 .bnr-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.48;border-radius:12px}
 .bnr-dark{position:absolute;inset:0;background:rgba(0,2,5,0.08);pointer-events:none;z-index:0;border-radius:12px}
 .bnr-trophy{
-  position:absolute;left:29.63%;top:-7.66px;width:39.79%;height:191px;
+  position:absolute;left:50%;transform:translateX(-50%);top:-7.66px;
+  width:143px;height:191px;
   filter:blur(0.95px);pointer-events:none;z-index:1;
 }
 .bnr-trophy img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.16}
 .bnr-ar-player{
-  position:absolute;left:62.76%;top:42.82px;width:35.63%;height:134px;
+  position:absolute;right:6px;top:42.82px;width:128px;height:134px;
   overflow:hidden;pointer-events:none;z-index:2;
 }
 .bnr-ar-player img{
   position:absolute;height:100%;left:-54.64%;top:0;width:209.29%;max-width:none;display:block;
 }
 .bnr-mbappe{
-  position:absolute;left:-12.56%;top:37.82px;
-  width:61.56%;height:197px;
+  position:absolute;left:-45px;top:37.82px;
+  width:221px;height:197px;
   pointer-events:none;z-index:3;
 }
 .bnr-mbappe img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
@@ -324,7 +330,7 @@ a{color:inherit;text-decoration:none}
 .section-title-row{display:flex;align-items:center;gap:8px;width:100%;margin-bottom:8px}
 
 .jackpot{
-  position:relative;width:100%;max-width:359px;margin:0 auto;
+  position:relative;width:100%;
   height:167px;overflow:visible;
 }
 .jk-ball{
@@ -894,6 +900,10 @@ a{color:inherit;text-decoration:none}
 .gw-chip-label{font-size:12px;line-height:16px;font-weight:500;color:rgba(255,255,255,.9);white-space:nowrap}
 /* --- Market Tables --- */
 .gw-market-tables{display:flex;flex-direction:column;gap:4px}
+.gw-panel[hidden]{display:none}
+.gw-panel{display:flex;flex-direction:column;gap:4px}
+.gw-tab{cursor:pointer}
+.gw-empty{margin:0 8px;padding:24px 16px;text-align:center;font-size:13px;color:rgba(255,255,255,.48);background:rgba(255,255,255,.04);border-radius:6px}
 .gw-league-title{
   display:flex;align-items:center;gap:8px;
   padding:4px 8px;
@@ -1038,18 +1048,10 @@ a{color:inherit;text-decoration:none}
 <body>
 <div class="app">
 
-  <!-- ===== Status Bar ===== -->
-  <div class="statusbar">
-    <p class="time">9:41</p>
-    <img class="cellular" src="assets/9a9814626f1691496dee37fbaec4dc36714c9fc3.svg" alt="">
-    <img class="wifi" src="assets/8a2078f592bc8059bdee9a1b67c5850384630832.svg" alt="">
-    <img class="battery" src="assets/f555df63f6a65f0f822624125f6922109416d804.svg" alt="">
-  </div>
-
-  <!-- ===== Header ===== -->
+  <!-- ===== Status Bar ===== -->  <!-- ===== Header ===== -->
   <div class="header-bar">
     <div class="logo-wrap">
-      <img class="vbet" src="assets/c7ee4cb442a696c4b22400e87d4d4564d77ee63d.svg" alt="VBet">
+      <span data-app-logo></span>
     </div>
     <div class="right">
       <button class="icon-btn-pink" aria-label="announcements">
@@ -1379,7 +1381,7 @@ a{color:inherit;text-decoration:none}
             <div class="live-pill">Live</div>
           </div>
         </div>
-        <div class="match">
+        <a class="match" href="match.html?id=70127" style="text-decoration:none">
           <div class="team">
             <div class="logo">
               <div class="logo-inner"><img src="assets/sew-fulham.png" alt="Fulham"></div>
@@ -1396,11 +1398,11 @@ a{color:inherit;text-decoration:none}
             </div>
             <span class="nm">Aston Villa</span>
           </div>
-        </div>
+        </a>
         <div class="bet-opts">
-          <div class="bet-opt"><span class="l">1</span><span class="o">1.25</span></div>
-          <div class="bet-opt"><span class="l">X</span><span class="o">1.25</span></div>
-          <div class="bet-opt"><span class="l">2</span><span class="o">1.25</span></div>
+          <div class="bet-opt"><span class="l">1</span><span class="o">1.20</span></div>
+          <div class="bet-opt"><span class="l">X</span><span class="o">6.50</span></div>
+          <div class="bet-opt"><span class="l">2</span><span class="o">15.00</span></div>
         </div>
       </div>
       <!-- Card 2: Arsenal vs Chelsea -->
@@ -1420,7 +1422,7 @@ a{color:inherit;text-decoration:none}
             <div class="live-pill">Live</div>
           </div>
         </div>
-        <div class="match">
+        <a class="match" href="match.html?id=70128" style="text-decoration:none">
           <div class="team">
             <div class="logo"></div>
             <span class="nm">Arsenal</span>
@@ -1433,7 +1435,7 @@ a{color:inherit;text-decoration:none}
             <div class="logo"></div>
             <span class="nm">Chelsea</span>
           </div>
-        </div>
+        </a>
         <div class="bet-opts">
           <div class="bet-opt"><span class="l">1</span><span class="o">2.05</span></div>
           <div class="bet-opt"><span class="l">X</span><span class="o">3.40</span></div>
@@ -1995,6 +1997,9 @@ a{color:inherit;text-decoration:none}
     <!-- Market Tables -->
     <div class="gw-market-tables">
 
+      <!-- ░░ Top Live Events panel ░░ -->
+      <div class="gw-panel" data-gw-panel="live">
+
       <!-- League Title: UK flag · World · Club Friendlies -->
       <div class="gw-league-title">
         <div class="gw-flag-wrap">
@@ -2004,71 +2009,6 @@ a{color:inherit;text-decoration:none}
         <div class="gw-dot6"><img src="assets/gw-dot6.svg" alt=""></div>
         <span class="gw-league-name">Club Friendlies</span>
       </div>
-
-      <!-- ─── Live Card (Tennis) ─── -->
-      <div class="gw-live-card">
-
-        <!-- Header: live dot · video · H1 · 22:48 ║ bell · chart -->
-        <div class="gw-card-hd">
-          <div class="gw-live-dot"><img src="assets/gw-live.svg" alt=""></div>
-          <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-video.svg" alt=""></div></div>
-          <span class="gw-hd-txt">H1</span>
-          <span class="gw-hd-txt">22:48</span>
-          <div class="gw-hd-right">
-            <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-bell.svg" alt=""></div></div>
-            <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-chart.svg" alt=""></div></div>
-          </div>
-        </div>
-
-        <!-- Match Body -->
-        <div class="gw-match-body">
-
-          <!-- Teams + Scores (tennis: 14px names, no logos) -->
-          <div class="gw-teams-score">
-            <div class="gw-team-side">
-              <div style="display:flex;gap:4px;align-items:center;align-self:stretch;flex-shrink:0">
-                <div class="gw-fav"><div class="ic"><img src="assets/gw-star.svg" alt=""></div></div>
-                <div class="gw-vdiv"></div>
-              </div>
-              <div class="gw-team-names">
-                <div class="gw-tennis-name">Hugo Nys/Edouard Rogger Vaselin</div>
-                <div class="gw-tennis-name">Maximo Gonzalez/Andres Molteni</div>
-              </div>
-            </div>
-            <!-- Score columns: 6|5 ┃ 40 [1] -->
-            <div class="gw-scores" style="height:46px">
-              <div class="gw-score-col" style="height:46px"><span class="gw-score-v">6</span><span class="gw-score-v">1</span></div>
-              <div class="gw-score-col" style="height:46px"><span class="gw-score-v">5</span><span class="gw-score-v">4</span></div>
-              <div style="width:1px;align-self:stretch;background:rgba(255,255,255,.16);flex-shrink:0"></div>
-              <div class="gw-score-col" style="height:46px"><span class="gw-score-v">40</span><span class="gw-score-v">40</span></div>
-              <div class="gw-score-box" style="height:46px"><span class="gw-score-v">1</span><span class="gw-score-v">1</span></div>
-            </div>
-          </div>
-
-          <!-- Market header: "Match Result" · +78 -->
-          <div class="gw-mkt-hd">
-            <span class="gw-mkt-name">Match Result</span>
-            <span class="gw-mkt-more">+78</span>
-          </div>
-
-          <!-- Bet options -->
-          <div class="gw-bet-opts">
-            <div class="gw-bet-opt"><span class="l">1</span><span class="o">1.30</span></div>
-            <div class="gw-bet-opt" style="background:rgba(255,255,255,.08);border-color:transparent"><span class="l">X</span><span class="o">1.20</span></div>
-            <div class="gw-bet-opt" style="background:rgba(255,255,255,.08);border-color:transparent"><span class="l">2</span><span class="o">2.00</span></div>
-          </div>
-
-          <!-- Indicator dots: · ● ━ ● · -->
-          <div class="gw-indicator">
-            <div class="gw-ind s"></div>
-            <div class="gw-ind m"></div>
-            <div class="gw-ind a"></div>
-            <div class="gw-ind m"></div>
-            <div class="gw-ind s"></div>
-          </div>
-
-        </div><!-- /gw-match-body -->
-      </div><!-- /gw-live-card -->
 
       <!-- ─── Football Match 1: Chelsea vs Aston Villa ─── -->
       <div class="gw-match-box">
@@ -2089,7 +2029,7 @@ a{color:inherit;text-decoration:none}
                 <div class="gw-fav"><div class="ic"><img src="assets/gw-star.svg" alt=""></div></div>
                 <div class="gw-vdiv"></div>
               </div>
-              <div class="gw-team-names">
+              <a class="gw-team-names" href="match.html?id=70123" style="text-decoration:none">
                 <div class="gw-team-row">
                   <div class="gw-team-logo"><img src="assets/gw-fulham.png" alt=""></div>
                   <span class="gw-team-nm">Chelsea</span>
@@ -2098,7 +2038,7 @@ a{color:inherit;text-decoration:none}
                   <div class="gw-team-logo"><img src="assets/gw-aston-villa.png" alt=""></div>
                   <span class="gw-team-nm">Aston Villa</span>
                 </div>
-              </div>
+              </a>
             </div>
             <div class="gw-scores">
               <div class="gw-score-col"><span class="gw-score-v">1</span><span class="gw-score-v">0</span></div>
@@ -2133,7 +2073,7 @@ a{color:inherit;text-decoration:none}
                 <div class="gw-fav"><div class="ic"><img src="assets/gw-star.svg" alt=""></div></div>
                 <div class="gw-vdiv"></div>
               </div>
-              <div class="gw-team-names">
+              <a class="gw-team-names" href="match.html?id=70129" style="text-decoration:none">
                 <div class="gw-team-row">
                   <div class="gw-team-logo"><img src="assets/gw-fulham.png" alt=""></div>
                   <span class="gw-team-nm">Liverpool</span>
@@ -2142,7 +2082,7 @@ a{color:inherit;text-decoration:none}
                   <div class="gw-team-logo"><img src="assets/gw-aston-villa.png" alt=""></div>
                   <span class="gw-team-nm">Manchester City</span>
                 </div>
-              </div>
+              </a>
             </div>
             <div class="gw-scores">
               <div class="gw-score-col"><span class="gw-score-v">0</span><span class="gw-score-v">0</span></div>
@@ -2177,7 +2117,7 @@ a{color:inherit;text-decoration:none}
                 <div class="gw-fav"><div class="ic"><img src="assets/gw-star.svg" alt=""></div></div>
                 <div class="gw-vdiv"></div>
               </div>
-              <div class="gw-team-names">
+              <a class="gw-team-names" href="match.html?id=70130" style="text-decoration:none">
                 <div class="gw-team-row">
                   <div class="gw-team-logo"><img src="assets/gw-fulham.png" alt=""></div>
                   <span class="gw-team-nm">Real Madrid</span>
@@ -2186,7 +2126,7 @@ a{color:inherit;text-decoration:none}
                   <div class="gw-team-logo"><img src="assets/gw-aston-villa.png" alt=""></div>
                   <span class="gw-team-nm">Barcelona</span>
                 </div>
-              </div>
+              </a>
             </div>
             <div class="gw-scores">
               <div class="gw-score-col"><span class="gw-score-v">1</span><span class="gw-score-v">0</span></div>
@@ -2201,6 +2141,151 @@ a{color:inherit;text-decoration:none}
           </div>
         </div>
       </div><!-- /match-box 3 -->
+
+      </div><!-- /gw-panel live -->
+
+      <!-- ░░ Top Upcoming Events panel ░░ -->
+      <div class="gw-panel" data-gw-panel="upcoming" hidden>
+
+        <div class="gw-league-title">
+          <div class="gw-flag-wrap">
+            <div class="gw-flag-inner"><img src="assets/gw-uk-flag.png" alt="UK"></div>
+          </div>
+          <span class="gw-league-name">England</span>
+          <div class="gw-dot6"><img src="assets/gw-dot6.svg" alt=""></div>
+          <span class="gw-league-name">Premier League</span>
+        </div>
+
+        <!-- Upcoming 1: Man City vs Chelsea -->
+        <div class="gw-match-box">
+          <div class="gw-card-hd">
+            <span class="gw-hd-txt">25 May</span>
+            <span class="gw-hd-txt">15:00</span>
+            <div class="gw-hd-right">
+              <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-bell.svg" alt=""></div></div>
+              <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-chart.svg" alt=""></div></div>
+            </div>
+          </div>
+          <div class="gw-match-body">
+            <div class="gw-teams-score">
+              <div class="gw-team-side">
+                <div style="display:flex;gap:4px;align-items:center;align-self:stretch;flex-shrink:0">
+                  <div class="gw-fav"><div class="ic"><img src="assets/gw-star.svg" alt=""></div></div>
+                  <div class="gw-vdiv"></div>
+                </div>
+                <a class="gw-team-names" href="match.html?id=80201" style="text-decoration:none">
+                  <div class="gw-team-row"><div class="gw-team-logo"><img src="assets/team-mancity.svg" alt=""></div><span class="gw-team-nm">Manchester City</span></div>
+                  <div class="gw-team-row"><div class="gw-team-logo"><img src="assets/team-chelsea.svg" alt=""></div><span class="gw-team-nm">Chelsea</span></div>
+                </a>
+              </div>
+            </div>
+            <div class="gw-bet-opts">
+              <div class="gw-bet-opt"><span class="l">1</span><span class="o">1.25</span></div>
+              <div class="gw-bet-opt"><span class="l">X</span><span class="o">3.64</span></div>
+              <div class="gw-bet-opt"><span class="l">2</span><span class="o">8.40</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming 2: Aston Villa vs Liverpool -->
+        <div class="gw-match-box">
+          <div class="gw-card-hd">
+            <span class="gw-hd-txt">26 May</span>
+            <span class="gw-hd-txt">18:30</span>
+            <div class="gw-hd-right">
+              <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-bell.svg" alt=""></div></div>
+              <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-chart.svg" alt=""></div></div>
+            </div>
+          </div>
+          <div class="gw-match-body">
+            <div class="gw-teams-score">
+              <div class="gw-team-side">
+                <div style="display:flex;gap:4px;align-items:center;align-self:stretch;flex-shrink:0">
+                  <div class="gw-fav"><div class="ic"><img src="assets/gw-star.svg" alt=""></div></div>
+                  <div class="gw-vdiv"></div>
+                </div>
+                <a class="gw-team-names" href="match.html?id=80202" style="text-decoration:none">
+                  <div class="gw-team-row"><div class="gw-team-logo"><img src="assets/sew-aston-villa.png" alt=""></div><span class="gw-team-nm">Aston Villa</span></div>
+                  <div class="gw-team-row"><div class="gw-team-logo"><img src="assets/team-liverpool.svg" alt=""></div><span class="gw-team-nm">Liverpool</span></div>
+                </a>
+              </div>
+            </div>
+            <div class="gw-bet-opts">
+              <div class="gw-bet-opt"><span class="l">1</span><span class="o">3.60</span></div>
+              <div class="gw-bet-opt"><span class="l">X</span><span class="o">3.30</span></div>
+              <div class="gw-bet-opt"><span class="l">2</span><span class="o">2.05</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming 3: Arsenal vs Man United -->
+        <div class="gw-match-box">
+          <div class="gw-card-hd">
+            <span class="gw-hd-txt">26 May</span>
+            <span class="gw-hd-txt">21:00</span>
+            <div class="gw-hd-right">
+              <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-bell.svg" alt=""></div></div>
+              <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-chart.svg" alt=""></div></div>
+            </div>
+          </div>
+          <div class="gw-match-body">
+            <div class="gw-teams-score">
+              <div class="gw-team-side">
+                <div style="display:flex;gap:4px;align-items:center;align-self:stretch;flex-shrink:0">
+                  <div class="gw-fav"><div class="ic"><img src="assets/gw-star.svg" alt=""></div></div>
+                  <div class="gw-vdiv"></div>
+                </div>
+                <a class="gw-team-names" href="match.html?id=80203" style="text-decoration:none">
+                  <div class="gw-team-row"><div class="gw-team-logo"><img src="assets/team-arsenal.svg" alt=""></div><span class="gw-team-nm">Arsenal</span></div>
+                  <div class="gw-team-row"><div class="gw-team-logo"><img src="assets/team-manunited.svg" alt=""></div><span class="gw-team-nm">Manchester United</span></div>
+                </a>
+              </div>
+            </div>
+            <div class="gw-bet-opts">
+              <div class="gw-bet-opt"><span class="l">1</span><span class="o">2.10</span></div>
+              <div class="gw-bet-opt"><span class="l">X</span><span class="o">3.40</span></div>
+              <div class="gw-bet-opt"><span class="l">2</span><span class="o">3.20</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming 4: Fulham vs Newcastle -->
+        <div class="gw-match-box">
+          <div class="gw-card-hd">
+            <span class="gw-hd-txt">27 May</span>
+            <span class="gw-hd-txt">17:30</span>
+            <div class="gw-hd-right">
+              <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-bell.svg" alt=""></div></div>
+              <div class="gw-icon-btn"><div class="ic"><img src="assets/gw-chart.svg" alt=""></div></div>
+            </div>
+          </div>
+          <div class="gw-match-body">
+            <div class="gw-teams-score">
+              <div class="gw-team-side">
+                <div style="display:flex;gap:4px;align-items:center;align-self:stretch;flex-shrink:0">
+                  <div class="gw-fav"><div class="ic"><img src="assets/gw-star.svg" alt=""></div></div>
+                  <div class="gw-vdiv"></div>
+                </div>
+                <a class="gw-team-names" href="match.html?id=80204" style="text-decoration:none">
+                  <div class="gw-team-row"><div class="gw-team-logo"><img src="assets/sew-fulham.png" alt=""></div><span class="gw-team-nm">Fulham</span></div>
+                  <div class="gw-team-row"><div class="gw-team-logo"><img src="assets/team-newcastle.svg" alt=""></div><span class="gw-team-nm">Newcastle United</span></div>
+                </a>
+              </div>
+            </div>
+            <div class="gw-bet-opts">
+              <div class="gw-bet-opt"><span class="l">1</span><span class="o">1.85</span></div>
+              <div class="gw-bet-opt"><span class="l">X</span><span class="o">3.50</span></div>
+              <div class="gw-bet-opt"><span class="l">2</span><span class="o">4.10</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /gw-panel upcoming -->
+
+      <!-- ░░ Boosted Odds panel ░░ -->
+      <div class="gw-panel" data-gw-panel="boosted" hidden>
+        <div class="gw-empty">No boosted odds available right now.</div>
+      </div>
 
     </div><!-- /gw-market-tables -->
   </section>
@@ -2240,8 +2325,43 @@ a{color:inherit;text-decoration:none}
 
 <!-- ===== Second Level Navigation (floating) ===== -->
 <div id="app-nav" data-page="home"></div>
+<script>
+/* Demo: every fresh launch of the home starts clean — $0 balance, no bonus,
+ * empty betslip and no open bets. (Runs before balance.js / betslip-store.js so
+ * they read the cleared values. The onboarding tour state is left untouched.) */
+(function () {
+  try { ['vbet:balance', 'vbet:bonus', 'vbet:bets', 'vbet:drafts'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
+})();
+</script>
+<script src="data/catalog.js"></script>
+<script src="catalog-render.js"></script>
+<script>VBetList.comps();</script>
+<script src="betslip-store.js"></script>
+<script src="balance.js"></script>
+<script src="logo.js"></script>
 <script src="nav.js"></script>
 <script src="betslip-popup.js"></script>
+<script src="onboarding.js"></script>
+<script>
+  /* Game-widget tab switcher: Top Live / Top Upcoming / Boosted Odds */
+  (function () {
+    var tabs = [].slice.call(document.querySelectorAll('.gw-tabs .gw-tab'));
+    var panels = [].slice.call(document.querySelectorAll('.gw-panel'));
+    if (!tabs.length || !panels.length) return;
+    var keys = ['live', 'upcoming', 'boosted'];
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener('click', function () {
+        tabs.forEach(function (t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+        var key = keys[i] || 'live';
+        panels.forEach(function (p) {
+          if (p.getAttribute('data-gw-panel') === key) p.removeAttribute('hidden');
+          else p.setAttribute('hidden', '');
+        });
+      });
+    });
+  })();
+</script>
 
 </body>
 </html>

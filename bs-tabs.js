@@ -46,28 +46,48 @@
 
   const active = el.dataset.bsTabs; // 'betslip' | 'openbets'
   const isBetslip = active === 'betslip';
+  const bsCount = 0; // betslip drafts — not wired up in this prototype
+  const obCount = (window.BetslipStore && window.BetslipStore.getCount()) || 0;
 
   el.outerHTML = isBetslip
     ? `<div class="bs-top-tabs">
         <div class="bs-top-tab active">
           <span class="lbl">Betslip</span>
-          <span class="cnt">3</span>
+          <span class="cnt">${bsCount}</span>
         </div>
         <a class="bs-top-tab" href="betslip-open-bets.html">
           <img class="bs-crv" src="assets/bs-curve-bg.svg" alt="">
           <span class="lbl">Open Bets</span>
-          <span class="cnt">4</span>
+          <span class="cnt" data-bs-count>${obCount}</span>
         </a>
       </div>`
     : `<div class="bs-top-tabs">
         <a class="bs-top-tab" href="betslip.html">
           <img class="bs-crv-flip" src="assets/bs-curve-bg.svg" alt="">
           <span class="lbl">Betslip</span>
-          <span class="cnt">3</span>
+          <span class="cnt">${bsCount}</span>
         </a>
         <div class="bs-top-tab active">
           <span class="lbl">Open Bets</span>
-          <span class="cnt">4</span>
+          <span class="cnt" data-bs-count>${obCount}</span>
         </div>
       </div>`;
+
+  function refresh() {
+    if (!window.BetslipStore) return;
+    const tgt = document.querySelector('[data-bs-count]');
+    if (tgt) tgt.textContent = String(window.BetslipStore.getCount());
+  }
+
+  // bs-tabs.js often runs before betslip-store.js loads. Re-read the count
+  // once the page is fully parsed and subscribe for future updates.
+  function wire() {
+    refresh();
+    if (window.BetslipStore) window.BetslipStore.subscribe(refresh);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wire, { once: true });
+  } else {
+    wire();
+  }
 })();
